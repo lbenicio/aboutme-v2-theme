@@ -258,7 +258,7 @@
       <button
         id="theme-toggle"
         type="button"
-        class="inline-flex h-9 w-9 items-center justify-center rounded-md bg-transparent hover:bg-muted text-foreground cursor-pointer mr-2 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+        class="inline-flex items-center justify-center bg-transparent hover:text-primary text-muted-foreground cursor-pointer transition-colors"
         onclick="toggleTheme(this)"
         aria-label="Toggle theme"
         title="Toggle theme"
@@ -322,8 +322,8 @@
         <button
           id="mobile-menu-button"
           type="button"
-          class="inline-flex h-9 w-9 items-center justify-center rounded-md bg-transparent hover:bg-muted text-foreground cursor-pointer ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-          aria-label="Open menu"
+          class="inline-flex items-center justify-center bg-transparent hover:text-primary text-muted-foreground cursor-pointer transition-colors"
+                    aria-label="Open menu"
           aria-controls="mobile-drawer"
           aria-expanded="false"
           onclick="window.__openMobileMenu('button')"
