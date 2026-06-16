@@ -1,0 +1,76 @@
+// ─── Design Tokens ────────────────────────────────────────────────────────────
+// CSS custom properties for theming (light/dark mode via .dark class on <html>)
+
+:root {
+  --background: 208 100% 97%;
+  --foreground: 222 47% 11%;
+  --card: 0 0% 100%;
+  --card-foreground: 222 47% 11%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 222 47% 11%;
+  --primary: 204 56% 79%;
+  --primary-foreground: 222 47% 11%;
+  --secondary: 210 40% 96.1%;
+  --secondary-foreground: 222 47% 11%;
+  --muted: 210 40% 96.1%;
+  --muted-foreground: 215.4 16.3% 46.9%;
+  --accent: 206 82% 86%;
+  --accent-foreground: 222 47% 11%;
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 0 0% 98%;
+  --border: 214.3 31.8% 91.4%;
+  --input: 214.3 31.8% 91.4%;
+  --ring: 212 98% 73%;
+  --radius: 0.5rem;
+
+  // Typography
+  --font-sans: "PT Sans", system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+
+  // Transitions
+  --transition-fast: 150ms ease;
+  --transition-normal: 200ms ease;
+}
+
+.dark {
+  --background: 222 47% 11%;
+  --foreground: 210 40% 98%;
+  --card: 222 47% 11%;
+  --card-foreground: 210 40% 98%;
+  --popover: 222 47% 11%;
+  --popover-foreground: 210 40% 98%;
+  --primary: 212 98% 73%;
+  --primary-foreground: 222 47% 11%;
+  --secondary: 217.2 32.6% 17.5%;
+  --secondary-foreground: 210 40% 98%;
+  --muted: 217.2 32.6% 17.5%;
+  --muted-foreground: 215 20.2% 65.1%;
+  --accent: 209 90% 70%;
+  --accent-foreground: 222 47% 11%;
+  --destructive: 0 62.8% 30.6%;
+  --destructive-foreground: 0 0% 98%;
+  --border: 217.2 32.6% 17.5%;
+  --input: 217.2 32.6% 17.5%;
+  --ring: 212 98% 73%;
+}
+
+// ─── Color helper functions ────────────────────────────────────────────────────
+@function clr($token) {
+  @return HSL(var(--#{$token}));
+}
+
+// ─── Breakpoints ───────────────────────────────────────────────────────────────
+$breakpoint-sm: 640px;
+$breakpoint-md: 768px;
+$breakpoint-lg: 1024px;
+$breakpoint-xl: 1280px;
+$breakpoint-2xl: 1536px;
+
+// ─── Z-index scale ─────────────────────────────────────────────────────────────
+$z-0: 0;
+$z-10: 10;
+$z-20: 20;
+$z-30: 30;
+$z-40: 40;
+$z-50: 50;
+$z-auto: auto;

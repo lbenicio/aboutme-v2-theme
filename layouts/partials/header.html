@@ -1,0 +1,379 @@
+<script>
+  // Three-way theme toggle: light → dark → system
+  (function () {
+    try {
+      const stored = localStorage.getItem('theme');
+      if (stored === 'dark') {
+        document.documentElement.classList.add('dark');
+      } else if (stored === 'light') {
+        document.documentElement.classList.remove('dark');
+      } else {
+        // 'system' or unset — follow OS preference
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        if (prefersDark) document.documentElement.classList.add('dark');
+        // Listen for OS theme changes when in system mode
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+          if (localStorage.getItem('theme') === 'system' || !localStorage.getItem('theme')) {
+            if (e.matches) {
+              document.documentElement.classList.add('dark');
+            } else {
+              document.documentElement.classList.remove('dark');
+            }
+            updateThemeToggleUI();
+          }
+        });
+      }
+      // Defer icon update until DOM is ready (button element may not exist yet)
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', updateThemeToggleUI);
+      } else {
+        updateThemeToggleUI();
+      }
+    } catch (e) {}
+  })();
+  function getThemeState() {
+    try {
+      const stored = localStorage.getItem('theme');
+      if (stored === 'dark' || stored === 'light') return stored;
+      return 'system';
+    } catch (e) { return 'system'; }
+  }
+  function updateThemeToggleUI() {
+    try {
+      const isDark = document.documentElement.classList.contains('dark');
+      const state = getThemeState();
+      const btn = document.querySelector('button[aria-label="Toggle theme"]');
+      if (!btn) return;
+      // Update aria-pressed based on resolved dark/light (not system state)
+      btn.setAttribute('aria-pressed', String(isDark));
+      // Update title attribute
+      const labels = { light: 'Switch to dark mode', dark: 'Switch to system mode', system: 'Switch to light mode' };
+      btn.setAttribute('title', labels[state] || 'Toggle theme');
+      // Update the SVG icons visibility based on state and resolved theme
+      const moonIcon = btn.querySelector('.theme-icon-moon');
+      const sunIcon = btn.querySelector('.theme-icon-sun');
+      const systemIcon = btn.querySelector('.theme-icon-system');
+      if (state === 'system') {
+        // System mode: only show the monitor icon
+        if (moonIcon) moonIcon.style.display = 'none';
+        if (sunIcon) sunIcon.style.display = 'none';
+        if (systemIcon) systemIcon.style.display = '';
+      } else {
+        // Light/dark mode: hide system icon, show appropriate celestial icon
+        if (systemIcon) systemIcon.style.display = 'none';
+        if (moonIcon) moonIcon.style.display = isDark ? 'none' : '';
+        if (sunIcon) sunIcon.style.display = isDark ? '' : 'none';
+      }
+    } catch (e) {}
+  }
+  function toggleTheme(btn) {
+    const el = document.documentElement;
+    const current = getThemeState();
+    let next;
+    if (current === 'light') {
+      next = 'dark';
+      el.classList.add('dark');
+    } else if (current === 'dark') {
+      next = 'system';
+      // Follow OS preference
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      if (prefersDark) {
+        el.classList.add('dark');
+      } else {
+        el.classList.remove('dark');
+      }
+    } else {
+      next = 'light';
+      el.classList.remove('dark');
+    }
+    try {
+      if (next === 'system') {
+        localStorage.removeItem('theme');
+      } else {
+        localStorage.setItem('theme', next);
+      }
+    } catch (e) {}
+    updateThemeToggleUI();
+  }
+  // Mobile side-drawer menu controls (explicit getElementById calls so the obfuscator rewrites tokens)
+  (function(){
+    function getTheme(){
+      try { return document.documentElement.classList.contains('dark') ? 'dark' : 'light'; }
+      catch { return 'light'; }
+    }
+    function openMobileMenu(src){
+      const panel = document.getElementById('mobile-drawer');
+      const overlay = document.getElementById('mobile-drawer-overlay');
+      const trigger = document.getElementById('mobile-menu-button');
+      if(!panel || !overlay || !trigger) return;
+      // Make obfuscation-proof by driving via inline styles and attributes
+      try {
+        panel.style.transform = 'translateX(0)';
+        // Ensure transition exists; if classes are obfuscated, this still animates
+        if (!panel.style.transition) panel.style.transition = 'transform 200ms ease-out';
+      } catch(e) {}
+      try { overlay.hidden = false; overlay.style.display = 'block'; } catch(e) {}
+      trigger.setAttribute('aria-expanded','true');
+      panel.setAttribute('aria-hidden','false');
+      try{ document.body.classList.add('overflow-hidden'); }catch(e){}
+      // Focus the close button for accessibility
+      const closeBtn = document.getElementById('mobile-drawer-close');
+      if(closeBtn) closeBtn.focus();
+      // Analytics: track menu open
+      try {
+        if (window.umami && typeof window.umami.track === 'function') {
+          window.umami.track('mobile_menu_open', { page: location.pathname, theme: getTheme(), source: src || 'programmatic' });
+        }
+      } catch(e) {}
+    }
+    function closeMobileMenu(src){
+      const panel = document.getElementById('mobile-drawer');
+      const overlay = document.getElementById('mobile-drawer-overlay');
+      const trigger = document.getElementById('mobile-menu-button');
+      if(!panel || !overlay || !trigger) return;
+      try {
+        panel.style.transform = 'translateX(100%)';
+        if (!panel.style.transition) panel.style.transition = 'transform 200ms ease-out';
+      } catch(e) {}
+      try { overlay.hidden = true; overlay.style.display = 'none'; } catch(e) {}
+      trigger.setAttribute('aria-expanded','false');
+      panel.setAttribute('aria-hidden','true');
+      try{ document.body.classList.remove('overflow-hidden'); }catch(e){}
+      trigger.focus();
+      // Analytics: track menu close
+      try {
+        if (window.umami && typeof window.umami.track === 'function') {
+          window.umami.track('mobile_menu_close', { page: location.pathname, theme: getTheme(), source: src || 'programmatic' });
+        }
+      } catch(e) {}
+    }
+    function onKeydown(e){ if(e.key === 'Escape') closeMobileMenu('escape'); }
+    // Expose globally for onclick handlers
+    window.__openMobileMenu = openMobileMenu;
+    window.__closeMobileMenu = closeMobileMenu;
+    // Attach a keydown listener at capture phase so it works while focus is inside panel
+    try { window.addEventListener('keydown', onKeydown, true); } catch(e) {}
+  })();
+</script>
+{{ $siteMode := .Site.Params.appMode | default "FULL" }}
+{{ $aboutOrigin := .Site.Params.aboutOrigin | default "" }}
+{{ $blogOrigin := .Site.Params.blogOrigin | default "" }}
+{{ $publicationsOrigin := .Site.Params.publicationsOrigin | default "" }}
+
+{{/* Build nav links — unified menu for all multi-page modes.
+     SINGLE: only Home.
+     TOOL_BOX: Home + Tools + Cheat Sheets (special-purpose).
+     Everything else (FULL, ABOUT_ONLY, BLOG_ONLY, PUBLICATIONS_ONLY):
+       Always the same 7 items; only hrefs/external flags change. */}}
+{{/* --- Determine which content groups are served locally --- */}}
+{{ $aboutLocal := or (eq $siteMode "FULL") (eq $siteMode "ABOUT_ONLY") }}
+{{ $blogLocal  := or (eq $siteMode "FULL") (eq $siteMode "BLOG_ONLY") }}
+{{ $pubsLocal  := or (eq $siteMode "FULL") (eq $siteMode "PUBLICATIONS_ONLY") (eq $siteMode "ABOUT_ONLY") }}
+
+{{/* Resolve external base URLs (empty string → fall back to internal) */}}
+{{ $aboutBase := "" }}
+{{ if and (not $aboutLocal) (ne (strings.TrimSpace $aboutOrigin) "") }}
+  {{ $aboutBase = $aboutOrigin }}
+{{ end }}
+{{ $aboutExt := ne $aboutBase "" }}
+
+{{ $blogBase := "" }}
+{{ if and (not $blogLocal) (ne (strings.TrimSpace $blogOrigin) "") }}
+  {{ $blogBase = $blogOrigin }}
+{{ end }}
+{{ $blogExt := ne $blogBase "" }}
+
+{{ $pubBase := "" }}
+{{ if and (not $pubsLocal) (ne (strings.TrimSpace $publicationsOrigin) "") }}
+  {{ $pubBase = $publicationsOrigin }}
+{{ end }}
+{{ $pubExt := ne $pubBase "" }}
+
+{{/* Home always points to the main (about) site. On non-about variants it is
+     an external link to aboutOrigin; on about/full it stays internal "/". */}}
+{{ $homeHref := cond $aboutExt $aboutBase "/" }}
+{{ $homeExt  := $aboutExt }}
+
+{{/* Logo link mirrors the Home link so clicking the site logo always goes to
+     the main site regardless of which variant is being served. */}}
+{{ $logoHref := $homeHref }}
+
+{{ $links := slice (dict "href" $homeHref "label" "Home" "external" $homeExt) }}
+
+{{ if eq $siteMode "SINGLE" }}
+  {{/* Minimal: logo + theme toggle only. */}}
+{{ else if eq $siteMode "TOOL_BOX" }}
+  {{ $links = $links | append (dict "href" "/tools" "label" "Tools") }}
+  {{ $links = $links | append (dict "href" "/cheat-sheets" "label" "Cheat Sheets") }}
+{{ else }}
+  {{/* About-group pages: About, Timeline, Reading, Contact */}}
+  {{ $aboutHref    := cond $aboutExt (print $aboutBase "/about")    "/about" }}
+  {{ $timelineHref := cond $aboutExt (print $aboutBase "/timeline") "/timeline" }}
+  {{ $readingHref  := cond $aboutExt (print $aboutBase "/reading")  "/reading" }}
+  {{ $contactHref  := cond $aboutExt (print $aboutBase "/contact")  "/contact" }}
+
+  {{/* Publications — in PUBLICATIONS_ONLY mode the content lives at "/" */}}
+  {{ $pubsHref := cond $pubExt $pubBase (cond (eq $siteMode "PUBLICATIONS_ONLY") "/" "/publications") }}
+
+  {{/* Blog — in BLOG_ONLY mode the content lives at "/" */}}
+  {{ $blogHref := cond $blogExt $blogBase (cond (eq $siteMode "BLOG_ONLY") "/" "/post") }}
+
+  {{/* Append all items in consistent order */}}
+  {{ $links = $links | append (dict "label" "About"        "href" $aboutHref    "external" $aboutExt) }}
+  {{ $links = $links | append (dict "label" "Timeline"     "href" $timelineHref "external" $aboutExt) }}
+  {{ $links = $links | append (dict "label" "Reading"      "href" $readingHref  "external" $aboutExt) }}
+  {{ $links = $links | append (dict "label" "Publications" "href" $pubsHref     "external" $pubExt) }}
+  {{ $links = $links | append (dict "label" "Blog"         "href" $blogHref     "external" $blogExt) }}
+  {{ $links = $links | append (dict "label" "Contact"      "href" $contactHref  "external" $aboutExt) }}
+{{ end }}
+
+<header class="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60" role="banner">
+  <div class="w-full flex h-16 items-center">
+    <a href="{{ if $homeExt }}{{ $logoHref }}{{ else }}{{ $logoHref | relURL }}{{ end }}" class="mr-6 flex items-center space-x-2 ml-5" aria-label="Home"{{ if $homeExt }} target="_blank" rel="noopener noreferrer"{{ end }}>
+      <img src="{{ (printf "%s/%s" "assets/favicon" "favicon.svg") | relURL }}" alt="Logo" width="32" height="32" class="h-8 w-8" />
+      <span class="font-bold text-lg font-headline pl-2">{{ .Site.Title }}</span>
+    </a>
+    <div class="flex flex-1 items-center justify-end space-x-2 pr-2">
+  <nav class="hidden md:flex md:items-center md:space-x-6" aria-label="Main">
+        {{ range $links }}
+          {{ $isExt := .external }}
+          {{ $href := .href }}
+          {{ $label := .label }}
+          {{/* Active check for internal links only */}}
+          {{ $isActive := false }}
+          {{ if not $isExt }}
+            {{ $cur := strings.Trim $.RelPermalink "/" }}
+            {{ $hrefNorm := strings.Trim $href "/" }}
+            {{ if eq $cur $hrefNorm }}
+              {{ $isActive = true }}
+            {{ end }}
+          {{ end }}
+          <a href="{{ if $isExt }}{{ $href }}{{ else }}{{ $href | relURL }}{{ end }}"
+            {{ if $isExt }}target="_blank" rel="noopener noreferrer"{{ end }}
+            class="text-lg md:text-sm font-medium transition-colors hover:text-primary {{ if $isActive }}text-primary{{ else }}text-muted-foreground{{ end }}"
+            {{ if $isActive }}aria-current="page"{{ end }}
+          >{{ $label }}</a>
+        {{ end }}
+      </nav>
+      <button
+        id="theme-toggle"
+        type="button"
+        class="inline-flex h-9 w-9 items-center justify-center rounded-md bg-transparent hover:bg-muted text-foreground cursor-pointer mr-2 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+        onclick="toggleTheme(this)"
+        aria-label="Toggle theme"
+        title="Toggle theme"
+      >
+        <!-- Lucide Moon (shown in light mode) -->
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="theme-icon-moon lucide lucide-moon h-[1.2rem] w-[1.2rem]"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+        </svg>
+        <!-- Lucide Sun (shown in dark mode) -->
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="theme-icon-sun lucide lucide-sun h-[1.2rem] w-[1.2rem]" style="display:none"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <circle cx="12" cy="12" r="4" />
+          <path d="M12 2v4" />
+          <path d="M12 18v4" />
+          <path d="M2 12h4" />
+          <path d="M18 12h4" />
+          <path d="M4.93 4.93l2.83 2.83" />
+          <path d="M16.24 16.24l2.83 2.83" />
+          <path d="M6.34 17.66l2.83-2.83" />
+          <path d="M14.83 9.17l2.83-2.83" />
+        </svg>
+        <!-- Lucide Monitor (shown in system mode) -->
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="theme-icon-system lucide lucide-monitor h-[1.2rem] w-[1.2rem]" style="display:none"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
+          <line x1="8" y1="21" x2="16" y2="21" />
+          <line x1="12" y1="17" x2="12" y2="21" />
+        </svg>
+        <span class="sr-only">Toggle theme</span>
+      </button>
+      {{/* Mobile menu: off-canvas side drawer with full-height panel */}}
+      <div class="md:hidden mr-2">
+        <button
+          id="mobile-menu-button"
+          type="button"
+          class="inline-flex h-9 w-9 items-center justify-center rounded-md bg-transparent hover:bg-muted text-foreground cursor-pointer ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+          aria-label="Open menu"
+          aria-controls="mobile-drawer"
+          aria-expanded="false"
+          onclick="window.__openMobileMenu('button')"
+          data-umami-event="mobile_menu_open_click"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
+          <span class="sr-only">Open menu</span>
+        </button>
+      </div>
+
+    </div>
+  </div>
+</header>
+
+{{/* Drawer root and overlay as direct children of <body> to avoid header stacking context issues */}}
+<div id="mobile-drawer-overlay" class="fixed inset-0 z-1000" style="background-color: hsl(var(--background));" hidden onclick="window.__closeMobileMenu('overlay')" data-umami-event="mobile_menu_overlay_click"></div>
+<aside
+  id="mobile-drawer"
+  class="fixed inset-y-0 right-0 z-1001 w-80 max-w-[85vw] border-l bg-background text-foreground shadow-xl flex flex-col"
+  role="dialog"
+  aria-modal="true"
+  aria-hidden="true"
+  aria-label="Mobile navigation"
+  style="transform: translateX(100%); transition: transform 200ms ease-out; will-change: transform;"
+>
+  <div class="flex items-center justify-between px-4 h-16 border-b">
+    <a href="{{ if $homeExt }}{{ $logoHref }}{{ else }}{{ $logoHref | relURL }}{{ end }}" class="flex items-center space-x-2" aria-label="Home"{{ if $homeExt }} target="_blank" rel="noopener noreferrer"{{ end }}>
+      <img src="{{ (printf "%s/%s" "assets/favicon" "favicon.svg") | relURL }}" alt="Logo" width="24" height="24" class="h-6 w-6" />
+      <span class="font-semibold text-base font-headline">{{ .Site.Title }}</span>
+    </a>
+  <button id="mobile-drawer-close" type="button" class="inline-flex h-9 w-9 items-center justify-center rounded-md hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" aria-label="Close menu" onclick="window.__closeMobileMenu('button')" data-umami-event="mobile_menu_close_click">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+      <span class="sr-only">Close</span>
+    </button>
+  </div>
+  <nav class="flex-1 overflow-y-auto px-4 py-4">
+    <ul class="space-y-2">
+      {{ range $links }}
+        <li>
+          <a
+            href="{{ if .external }}{{ .href }}{{ else }}{{ .href | relURL }}{{ end }}"
+            {{ if .external }}target="_blank" rel="noopener noreferrer"{{ end }}
+            class="block rounded-md px-3 py-2 text-base font-medium text-muted-foreground hover:text-primary hover:bg-muted"
+            onclick="window.__closeMobileMenu()"
+          >{{ .label }}</a>
+        </li>
+      {{ end }}
+    </ul>
+  </nav>
+  <div class="p-4 border-t text-xs text-muted-foreground/80">
+    <p>&copy; {{ now.Format "2006" }} {{ .Site.Params.author | default .Site.Title }}</p>
+  </div>
+</aside>

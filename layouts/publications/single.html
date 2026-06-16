@@ -1,0 +1,61 @@
+{{ define "main" }} {{/* Derive a clean year or date string for publications
+*/}} {{ $year := 0 }} {{ if isset .Params "year" }} {{ $year = int .Params.year
+}} {{ else if isset .Params "date" }} {{ $s := printf "%v" .Params.date }} {{ $m
+:= findRE "^[0-9]{4}$" $s }} {{ if gt (len $m) 0 }} {{ $year = int (index $m 0)
+}} {{ else }} {{ $year = int (dateFormat "2006" .Params.date) }} {{ end }} {{
+else if .Date }} {{ $year = int (time.Format "2006" .Date) }} {{ end }}
+
+<article class="py-6">
+  {{/* JSON-LD for publications */}} {{ $siteUrl := .Site.Params.siteUrl }} {{
+  $basePath := .Site.Params.basePath | default "" }} {{ $dateStr := "" }} {{
+  with .Date }}{{ $dateStr = time.Format "2006-01-02" . }}{{ end }} {{ $type :=
+  "ScholarlyArticle" }} {{ with .Params.venue }}{{ if eq (lower .) "book" }}{{
+  $type = "Book" }}{{ end }}{{ end }} {{ $pubLd := dict "@context"
+  "https://schema.org" "@type" $type "headline" .Title }} {{ if ne $dateStr ""
+  }} {{ $pubLd = merge $pubLd (dict "datePublished" $dateStr) }} {{ end }} {{
+  with .Params.author }} {{ $pubLd = merge $pubLd (dict "author" (dict "@type"
+  "Person" "name" .)) }} {{ end }} {{ with .Params.venue }} {{ $pubLd = merge
+  $pubLd (dict "isPartOf" (dict "@type" "PublicationIssue" "name" .)) }} {{ end
+  }} {{ with .Params.link }} {{ if and (not (hasPrefix . "http")) $siteUrl }} {{
+  $pubLd = merge $pubLd (dict "url" (print $siteUrl (relURL .))) }} {{ else }}
+  {{ $pubLd = merge $pubLd (dict "url" .) }} {{ end }} {{ end }}
+  <script type="application/ld+json">
+    {{ $pubLd | jsonify | safeJS }}
+  </script>
+  <header class="mb-4 not-prose">
+    <h1 class="text-3xl md:text-4xl font-bold tracking-tight">{{ .Title }}</h1>
+    <div class="mt-2 text-sm text-muted-foreground flex flex-wrap items-center">
+      {{ with .Params.author }}<span>{{ . }}</span>{{ end }} {{ with
+      .Params.venue }}{{ if or . $.Params.author }}<span class="mx-2">·</span>{{
+      end }}<span>{{ . }}</span>{{ end }} {{ if gt $year 0 }}<span class="mx-2"
+        >·</span
+      ><span>{{ $year }}</span>{{ end }}
+    </div>
+  </header>
+
+  <div class="prose dark:prose-invert mt-6 max-w-none">
+    {{ .Content }}
+  </div>
+
+  {{ with .Params.tags }}
+  <div
+    class="mt-6 flex flex-wrap gap-2 text-xs text-muted-foreground not-prose"
+  >
+    {{ range . }}<span class="px-2 py-0.5 rounded bg-muted">#{{ . }}</span>{{
+    end }}
+  </div>
+  {{ end }} {{ if or .Prev .Next }}
+  <nav class="mt-8 flex items-center justify-between text-sm not-prose">
+    {{ with .Prev }}<a
+      class="underline underline-offset-4"
+      href="{{ .RelPermalink }}"
+      ><span class="text-muted-foreground">← Previous</span> {{ .Title }}</a
+    >{{ end }} {{ with .Next }}<a
+      class="underline underline-offset-4"
+      href="{{ .RelPermalink }}"
+      >{{ .Title }} <span class="text-muted-foreground">Next →</span></a
+    >{{ end }}
+  </nav>
+  {{ end }}
+</article>
+{{ end }}

@@ -1,0 +1,24 @@
+name = "aboutme"
+min_version = "0.152.0"
+license = "GPL-3.0-only"
+homepage = "https://github.com/lbenicio/aboutme-v2-theme"
+description = "A clean, SCSS-powered Hugo theme for personal websites, blogs, and portfolios with built-in search, dark mode, and multi-variant export support. No Node.js required."
+
+[author]
+  name = "Leonardo Benicio"
+  homepage = "https://lbenicio.dev"
+
+# ── Default theme params ──────────────────────────────────────────────────
+[params]
+  # Social handlers (used by header, footer, JSON-LD, SEO, fork-me)
+  githubHandler = ""
+  linkedinHandler = ""
+  twitterHandler = ""
+
+# ── Page-level config (set in content/*/_index.md front matter) ───────────
+# Homepage  → content/_index.md         (heading, subtitle, avatar, socials)
+# About     → content/about/_index.md   (summary, name, role, skills, interests, researchInterests, certifications)
+# Contact   → content/contact/_index.md (postUrl, authToken, email, name, pgpKey)
+#
+# Social handlers above serve as the global default and can be overridden
+# per-page via front matter (e.g. github: "myuser").

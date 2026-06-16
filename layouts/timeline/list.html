@@ -1,0 +1,67 @@
+{{ define "main" }}
+<section class="space-y-10 py-6">
+  <div class="space-y-4">
+    <h1 class="text-4xl md:text-5xl font-bold tracking-tighter">Timeline</h1>
+    <p class="text-muted-foreground max-w-2xl text-sm md:text-base">
+      A long-form, evolving chronology of milestones—projects, study phases,
+      publications, and turning points. Highlights mark inflection moments.
+    </p>
+  </div>
+  {{ $items := .Params.timeline | default (slice) }} {{ if gt (len $items) 0
+  }} {{/* Sort by date desc (YYYY-MM) */}} {{ $sorted := sort $items "date"
+  "desc" }}
+  <div class="relative border-l border-border/40 pl-6">
+    <div
+      class="absolute -left-[7px] top-2 bottom-2 w-[3px] bg-gradient-to-b from-primary/60 via-primary/20 to-transparent rounded"
+    ></div>
+    <ul class="space-y-10">
+  {{ range $sorted }} {{ $accent := "border" }} {{ if .highlight }}{{
+  $accent = "ring-2 ring-primary/40 shadow-lg bg-background/95 backdrop-blur" }}{{ end }}
+      <li class="relative" id="{{ anchorize .title }}">
+        <div
+          class="absolute -left-3 mt-2 h-5 w-5 rounded-full border bg-background flex items-center justify-center text-[10px] font-bold text-primary"
+        >
+          {{ (printf "%s-01" .date) | time | time.Format "2006" }}
+        </div>
+        <div class="rounded-lg p-4 md:p-5 transition-colors {{ $accent }}">
+          <div class="flex flex-wrap items-center gap-2 mb-2">
+            <h2 class="text-lg md:text-xl font-semibold leading-tight">
+              {{ .title }}
+            </h2>
+            {{/* Category badge */}} {{ $cat := .category | default "misc" }} {{
+            $cls := (dict "education" "bg-blue-500/15 text-blue-500" "career" "bg-emerald-500/15 text-emerald-500" "project" "bg-indigo-500/15 text-indigo-500" "award" "bg-amber-500/15 text-amber-600" "writing" "bg-fuchsia-500/15 text-fuchsia-500" "oss" "bg-teal-500/15 text-teal-500" "learning" "bg-cyan-500/15 text-cyan-600" "personal" "bg-slate-500/15 text-slate-500" "security" "bg-red-500/15 text-red-500") }} {{ $catClass := index $cls $cat | default
+            "bg-muted text-muted-foreground" }}
+            <span
+              class="px-2 py-0.5 rounded text-[10px] font-medium tracking-wide {{ $catClass }}"
+              >{{ upper $cat }}</span
+            >
+            <span class="text-xs text-muted-foreground tabular-nums font-mono"
+              >{{ .date }}</span
+            >
+          </div>
+          <p class="text-sm md:text-base text-muted-foreground leading-relaxed">
+            {{ .description }}
+          </p>
+          {{ with .links }} {{ if gt (len .) 0 }}
+          <div class="flex flex-wrap gap-3 mt-3 text-xs md:text-sm">
+            {{ range . }}
+            <a
+              href="{{ .href }}"
+              class="underline underline-offset-4 hover:text-primary"
+              >{{ .label }}</a
+            >
+            {{ end }}
+          </div>
+          {{ end }} {{ end }}
+        </div>
+      </li>
+      {{ end }}
+    </ul>
+  </div>
+  {{ else }}
+  <p class="text-sm text-muted-foreground">
+    No timeline items yet. Add items to the <code>timeline</code> parameter in <code>content/timeline/_index.md</code>.
+  </p>
+  {{ end }}
+</section>
+{{ end }}

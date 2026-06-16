@@ -1,0 +1,14 @@
+// ─── Dynamic Value Utilities (calc, arbitrary values from Tailwind patterns) ──
+
+// Dynamic min-height used on homepage hero and fallback states
+.min-h-\[calc\(100vh-10rem\)\] {
+  min-height: calc(100vh - 10rem);
+}
+
+// Dynamic spacing used in about page affiliations section
+.space-y-\[0\.25rem\] > * + * {
+  margin-top: 0.25rem;
+}
+
+// Override for prose max-width in SINGLE mode
+.max-w-\[48rem\] { max-width: 48rem; }

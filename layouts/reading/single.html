@@ -1,0 +1,58 @@
+{{ define "main" }} {{/* Reading item detail with JSON-LD (Book/Article) */}} {{
+$siteUrl := .Site.Params.siteUrl }} {{ $dateStr := "" }} {{ with .Date }}{{
+$dateStr = time.Format "2006-01-02" . }}{{ end }} {{ $type := "Article" }} {{
+with .Params.venue }}{{ if eq (lower .) "book" }}{{ $type = "Book" }}{{ end }}{{
+end }} {{ $cover := .Params.cover }} {{ $coverAbs := "" }} {{ if and $cover
+(hasPrefix $cover "http") }} {{ $coverAbs = $cover }} {{ else if $cover }} {{
+$coverAbs = print .Site.Params.basePath $cover }} {{ end }} {{ $coverLd :=
+$coverAbs }} {{ if and $coverAbs (not (hasPrefix $coverAbs "http")) $siteUrl }}
+{{ $coverLd = print $siteUrl (relURL $coverAbs) }} {{ end }} {{ $ld := dict
+"@context" "https://schema.org" "@type" $type "headline" .Title }} {{ if ne
+$dateStr "" }} {{ $ld = merge $ld (dict "datePublished" $dateStr) }} {{ end }}
+{{ with .Params.author }} {{ $ld = merge $ld (dict "author" (dict "@type"
+"Person" "name" .)) }} {{ end }} {{ if $coverLd }} {{ $ld = merge $ld (dict
+"image" $coverLd) }} {{ end }} {{ with .Params.link }} {{ $ld = merge $ld (dict
+"url" .) }} {{ end }}
+<script type="application/ld+json">
+  {{ $ld | jsonify | safeJS }}
+</script>
+
+<article class="py-6">
+  <header class="mb-4 not-prose">
+    <h1 class="text-3xl md:text-4xl font-bold tracking-tight">{{ .Title }}</h1>
+    <div class="mt-2 text-sm text-muted-foreground flex flex-wrap items-center">
+      {{ with .Params.author }}<span>{{ . }}</span>{{ end }} {{ with
+      .Params.venue }}{{ if or . $.Params.author }}<span class="mx-2">·</span>{{
+      end }}<span>{{ . }}</span>{{ end }} {{ if .Date }}<span class="mx-2"
+        >·</span
+      ><span>{{ .Date | time.Format "2006" }}</span>{{ else if .Params.year
+      }}<span class="mx-2">·</span><span>{{ .Params.year }}</span>{{ end }}
+    </div>
+  </header>
+
+  <div class="prose text-slate-900 dark:prose-invert mt-6 max-w-none">
+    {{ .Content }}
+  </div>
+
+  {{ with .Params.tags }}
+  <div
+    class="mt-6 flex flex-wrap gap-2 text-xs text-muted-foreground not-prose"
+  >
+    {{ range . }}<span class="px-2 py-0.5 rounded bg-muted">#{{ . }}</span>{{
+    end }}
+  </div>
+  {{ end }} {{ if or .Prev .Next }}
+  <nav class="mt-8 flex items-center justify-between text-sm not-prose">
+    {{ with .Prev }}<a
+      class="underline underline-offset-4"
+      href="{{ .RelPermalink }}"
+      ><span class="text-muted-foreground">← Previous</span> {{ .Title }}</a
+    >{{ end }} {{ with .Next }}<a
+      class="underline underline-offset-4"
+      href="{{ .RelPermalink }}"
+      >{{ .Title }} <span class="text-muted-foreground">Next →</span></a
+    >{{ end }}
+  </nav>
+  {{ end }}
+</article>
+{{ end }}

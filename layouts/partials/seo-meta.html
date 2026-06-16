@@ -1,0 +1,64 @@
+{{/* Open Graph & Twitter meta tags derived from page/site params (Hugo v0.111
+compatible) */}} {{ $siteUrl := .Site.Params.siteUrl }} {{ $basePath :=
+.Site.Params.basePath | default "" }} {{/* Title: default to site title, prepend
+page title when available */}} {{ $title := .Site.Title }} {{ with .Title }}{{
+$title = printf "%s · %s" . $.Site.Title }}{{ end }} {{/* Description: prefer
+front matter, else site description */}} {{ $desc := .Site.Params.description }}
+{{ with .Params.description }}{{ $desc = . }}{{ end }} {{/* Type: article for
+blog/publications, website otherwise */}} {{ $type := "website" }} {{ if or (eq .Section "post") (eq .Section "publications") }}{{ $type = "article" }}{{ end }}
+{{/* Resolve image: prefer generated OG for blog posts, else front matter cover, else configurable favicon fallback */}}
+{{ $ogBase := "assets/og" }}
+{{ $fp := "assets/favicon" }}
+{{ $img := printf "%s/android-chrome-512x512.png" $fp }}
+{{ if eq .Section "post" }}
+  {{/* Prefer Hugo-generated OG image (via og-image.html partial), then static fallback */}}
+  {{ $slug := .File.TranslationBaseName }}
+  {{ $ogResource := resources.Get (printf "assets/og/%s.png" $slug) }}
+  {{ if $ogResource }}
+    {{ $img = $ogResource.RelPermalink }}
+  {{ else }}
+    {{ $ogStatic := printf "%s/%s.png" $ogBase $slug }}
+    {{ if (fileExists $ogStatic) }}
+      {{ $img = $ogStatic }}
+    {{ end }}
+  {{ end }}
+{{ end }}
+{{ with .Params.cover }}
+  {{ if hasPrefix . "http" }}
+    {{ $img = . }}
+  {{ else }}
+    {{ $img = print $basePath . }}
+  {{ end }}
+{{ end }}
+{{ $imgAbs := $img }}
+{{ if and (not (hasPrefix $img "http")) $siteUrl }}
+  {{ $imgAbs = print $siteUrl (relURL $img) }}
+{{ end }}
+{{ if $title }}<meta
+  property="og:title"
+  content="{{ $title }}"
+/>{{ end }} {{ if $desc }}<meta
+  property="og:description"
+  content="{{ $desc }}"
+/>{{ end }} {{ if $siteUrl }}<meta
+  property="og:url"
+  content="{{ $siteUrl }}{{ .RelPermalink }}"
+/>{{ end }}
+<meta property="og:type" content="{{ $type }}" />
+{{ if $imgAbs }}<meta property="og:image" content="{{ $imgAbs }}" />{{ end }}
+{{/* Article timestamps for blog posts */}}
+{{ if eq $type "article" }}
+  {{ with .Date }}<meta property="article:published_time" content="{{ . | time.Format "2006-01-02T15:04:05-07:00" }}" />{{ end }}
+  {{ with .Lastmod }}<meta property="article:modified_time" content="{{ . | time.Format "2006-01-02T15:04:05-07:00" }}" />{{ end }}
+{{ end }}
+
+<meta
+  name="twitter:card"
+  content="{{ if $imgAbs }}summary_large_image{{ else }}summary{{ end }}"
+/>
+{{ if $title }}<meta name="twitter:title" content="{{ $title }}" />{{ end }} {{
+if $desc }}<meta name="twitter:description" content="{{ $desc }}" />{{ end }} {{
+with .Site.Params.twitterHandler }}<meta
+  name="twitter:site"
+  content="@{{ . }}"
+/>{{ end }}

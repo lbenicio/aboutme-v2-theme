@@ -1,0 +1,13 @@
+{{/*
+  Usage: {{< icon "twitter" class="h-4 w-4 inline-block align-middle" >}}
+  Renders an SVG partial from layouts/partials/icons/<name>.svg.html
+  The partial should output an SVG that uses currentColor for fill/stroke so it inherits theme colors.
+*/}}
+{{/* Support either positional parameter ({{< icon "twitter" >}}) or named parameter ({{< icon name="twitter" >}}) */}}
+{{ $name := .Get "name" }}
+{{ if not $name }}
+  {{ $name = .Get 0 }}
+{{ end }}
+{{ $class := .Get "class" | default "inline-block align-middle" }}
+{{ $title := .Get "title" | default (printf "%s icon" $name) }}
+{{ partialCached (printf "icons/%s.svg.html" $name) (dict "class" $class "title" $title) }}

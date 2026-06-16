@@ -1,0 +1,28 @@
+[
+{{- $pages := .Pages.ByDate.Reverse -}}
+{{- range $i, $p := $pages -}}
+  {{- if $i }},{{ end -}}
+  {{- $year := 0 -}}
+  {{- if isset $p.Params "year" -}}
+    {{- $year = int $p.Params.year -}}
+  {{- else if isset $p.Params "date" -}}
+    {{- $s := printf "%v" $p.Params.date -}}
+    {{- $m := findRE "^[0-9]{4}" $s -}}
+    {{- if gt (len $m) 0 -}}
+      {{- $year = int (index $m 0) -}}
+    {{- end -}}
+  {{- end -}}
+  {
+    "slug": {{ $p.File.TranslationBaseName | jsonify }},
+    "title": {{ $p.Title | jsonify }},
+    {{- with $p.Params.description }}"description": {{ . | jsonify }},{{ end -}}
+    {{- with $p.Params.author }}"author": {{ . | jsonify }},{{ end -}}
+    {{- with $p.Params.venue }}"venue": {{ . | jsonify }},{{ end -}}
+    {{- with $p.Params.date }}"date": {{ . | jsonify }},{{ end -}}
+    {{- if gt $year 0 }}"year": {{ $year }},{{ end -}}
+    {{- with $p.Params.categories }}"categories": {{ . | jsonify }},{{ end -}}
+    {{- with $p.Params.tags }}"tags": {{ . | jsonify }},{{ end -}}
+    "link": {{ $p.RelPermalink | jsonify }}
+  }
+{{- end -}}
+]

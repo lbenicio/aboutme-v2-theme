@@ -1,0 +1,329 @@
+{{ define "main" }}
+<section class="space-y-12 py-6">
+  <section class="text-center">
+    <h1 class="text-4xl md:text-5xl font-bold tracking-tighter">About Me</h1>
+    <p class="max-w-3xl mx-auto text-lg text-muted-foreground mt-4 leading-relaxed">{{ .Params.summary | default .Site.Params.executiveSummary | default "Computer Scientist trained at IME‑USP and enriched by academic work at the University of Toronto, with a foundation in mathematics and a focus on parallel & distributed systems. I bridge theory and engineering to build scalable, reliable, and performance‑aware software—especially where scheduling, concurrency, memory hierarchy, and GPU acceleration intersect. Passionate about reproducible benchmarking and turning principled models into practical, measurable systems." }}</p>
+  </section>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <div class="lg:col-span-1 space-y-8">
+      <div class="shadow-lg rounded-lg border bg-card/50 hover:bg-card transition-colors">
+        <div class="p-6 flex flex-col items-center">
+          <picture>
+            <source srcset="{{ "assets/images/avatar/profile-picture.avif" | relURL }}" type="image/avif" />
+            <source srcset="{{ "assets/images/avatar/profile-picture.webp" | relURL }}" type="image/webp" />
+            <img src="{{ "assets/images/avatar/profile-picture.png" | relURL }}" alt="Profile Picture" width="128" height="128" class="rounded-full border-4 border-primary" loading="eager" />
+          </picture>
+          <h2 class="text-2xl font-semibold mt-4">{{ .Params.name | default .Site.Params.author | default "Your Name" }}</h2>
+          <p class="text-muted-foreground">{{ .Params.role | default "" }}</p>
+          {{ $social := slice }}
+          {{ with (.Params.github | default .Site.Params.githubHandler) }}{{ $social = $social | append (dict "name" "GitHub" "url" (printf "https://github.com/%s" .)) }}{{ end }}
+          {{ with (.Params.linkedin | default .Site.Params.linkedinHandler) }}{{ $social = $social | append (dict "name" "LinkedIn" "url" (printf "https://www.linkedin.com/in/%s" .)) }}{{ end }}
+          {{ with (.Params.twitter | default .Site.Params.twitterHandler) }}{{ $social = $social | append (dict "name" "Twitter" "url" (printf "https://twitter.com/%s" .)) }}{{ end }}
+          <div class="flex items-center justify-center gap-2 mt-4">
+            {{ range $social }}
+              <a href="{{ .url }}" target="_blank" rel="noopener noreferrer" class="inline-flex h-9 w-9 items-center justify-center rounded-md hover:bg-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-ring/70" aria-label="{{ .name }}">
+                {{ if eq .name "GitHub" }}
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.5-.67 1.08-.82 1.7-.15.62-.2 1.27-.18 1.9V22"/></svg>
+                {{ else if eq .name "LinkedIn" }}
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452H17.21V14.86c0-1.333-.27-3.046-2.145-3.046-1.86 0-2.145 1.45-2.145 2.948v5.69H9.069V9h2.852v1.561h.044c.434-.82 1.494-1.686 3.074-1.686 3.29 0 3.897 2.165 3.897 4.983v6.594zM5.337 7.433a1.805 1.805 0 11-.002-3.61 1.805 1.805 0 01.002 3.61zM6.763 20.452H3.911V9h2.852v11.452z"/></svg>
+                {{ else if eq .name "Twitter" }}
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor"><path d="M19.633 7.997c.013.177.013.354.013.53 0 5.386-4.099 11.599-11.6 11.599-2.31 0-4.457-.676-6.265-1.842.324.038.636.05.972.05 1.91 0 3.67-.65 5.07-1.755a4.099 4.099 0 01-3.827-2.84c.25.039.5.064.763.064.363 0 .726-.051 1.065-.139a4.091 4.091 0 01-3.282-4.015v-.051c.538.3 1.162.482 1.824.507a4.082 4.082 0 01-1.826-3.405c0-.751.2-1.435.551-2.034a11.63 11.63 0 008.44 4.281 4.615 4.615 0 01-.101-.938 4.091 4.091 0 017.078-2.799 8.1 8.1 0 002.595-.988 4.112 4.112 0 01-1.8 2.261 8.2 8.2 0 002.357-.638 8.824 8.824 0 01-2.047 2.115z"/></svg>
+                {{ end }}
+                <span class="sr-only">{{ .name }}</span>
+              </a>
+            {{ end }}
+          </div>
+        </div>
+      </div>
+
+      <div class="shadow-lg rounded-lg border bg-card/50 hover:bg-card transition-colors">
+        <div class="p-5">
+          <div class="flex items-center gap-2 mb-3">
+            <!-- Lucide Trophy -->
+            <svg class="w-6 h-6 text-primary" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 14.66v1.626a2 2 0 0 1-.976 1.696A5 5 0 0 0 7 21.978"/><path d="M14 14.66v1.626a2 2 0 0 0 .976 1.696A5 5 0 0 1 17 21.978"/><path d="M18 9h1.5a1 1 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M6 9a6 6 0 0 0 12 0V3a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1z"/><path d="M6 9H4.5a1 1 0 0 1 0-5H6"/></svg>
+            <span class="font-semibold">At a Glance</span>
+          </div>
+          <div class="text-sm text-muted-foreground space-y-4">
+            <div>
+              <h3 class="text-xs font-semibold uppercase tracking-wide text-foreground/70 mb-1">Experience</h3>
+              <p class="leading-relaxed"><span class="font-medium text-foreground">7+ years</span> applying computer science fundamentals to real systems.</p>
+            </div>
+            <div>
+              <h3 class="text-xs font-semibold uppercase tracking-wide text-foreground/70 mb-1">Focus Areas</h3>
+              <ul class="list-disc pl-4 space-y-1">
+                <li>Parallel & Distributed Systems</li>
+                <li>Performance Engineering</li>
+                <li>Scalability & Reliability</li>
+                <li>Compilers / Program Analysis</li>
+                <li>GPU Acceleration</li>
+              </ul>
+            </div>
+            <div>
+              <h3 class="text-xs font-semibold uppercase tracking-wide text-foreground/70 mb-1">Core Values</h3>
+              <div class="flex flex-wrap gap-2">
+                <span class="px-2 py-0.5 text-xs rounded bg-secondary">Rigor</span>
+                <span class="px-2 py-0.5 text-xs rounded bg-secondary">Reproducibility</span>
+                <span class="px-2 py-0.5 text-xs rounded bg-secondary">Mechanical Sympathy</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="shadow-lg rounded-lg border bg-card/50 hover:bg-card transition-colors">
+        <div class="p-5">
+          <div class="flex items-center gap-2 mb-3">
+            <!-- Lucide Graduation Cap -->
+            <svg class="w-6 h-6 text-primary" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.908a2 2 0 0 0 1.66 0z"/><path d="M22 10v6"/><path d="M6 12.5V16a6 3 0 0 0 12 0v-3.5"/></svg>
+            <span class="font-semibold">Awards & Diplomas</span>
+          </div>
+          <div class="text-sm text-muted-foreground space-y-2">
+            <ul class="list-disc pl-5 space-y-2">
+              <li><span class="font-medium text-foreground">M.Sc. Computer Science (2025)</span> – Focus on scalable parallel processing & performance modeling (USP).</li>
+              <li><span class="font-medium text-foreground">B.Sc. Computer Science (2019)</span> – Core CS theory, operating systems, distributed systems (USP / IME‑USP).</li>
+              <li><span class="font-medium text-foreground">Academic Term – University of Toronto (2024)</span> – Parallel computing, distributed systems, compiler design.</li>
+              <li><span class="font-medium text-foreground">Undergraduate Research Distinction</span> – Memory hierarchy microbenchmarks informing later scheduling heuristics.</li>
+              <li><span class="font-medium text-foreground">Conference Publications</span> – ERAD-SP 2024 & WSCAD 2021.</li>
+            </ul>
+            <p class="text-xs text-muted-foreground/70 leading-relaxed">See full timeline for detailed milestones in education, research, and publications.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="lg:col-span-2 space-y-8">
+      <div class="shadow-lg rounded-lg border bg-card/50 hover:bg-card transition-colors">
+        <div class="p-5">
+          <div class="flex items-center gap-2 mb-3">
+            <!-- Lucide Briefcase -->
+            <svg class="w-6 h-6 text-primary" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 20V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/><rect width="20" height="14" x="2" y="6" rx="2"/></svg>
+            <span class="font-semibold">My Background</span>
+          </div>
+          <div class="text-muted-foreground space-y-4">
+            <p>Long before I wrote my first program, I was captivated by mathematics—patterns in numbers, the elegance of proofs, and the sense that rigorous structure could unlock entire worlds of possibility. That early curiosity naturally evolved into an interest in computation: if mathematics provided the language of abstraction, computing became the instrument to animate those abstractions at scale.</p>
+            <p>I formalized that intuition while studying at the Institute of Mathematics and Statistics (IME‑USP), where the boundary between pure theory and practical systems felt deliberately porous. Courses in algorithms, data structures, compilers, and numerical methods reinforced a conviction that performance is not just an optimization phase—it is a design mindset. I became fascinated with the question: how do we transform a mathematically clean model into a system that remains efficient, predictable, and reliable under real workloads?</p>
+            <p>I hold graduate credentials from the University of São Paulo (USP) and completed an academic term at the University of Toronto focused on parallel computing, distributed systems, and advanced compiler design—strengthening a binational perspective on systems performance research and engineering rigor.</p>
+            <p>That question led me deep into parallel and distributed computing. I explore scheduling, load balancing, concurrency control, memory hierarchies, and heterogeneous acceleration (especially GPUs) to push throughput and scalability without sacrificing determinism or correctness. I am particularly interested in how theoretical limits (Amdahl, Gustafson, roofline models) map onto practical engineering trade‑offs in modern architectures.</p>
+            <p>Professionally and academically, I focus on building and evaluating systems that behave robustly under contention, failure, and growth. I value reproducibility: benchmarks should be defendable, artifacts should be inspectable, and performance claims should survive scrutiny. This emphasis on measurable truth ties back to the precision I admired in mathematics—it keeps engineering honest.</p>
+            <p>Beyond the core of systems performance, I enjoy exploring compilers and program analysis as enabling technologies: better intermediate representations, static analysis, and transformation pipelines widen the space of feasible optimizations. The interplay between symbolic reasoning and low‑level mechanics remains a constant source of motivation.</p>
+            <p>Today, my work sits at the intersection of theory, tooling, and execution: taking principled models, embedding them in real systems, measuring their behavior, and iterating. It is an ongoing narrative—rooted in early mathematical curiosity—driven by a desire to make complex computation more transparent, efficient, and trustworthy.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="shadow-lg rounded-lg border bg-card/50 hover:bg-card transition-colors">
+        <div class="p-5">
+          <div class="flex items-center gap-2 mb-3">
+            <!-- Lucide Users -->
+            <svg class="w-6 h-6 text-primary" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><path d="M16 3.128a4 4 0 0 1 0 7.744"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><circle cx="9" cy="7" r="4"/></svg>
+            <span class="font-semibold">University of Toronto</span>
+          </div>
+          <div class="text-muted-foreground space-y-4">
+            <p>The University of Toronto is a leading global public research university. My academic term there broadened my perspective on parallel computing, distributed systems, and advanced compiler design—complementing and extending the systems foundations developed at IME‑USP.</p>
+            <ul class="list-disc pl-6 space-y-1">
+              <li>Official site: <a href="https://www.utoronto.ca/" target="_blank" rel="noopener noreferrer" class="underline underline-offset-4">utoronto.ca</a></li>
+              <li>Computer Science Department: <a href="https://web.cs.toronto.edu/" target="_blank" rel="noopener noreferrer" class="underline underline-offset-4">web.cs.toronto.edu</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="shadow-lg rounded-lg border bg-card/50 hover:bg-card transition-colors">
+        <div class="p-5">
+          <div class="flex items-center gap-2 mb-3">
+            <!-- Lucide Graduation Cap -->
+            <svg class="w-6 h-6 text-primary" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.908a2 2 0 0 0 1.66 0z"/><path d="M22 10v6"/><path d="M6 12.5V16a6 3 0 0 0 12 0v-3.5"/></svg>
+            <span class="font-semibold">University of São Paulo (USP)</span>
+          </div>
+          <div class="text-muted-foreground space-y-4">
+            <p>The University of São Paulo (USP) is a leading public research university in Latin America. I studied at the Institute of Mathematics and Statistics (IME‑USP), a renowned center for mathematics, statistics, and computer science.</p>
+            <ul class="list-disc pl-6 space-y-1">
+              <li>Official site: <a href="https://www5.usp.br/" target="_blank" rel="noopener noreferrer" class="underline underline-offset-4">usp.br</a></li>
+              <li>Institute of Mathematics and Statistics (IME‑USP): <a href="https://www.ime.usp.br/" target="_blank" rel="noopener noreferrer" class="underline underline-offset-4">ime.usp.br</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="shadow-lg rounded-lg border bg-card/50 hover:bg-card transition-colors">
+        <div class="p-5">
+          <div class="flex items-center gap-2 mb-3">
+            <!-- Lucide Landmark (university) -->
+            <svg class="w-6 h-6 text-primary" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 18v-7"/><path d="M11.12 2.198a2 2 0 0 1 1.76.006l7.866 3.847c.476.233.31.949-.22.949H3.474c-.53 0-.695-.716-.22-.949z"/><path d="M14 18v-7"/><path d="M18 18v-7"/><path d="M3 22h18"/><path d="M6 18v-7"/></svg>
+            <span class="font-semibold">Institute of Mathematics and Statistics (IME‑USP)</span>
+          </div>
+          <div class="text-muted-foreground space-y-4">
+            <p>IME‑USP is a renowned institute at USP spanning mathematics, statistics, and computer science. It provided the theoretical and practical foundations of my CS formation.</p>
+            <ul class="list-disc pl-6 space-y-1">
+              <li>Official site: <a href="https://www.ime.usp.br/" target="_blank" rel="noopener noreferrer" class="underline underline-offset-4">ime.usp.br</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="shadow-lg rounded-lg border bg-card/50 hover:bg-card transition-colors">
+        <div class="p-5">
+          <div class="flex items-center gap-2 mb-3">
+            <!-- Lucide Users -->
+            <svg class="w-6 h-6 text-primary" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><path d="M16 3.128a4 4 0 0 1 0 7.744"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><circle cx="9" cy="7" r="4"/></svg>
+            <span class="font-semibold">Sociedade Brasileira de Computação (SBC)</span>
+          </div>
+          <div class="text-muted-foreground space-y-4">
+            <p>The Sociedade Brasileira de Computação (SBC) is Brazil’s leading professional association for computer science and computing education. It promotes research, education, and technology dissemination through conferences, journals, and community initiatives across the country.</p>
+            <ul class="list-disc pl-6 space-y-1">
+              <li>Official site: <a href="https://www.sbc.org.br/" target="_blank" rel="noopener noreferrer" class="underline underline-offset-4">sbc.org.br</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+    <div class="shadow-lg rounded-lg border bg-card/50 hover:bg-card transition-colors">
+      <div class="p-5">
+        <div class="flex items-center gap-2 mb-3">
+          <!-- Lucide Grid (skills) -->
+          <svg class="w-6 h-6 text-primary" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="8" width="8" height="8" rx="2"/><path d="M16 4h2a2 2 0 0 1 2 2v2"/><path d="M8 20H6a2 2 0 0 1-2-2v-2"/><path d="M16 20h2a2 2 0 0 0 2-2v-2"/><path d="M8 4H6a2 2 0 0 0-2 2v2"/></svg>
+          <span class="font-semibold">Skills & Expertise</span>
+        </div>
+        <div class="flex flex-wrap gap-2">
+          {{ range (.Params.skills | default .Site.Params.skills) }}
+            <span class="text-sm px-3 py-1 rounded bg-secondary">{{ . }}</span>
+          {{ end }}
+        </div>
+      </div>
+    </div>
+
+    <div class="shadow-lg rounded-lg border bg-card/50 hover:bg-card transition-colors">
+      <div class="p-5">
+        <div class="flex items-center gap-2 mb-3">
+          <!-- Lucide Heart -->
+          <svg class="w-6 h-6 text-primary" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9.5a5.5 5.5 0 0 1 9.591-3.676.56.56 0 0 0 .818 0A5.49 5.49 0 0 1 22 9.5c0 2.29-1.5 4-3 5.5l-5.492 5.313a2 2 0 0 1-3 .019L5 15c-1.5-1.5-3-3.2-3-5.5"/></svg>
+          <span class="font-semibold">Interests & Hobbies</span>
+        </div>
+        <div class="flex flex-wrap gap-2">
+          {{ range (.Params.interests | default .Site.Params.interests) }}
+            <span class="text-sm px-3 py-1 rounded border">{{ . }}</span>
+          {{ end }}
+        </div>
+      </div>
+    </div>
+
+    <div class="shadow-lg rounded-lg border md:col-span-2 bg-card/50 hover:bg-card transition-colors">
+      <div class="p-5">
+        <div class="flex items-center gap-2 mb-3">
+          <!-- Lucide Microscope -->
+          <svg class="w-6 h-6 text-primary" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 18h8"/><path d="M3 22h18"/><path d="M14 22a7 7 0 1 0 0-14h-1"/><path d="M9 14h2"/><path d="M9 12a2 2 0 0 1-2-2V6h6v4a2 2 0 0 1-2 2Z"/><path d="M12 6V3a1 1 0 0 0-1-1H9a1 1 0 0 0-1 1v3"/></svg>
+          <span class="font-semibold">Research Interests</span>
+        </div>
+        <div class="flex flex-wrap gap-2">
+          {{ range (.Params.researchInterests | default .Site.Params.researchInterests) }}
+            <span class="text-sm px-3 py-1 rounded bg-secondary">{{ . }}</span>
+          {{ end }}
+        </div>
+      </div>
+    </div>
+    <div class="text-center mb-4 space-y-2 w-[100vw] mt-10">
+          <h2 class="text-2xl md:text-3xl font-semibold tracking-tight">Certifications</h2>
+          <p class="text-sm md:text-base text-muted-foreground max-w-2xl mx-auto">Filter and explore professional and foundational credentials.</p>
+        </div>
+    <div class="shadow-lg rounded-lg border md:col-span-2 bg-card/50 hover:bg-card transition-colors">
+      
+      <div class="p-5">
+        
+        <div class="flex items-center gap-2 mb-3">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"/></svg>
+          <span class="font-semibold">Professional & Academic Credentials</span>
+        </div>
+        {{ $certs := .Params.certifications }}
+        {{ if $certs }}
+          <ul class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3" role="list">
+            {{ range $certs }}
+              <li class="group border rounded-md p-4 bg-card/50 hover:bg-card transition-colors" role="listitem">
+                <div class="flex flex-col gap-3">
+                  <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2">
+                    <div>
+                      <h3 class="text-sm font-semibold leading-tight">{{ .name }}</h3>
+                      {{ with .issuer }}<p class="text-xs text-muted-foreground/80 mt-0.5">{{ . }}</p>{{ end }}
+                      <div class="mt-1 flex flex-wrap items-center gap-2">
+                        {{ with .level }}<span class="inline-flex items-center rounded bg-primary/10 text-primary border border-primary/20 px-1.5 py-0.5 text-[10px] font-medium tracking-wide">{{ . }}</span>{{ end }}
+                        {{ with .scope }}<span class="inline-flex items-center rounded bg-accent/10 text-accent-foreground dark:text-foreground border border-accent/20 px-1.5 py-0.5 text-[10px] font-medium tracking-wide">{{ . }}</span>{{ end }}
+                        {{ $issued := .issued }}
+                        {{ $expires := .expires }}
+                        {{ if or $issued $expires }}
+                          <span class="inline-flex items-center rounded bg-muted px-1.5 py-0.5 text-[10px] font-mono text-muted-foreground/90" aria-label="{{ if $issued }}Issued {{ $issued }}{{ end }}{{ if $expires }}; Expires {{ $expires }}{{ end }}">
+                            {{ if $issued }}{{ $issued }}{{ else }}—{{ end }}
+                            {{ if $expires }}<span class="px-1 opacity-50">→</span>{{ $expires }}{{ end }}
+                          </span>
+                        {{ end }}
+                      </div>
+                    </div>
+                    {{ with .url }}
+                      <a href="{{ . }}" target="_blank" rel="noopener noreferrer" class="text-xs inline-flex items-center gap-1 text-primary hover:underline rounded px-1 py-0.5 self-start">
+                        Verify <span aria-hidden="true" class="text-[10px] opacity-70">↗</span>
+                      </a>
+                    {{ end }}
+                  </div>
+                  {{ with .notes }}<p class="text-xs text-muted-foreground leading-relaxed">{{ . }}</p>{{ end }}
+                  {{ if or .domainTags .skills }}
+                    <div class="flex flex-wrap gap-1.5 mt-1" aria-label="Associated skills and domains">
+                      {{ range .domainTags }}<span class="px-1.5 py-0.5 text-[10px] font-normal rounded bg-secondary">{{ . }}</span>{{ end }}
+                      {{ range .skills }}<span class="px-1.5 py-0.5 text-[10px] font-normal rounded border">{{ . }}</span>{{ end }}
+                    </div>
+                  {{ end }}
+                </div>
+              </li>
+            {{ end }}
+          </ul>
+        {{ else }}
+          <p class="text-sm text-muted-foreground">Add certificates in the <code>certifications</code> parameter in <code>content/about/_index.md</code> to display them here.</p>
+        {{ end }}
+      </div>
+    </div>
+  </div>
+
+  <section aria-labelledby="affiliations-heading" class="pt-4 overflow-x-hidden">
+    <div class="text-center mb-6 space-y-2">
+      <h2 id="affiliations-heading" class="text-2xl md:text-3xl font-semibold tracking-tight">Affiliations & Community</h2>
+      <p class="text-sm md:text-base text-muted-foreground max-w-2xl mx-auto">Organizations and institutions that shaped my academic path and professional network.</p>
+    </div>
+    <ul class="grid gap-6 md:grid-cols-3 min-w-0" role="list">
+      {{ $aff := slice
+  (dict "key" "sbc" "name" "Sociedade Brasileira de Computação" "short" "SBC" "role" "Member" "href" "https://www.sbc.org.br/" "img" "assets/images/institutions/sbc" "alt" "Logo of Sociedade Brasileira de Computação (SBC)" "description" "Brazilian Computer Society promoting research, education, and technology dissemination." "formats" (slice "avif" "webp" "jpeg"))
+  (dict "key" "ime" "name" "Instituto de Matemática e Estatística – USP" "short" "IME‑USP" "role" "Alumnus" "href" "https://www.ime.usp.br/" "img" "assets/images/institutions/ime" "alt" "Logo of IME‑USP" "description" "Renowned institute at USP for mathematics, statistics, and computer science." "formats" (slice "avif" "webp" "png"))
+  (dict "key" "usp" "name" "Universidade de São Paulo" "short" "USP" "role" "Graduate" "href" "https://www5.usp.br/" "img" "assets/images/institutions/usp" "alt" "Logo of USP" "description" "Leading Latin American public research university." "formats" (slice "webp" "png"))
+  (dict "key" "fgv" "name" "Fundação Getulio Vargas" "short" "FGV" "role" "Postgraduate (Continuing Education)" "href" "https://portal.fgv.br/" "img" "assets/images/institutions/fgv" "alt" "Logo of FGV" "description" "Brazilian higher education institution and think tank known for public policy and management." "formats" (slice "avif" "webp" "png"))
+  (dict "key" "utoronto" "name" "University of Toronto" "short" "U of T" "role" "Professional / Research Community Engagement" "href" "https://www.utoronto.ca/" "img" "assets/images/institutions/utoronto" "alt" "Logo of the University of Toronto" "description" "Top-ranked Canadian research university with strong programs in CS and engineering." "formats" (slice "avif" "webp" "png"))
+      }}
+      {{ range $aff }}
+        <li class="group relative min-w-0">
+          <div class="h-full flex flex-col rounded-lg border bg-card/50 backdrop-blur-sm p-4 transition-all hover:bg-card hover:shadow-lg focus-within:shadow-lg focus-within:ring-2 focus-within:ring-ring/60 overflow-hidden min-w-0">
+            <div class="flex items-center gap-4 mb-3 min-w-0">
+              <div class="relative w-16 h-16 shrink-0 rounded-md border bg-white/70 flex items-center justify-center overflow-hidden">
+                <picture>
+                  <source srcset="{{ (print .img ".avif") | relURL }}" type="image/avif" />
+                  <source srcset="{{ (print .img ".webp") | relURL }}" type="image/webp" />
+                  <img src="{{ (print .img ".webp") | relURL }}" alt="{{ .alt }}" width="64" height="64" class="object-contain max-w-[64px] max-h-[64px] transition-transform group-hover:scale-105" />
+                </picture>
+              </div>
+              <div class="min-w-0">
+                <h3 class="text-sm font-semibold leading-tight truncate" title="{{ .name }}">{{ .name }}</h3>
+                <p class="text-xs text-muted-foreground/80 mt-0.5 break-words">{{ .role }}</p>
+              </div>
+            </div>
+            {{ with .description }}
+              <p class="text-xs text-muted-foreground flex-1 leading-relaxed break-words">{{ . }}</p>
+            {{ end }}
+            <div class="mt-4 pt-2 border-t flex items-center justify-between">
+              <span class="text-[10px] font-mono tracking-wide text-muted-foreground/70">{{ .short }}</span>
+              <a href="{{ .href }}" target="_blank" rel="noopener noreferrer" class="text-xs inline-flex items-center gap-1 text-primary hover:underline rounded px-1 py-0.5">Visit <span aria-hidden="true" class="text-[10px] opacity-70">↗</span></a>
+            </div>
+          </div>
+        </li>
+      {{ end }}
+    </ul>
+  </section>
+</section>
+{{ end }}

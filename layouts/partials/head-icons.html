@@ -1,0 +1,13 @@
+{{/* Favicon and app icons — shipped in static/assets/favicon/ */}}
+{{ $fp := "assets/favicon" }}
+<link rel="shortcut icon" href="{{ (printf "%s/favicon.ico" $fp) | relURL }}" />
+<link rel="icon" type="image/x-icon" href="{{ (printf "%s/favicon.ico" $fp) | relURL }}" />
+<link rel="icon" href="{{ (printf "%s/favicon.svg" $fp) | relURL }}" type="image/svg+xml" />
+<link rel="icon" href="{{ (printf "%s/favicon-32x32.png" $fp) | relURL }}" sizes="32x32" type="image/png" />
+<link rel="icon" href="{{ (printf "%s/favicon-16x16.png" $fp) | relURL }}" sizes="16x16" type="image/png" />
+<link rel="apple-touch-icon" href="{{ (printf "%s/apple-touch-icon.png" $fp) | relURL }}" />
+<link rel="manifest" href="{{ (printf "%s/site.webmanifest" $fp) | relURL }}" />
+<link rel="mask-icon" href="{{ (printf "%s/safari-pinned-tab.svg" $fp) | relURL }}" color="#209cee" />
+<meta name="msapplication-TileColor" content="#209cee" />
+<meta name="msapplication-config" content="{{ (printf "%s/browserconfig.xml" $fp) | relURL }}" />
+<meta name="theme-color" content="#d2e9f8" />

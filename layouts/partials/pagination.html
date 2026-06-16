@@ -1,0 +1,43 @@
+{{ with .Paginator }}{{ if gt .TotalPages 1 }}
+<nav class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-6" role="navigation" aria-label="Pagination">
+  <span class="text-sm text-muted-foreground order-1"
+    >Page {{ .PageNumber }} of {{ .TotalPages }}</span
+  >
+  <div class="flex items-center gap-1 order-2 sm:order-3">
+    {{ if .HasPrev }}<a
+      class="text-sm px-3 py-1.5 rounded-md border bg-background hover:bg-muted transition-colors"
+      href="{{ .Prev.URL }}"
+      aria-label="Previous page"
+      >← Prev</a
+    >{{ end }}
+    {{/* Page number buttons */}}
+    {{ $current := .PageNumber }}
+    {{ $total := .TotalPages }}
+    {{ $start := math.Max 1 (math.Sub $current 2) }}
+    {{ $end := math.Min $total (math.Add $current 2) }}
+    {{ if gt $start 1 }}
+      <a class="text-sm px-2 py-1.5 rounded-md hover:bg-muted transition-colors text-muted-foreground" href="{{ .First.URL }}" aria-label="Page 1">1</a>
+      {{ if gt $start 2 }}<span class="text-sm px-1 text-muted-foreground">…</span>{{ end }}
+    {{ end }}
+    {{ range seq $start $end }}
+      {{ if eq . $current }}
+        <span class="text-sm px-2 py-1.5 rounded-md bg-primary text-primary-foreground font-medium" aria-current="page">{{ . }}</span>
+      {{ else }}
+        {{ $url := index $.Paginator.Pagers (math.Sub . 1) }}
+        <a class="text-sm px-2 py-1.5 rounded-md hover:bg-muted transition-colors text-muted-foreground" href="{{ $url.URL }}" aria-label="Page {{ . }}">{{ . }}</a>
+      {{ end }}
+    {{ end }}
+    {{ if lt $end $total }}
+      {{ if lt $end (math.Sub $total 1) }}<span class="text-sm px-1 text-muted-foreground">…</span>{{ end }}
+      {{ $last := index $.Paginator.Pagers (math.Sub $total 1) }}
+      <a class="text-sm px-2 py-1.5 rounded-md hover:bg-muted transition-colors text-muted-foreground" href="{{ $last.URL }}" aria-label="Page {{ $total }}">{{ $total }}</a>
+    {{ end }}
+    {{ if .HasNext }}<a
+      class="text-sm px-3 py-1.5 rounded-md border bg-background hover:bg-muted transition-colors"
+      href="{{ .Next.URL }}"
+      aria-label="Next page"
+      >Next →</a
+    >{{ end }}
+  </div>
+</nav>
+{{ end }}{{ end }}

@@ -1,0 +1,7 @@
+<div class="mt-6">
+  {{ if .Inner }}
+    <p>{{ .Inner }}</p>
+  {{ end }}
+  {{/* Use the shared contact form partial to keep markup and scripts consistent */}}
+  {{ partial "contact-form.html" .Page }}
+</div>

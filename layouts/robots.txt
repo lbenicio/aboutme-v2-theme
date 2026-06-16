@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+
+{{- with .Site.Params.siteUrl -}}
+Sitemap: {{ . | strings.TrimRight "/" }}/sitemap.xml
+{{- end -}}

@@ -1,0 +1,30 @@
+[
+{{- $first := true -}}
+{{- range (.Pages.ByDate.Reverse) -}}
+  {{- if not $first }},{{ end -}}
+  {{- $first = false -}}
+  {{- $pg := . -}}
+  {{- $year := 0 -}}
+  {{- if isset $pg.Params "year" -}}
+    {{- $year = int $pg.Params.year -}}
+  {{- else if isset $pg.Params "date" -}}
+    {{- $s := printf "%v" $pg.Params.date -}}
+    {{- $m := findRE "^[0-9]{4}" $s -}}
+    {{- if gt (len $m) 0 -}}
+      {{- $year = int (index $m 0) -}}
+    {{- end -}}
+  {{- end -}}
+  {
+    "slug": {{ jsonify (trim $pg.File.LogicalName ".md") }},
+    "title": {{ jsonify $pg.Title }},
+    "description": {{ jsonify ($pg.Params.description | default "") }},
+    "author": {{ jsonify ($pg.Params.author | default "") }},
+    "venue": {{ jsonify ($pg.Params.venue | default "") }},
+    "date": {{ jsonify ($pg.Params.date | default "") }},
+    "year": {{ $year }},
+    "categories": {{ jsonify ($pg.Params.categories | default (slice)) }},
+    "tags": {{ jsonify ($pg.Params.tags | default (slice)) }},
+    "link": {{ jsonify $pg.RelPermalink }}
+  }
+{{- end -}}
+]

@@ -1,0 +1,23 @@
+{{/* og-image.html — generates OG social preview cards during Hugo build.
+     Uses Hugo native images.Text filter on a shared 1200x630 base card.
+     Requires: Hugo >=0.120, assets/images/og-base.png, assets/fonts/OpenSans-Bold.ttf
+*/}}
+{{ if and .Title .File }}
+  {{ $title := .Title }}
+  {{ $slug := .File.TranslationBaseName }}
+  {{ $ogBase := resources.Get "images/og-base.png" }}
+  {{ $font := resources.Get "fonts/OpenSans-Bold.ttf" }}
+  {{ if and $ogBase $font }}
+    {{ $destPath := printf "assets/og/%s.png" $slug }}
+    {{ if not (resources.Get $destPath) }}
+      {{ $og := $ogBase | images.Text $title (dict
+        "size" 42
+        "color" "#0f172a"
+        "x" 60
+        "y" 200
+        "font" $font
+      ) }}
+      {{ $og = $og | resources.Copy $destPath }}
+    {{ end }}
+  {{ end }}
+{{ end }}

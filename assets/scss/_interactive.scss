@@ -1,0 +1,51 @@
+// ─── Interactive State Variants (hover, focus, focus-visible, group) ──────────
+
+// ── Hover states ───────────────────────────────────────────────────────────────
+.hover\:bg-muted:hover          { background-color: HSL(var(--muted)); }
+.hover\:bg-accent:hover         { background-color: HSL(var(--accent)); }
+.hover\:bg-accent\/90:hover     { background-color: HSL(var(--accent) / 0.9); }
+.hover\:bg-accent\/80:hover     { background-color: HSL(var(--accent) / 0.8); }
+.hover\:bg-card:hover           { background-color: HSL(var(--card)); }
+.hover\:text-primary:hover      { color: HSL(var(--primary)); }
+.hover\:text-foreground:hover   { color: HSL(var(--foreground)); }
+.hover\:text-accent-foreground:hover { color: HSL(var(--accent-foreground)); }
+.hover\:underline:hover         { text-decoration: underline; }
+.hover\:shadow-lg:hover         { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1); }
+.hover\:opacity-80:hover        { opacity: 0.8; }
+
+// ── Focus states ───────────────────────────────────────────────────────────────
+.focus\:outline-none:focus      { outline: none; }
+.focus\:ring:focus              { box-shadow: 0 0 0 2px HSL(var(--ring)); }
+.focus\:ring-ring:focus         { box-shadow: 0 0 0 2px HSL(var(--ring)); }
+
+// ── Focus-visible states ───────────────────────────────────────────────────────
+.focus-visible\:outline-none:focus-visible { outline: none; }
+.focus-visible\:ring-2:focus-visible       { box-shadow: 0 0 0 2px; }
+.focus-visible\:ring-ring:focus-visible    { box-shadow: 0 0 0 2px HSL(var(--ring)); }
+.focus-visible\:ring-ring\/70:focus-visible { box-shadow: 0 0 0 2px HSL(var(--ring) / 0.7); }
+
+.focus-visible\:ring-offset-2:focus-visible {
+  box-shadow: 0 0 0 2px HSL(var(--background)), 0 0 0 4px HSL(var(--ring));
+}
+
+// ── Focus-within states ────────────────────────────────────────────────────────
+.focus-within\:ring-2:focus-within { box-shadow: 0 0 0 2px; }
+.focus-within\:ring-ring\/60:focus-within { box-shadow: 0 0 0 2px HSL(var(--ring) / 0.6); }
+.focus-within\:shadow-lg:focus-within { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1); }
+
+// ── Group hover states ─────────────────────────────────────────────────────────
+.group:hover .group-hover\:scale-105 { transform: scale(1.05); }
+
+// ── Focus undo-sr-only (for skip-to-content links) ────────────────────────────
+// Undoes sr-only hiding on focus, without overriding positioning utilities
+.focus\:not-sr-only:focus {
+  width: auto;
+  height: auto;
+  margin: 0;
+  overflow: visible;
+  clip: auto;
+  white-space: normal;
+}
+
+// ── Group focus-within ─────────────────────────────────────────────────────────
+.group:focus-within .group-focus-within\:ring-2 { box-shadow: 0 0 0 2px; }

@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no" />
+        {{/* Compute dynamic title */}} {{ $siteMode := .Site.Params.appMode | default "FULL" }} {{ $bm := .Site.Params.blogMode }} {{ $isBlogMode := or (eq $siteMode "BLOG_ONLY") (eq $bm true) (eq $bm "true") }} {{
+        $titlePrefix := .Title }} {{ if and .IsHome $isBlogMode }}{{ $titlePrefix = "Blog" }}{{ end }}
+        <title>{{ with $titlePrefix }}{{ . }} · {{ end }}{{ .Site.Title }}</title>
+        <meta name="description" content="{{ with .Params.description }}{{ . }}{{ else }}{{ .Site.Params.description }}{{ end }}" />
+        <link rel="alternate" type="application/rss+xml" title="RSS" href="{{ .Site.BaseURL }}index.xml" />
+        {{ partial "head-meta.html" . }} {{ partial "head-icons.html" . }} {{ partial "seo-meta.html" . }} {{ partial "ld-website-person.html" . }} {{ partial "ld-breadcrumbs.html" . }} {{/* SCSS via Hugo Pipes (no
+        Node.js required) */}} {{ $isDev := or (eq (getenv "HUGO_ENV") "development") (eq (getenv "HUGO_ENVIRONMENT") "development") }} {{ if $isDev }} {{ $styles := resources.Get "scss/main.scss" | css.Sass }}
+        <link rel="stylesheet" href="{{ $styles.RelPermalink }}" />
+        {{ else }} {{ $styles := resources.Get "scss/main.scss" | css.Sass | minify | fingerprint }}
+        <link rel="stylesheet" href="{{ $styles.RelPermalink }}" integrity="{{ $styles.Data.Integrity }}" />
+        {{ end }}
+    </head>
+    <body class="flex flex-col min-h-screen">
+        <script>
+            (function () {
+                try {
+                    document.addEventListener("gesturestart", function (e) {
+                        e.preventDefault();
+                    });
+                    document.addEventListener(
+                        "touchstart",
+                        function (e) {
+                            if (e.touches && e.touches.length > 1) {
+                                e.preventDefault();
+                            }
+                        },
+                        { passive: false },
+                    );
+                    var lastTouch = 0;
+                    document.addEventListener(
+                        "touchend",
+                        function (e) {
+                            var now = Date.now();
+                            if (now - lastTouch <= 300) {
+                                e.preventDefault();
+                            }
+                            lastTouch = now;
+                        },
+                        { passive: false },
+                    );
+                } catch (err) {}
+            })();
+        </script>
+        <a href="#content" class="sr-only focus:not-sr-only fixed top-2 left-2 z-50 rounded-md border bg-background px-3 py-2 text-sm shadow">Skip to content</a>
+        {{ partial "header.html" . }} {{ partial "fork-me.html" . }}
+        <main id="content" class="w-full px-4 md:px-6 flex-1" role="main" aria-label="Content">{{ partial "breadcrumbs.html" . }} {{ block "main" . }}{{ end }}</main>
+        {{ partial "footer.html" . }}
+    </body>
+</html>

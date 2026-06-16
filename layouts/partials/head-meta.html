@@ -1,0 +1,68 @@
+{{/* Dynamic meta & analytics based on params */}}
+{{ $siteUrl := .Site.Params.siteUrl }}
+{{ $basePath := trim .Site.Params.basePath "/" }}
+{{ $appMode := upper .Site.Params.appMode }}
+{{ $isDev := or (eq (getenv "HUGO_ENV") "development") (eq (getenv "HUGO_ENVIRONMENT") "development") }}
+{{ $isProd := or (eq (getenv "HUGO_ENV") "production") (eq (getenv "HUGO_ENVIRONMENT") "production") }}
+
+{{ if $siteUrl }}
+	<link rel="canonical" href="{{ $siteUrl }}{{ .RelPermalink }}" />
+{{ end }}
+{{/* Page description for SEO */}}
+{{ $desc := .Site.Params.description }}
+{{ with .Params.description }}{{ $desc = . }}{{ end }}
+{{ with $desc }}<meta name="description" content="{{ . }}" />{{ end }}
+{{/* Add noindex on paginated list pages (page > 1) to avoid duplicate content issues */}}
+{{ if .IsNode }}
+	{{ with .Paginator }}
+		{{ if gt .PageNumber 1 }}<meta name="robots" content="noindex,follow" />{{ end }}
+	{{ end }}
+{{ end }}
+
+{{/* Fonts: preload regular weight */}}
+<link rel="preload" href="{{ "assets/fonts/OpenSans-Regular.ttf" | relURL }}" as="font" type="font/ttf" crossorigin>
+{{/* Serve fonts.css via Hugo Pipes from assets/css */}}
+{{ if $isDev }}
+  {{ $f := resources.Get "css/fonts.css" | resources.ExecuteAsTemplate (printf "css/fonts-dev-%d.css" now.Unix) .   }}
+  <link rel="stylesheet" href="{{ $f.RelPermalink }}" />
+{{ else }}
+  {{ $f := resources.Get "css/fonts.css" | minify | fingerprint   }}
+  <link rel="stylesheet" href="{{ $f.RelPermalink }}" integrity="{{ $f.Data.Integrity }}" />
+{{ end }}
+
+{{/* Render analytics only in production and when a website ID is configured */}}
+{{/* Choose an Umami site ID based on the current export variant. Preference order:
+   - aboutme (FULL/ABOUT_ONLY): use umamiAboutmeId
+   - blog (BLOG_ONLY): use umamiBlogId
+   - publications (PUBLICATIONS_ONLY): use umamiPublicationsId
+   - single variants (SINGLE): use umamiNewsletterId / umamiSocialsId / umamiContactId when appropriate
+   - otherwise fall back to the legacy umamiWebsiteId
+*/}}
+{{ $scratch := newScratch }}
+{{ $scratch.Set "umamiId" .Site.Params.umamiWebsiteId }}
+
+{{ if or (eq $appMode "ABOUT_ONLY") (eq $appMode "FULL") }}
+  {{ with .Site.Params.umamiAboutmeId }}{{ $scratch.Set "umamiId" . }}{{ end }}
+{{ else if eq $appMode "BLOG_ONLY" }}
+  {{ with .Site.Params.umamiBlogId }}{{ $scratch.Set "umamiId" . }}{{ end }}
+{{ else if eq $appMode "PUBLICATIONS_ONLY" }}
+  {{ with .Site.Params.umamiPublicationsId }}{{ $scratch.Set "umamiId" . }}{{ end }}
+{{ else if eq $appMode "SINGLE" }}
+  {{ $sc := .Site.Params.singleContent }}
+  {{ if eq $sc "content/single/newsletter.md" }}
+    {{ with .Site.Params.umamiNewsletterId }}{{ $scratch.Set "umamiId" . }}{{ end }}
+  {{ else if eq $sc "content/single/socials.md" }}
+    {{ with .Site.Params.umamiSocialsId }}{{ $scratch.Set "umamiId" . }}{{ end }}
+  {{ else if eq $sc "content/single/contact.md" }}
+    {{ with .Site.Params.umamiContactId }}{{ $scratch.Set "umamiId" . }}{{ end }}
+  {{ else if eq $sc "content/single/marketing.md" }}
+    {{ with .Site.Params.umamiMarketingId }}{{ $scratch.Set "umamiId" . }}{{ end }}
+  {{ else if eq $sc "content/single/apps.md" }}
+    {{ with .Site.Params.umamiAppsId }}{{ $scratch.Set "umamiId" . }}{{ end }}
+  {{ end }}
+{{ end }}
+
+{{ $umamiId := $scratch.Get "umamiId" }}
+{{ if and $isProd $umamiId }}
+<script async defer data-website-id="{{ $umamiId }}" data-auto-track="true" src="{{ .Site.Params.umamiScriptUrl | default "https://cloud.umami.is/script.js" }}"></script>
+{{ end }}

@@ -1,0 +1,35 @@
+// ─── Dark Mode Overrides ──────────────────────────────────────────────────────
+// Additional dark mode overrides beyond CSS custom properties
+
+.dark {
+  .bg-white\/70 {
+    background-color: HSL(0 0% 100% / 0.1);
+  }
+
+  .text-slate-900 {
+    color: HSL(var(--foreground));
+  }
+
+  .text-slate-100 {
+    color: HSL(210 40% 98%);
+  }
+
+  .prose {
+    a {
+      color: HSL(var(--foreground));
+    }
+  }
+
+  // Timeline gradient adjustments
+  .timeline-line::before {
+    background-image: linear-gradient(to bottom, HSL(var(--primary) / 0.4), HSL(var(--primary) / 0.1), transparent);
+  }
+}
+
+// Dark mode overrides for specific elements that use dark: prefix
+.dark .dark\:bg-muted\/40 { background-color: HSL(var(--muted) / 0.4); }
+.dark .dark\:prose-invert {
+  // CSS custom properties handle the color switching
+}
+.dark .dark\:text-slate-100 { color: HSL(210 40% 98%); }
+.dark .dark\:text-foreground { color: HSL(var(--foreground)); }

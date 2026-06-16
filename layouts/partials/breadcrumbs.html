@@ -1,0 +1,57 @@
+{{/* Breadcrumbs partial mirroring v1 behavior */}}
+{{- $isHome := .IsHome -}}
+{{- if not $isHome -}}
+  {{- $rel := .RelPermalink -}}
+  {{- $path := ($rel | strings.TrimPrefix "/" | strings.TrimSuffix "/") -}}
+  {{- if $path -}}
+  {{- $parts := split $path "/" -}}
+  {{- $map := dict "about" "About" "contact" "Contact" "tools" "Tools" "cheat-sheets" "Cheat Sheets" "reading" "Reading" "reading-list" "Reading List" "publications" "Publications" "post" "Blog" "tag" "Tag" "tags" "Tag" "category" "Category" "categories" "Category" "page" "Page" "p" "Page" -}}
+  {{- $siteMode := .Site.Params.appMode | default "FULL" -}}
+  {{- $isBlogOnly := or (eq $siteMode "BLOG_ONLY") (eq .Site.Params.blogMode true) (eq .Site.Params.blogMode "true") -}}
+    <nav class="mt-7 mb-1 text-xs" aria-label="Breadcrumb">
+      <ol class="flex flex-wrap items-center gap-1 text-muted-foreground">
+        <li>
+          <a href="{{ "/" | relURL }}" class="hover:text-primary underline underline-offset-4">Home</a>
+        </li>
+        {{- $lastIdx := sub (len $parts) 1 -}}
+        {{- range $i, $seg := $parts -}}
+          {{- /* Skip the pagination path segment itself (v1 hides 'p'/'page') */ -}}
+          {{- if or (eq $seg "p") (eq $seg "page") -}}
+            {{- continue -}}
+          {{- end -}}
+          {{- /* Build href from the first i+1 segments; avoid wrapping $parts with slice which nests it */ -}}
+          {{- $computedHref := (print "/" (delimit (first (add $i 1) $parts) "/") "/") -}}
+          {{- $isLast := eq $i $lastIdx -}}
+          {{- $scratch := newScratch -}}
+          {{- $scratch.Set "label" (title (humanize $seg)) -}}
+          {{- with index $map $seg -}}
+            {{- $scratch.Set "label" . -}}
+          {{- end -}}
+          {{- /* If previous segment is p/page, label as Page N */ -}}
+          {{- if gt $i 0 -}}
+            {{- $prev := index $parts (sub $i 1) -}}
+            {{- if or (eq $prev "p") (eq $prev "page") -}}
+              {{- $scratch.Set "label" (printf "Page %s" $seg) -}}
+            {{- end -}}
+          {{- end -}}
+          {{- $label := $scratch.Get "label" -}}
+          {{- /* Determine final href; in BLOG_ONLY mode, link '/blog' to site root */ -}}
+          {{- if and (eq $seg "post") $isBlogOnly -}}
+            {{- $scratch.Set "href" "/" -}}
+          {{- else -}}
+            {{- $scratch.Set "href" $computedHref -}}
+          {{- end -}}
+
+          <li class="flex items-center gap-1">
+            <span class="px-1">/</span>
+            {{- if $isLast -}}
+              <span class="text-foreground">{{ $label }}</span>
+            {{- else -}}
+              <a href="{{ $scratch.Get "href" | relURL }}" class="hover:text-primary underline underline-offset-4">{{ $label }}</a>
+            {{- end -}}
+          </li>
+        {{- end -}}
+      </ol>
+    </nav>
+  {{- end -}}
+{{- end -}}

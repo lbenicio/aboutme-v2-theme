@@ -1,0 +1,97 @@
+{{ define "main" }}
+{{ $mode := .Site.Params.appMode | default "FULL" }}
+{{ if eq $mode "ABOUT_ONLY" }}
+  <div class="py-16 text-center text-muted-foreground">
+    Blog listing not available in ABOUT_ONLY mode.</p>
+  </div>
+{{ else if eq $mode "BLOG_ONLY" }}
+  <div class="py-16 text-center text-muted-foreground">
+    <h1 class="text-3xl font-bold mb-4">Blog is the homepage</h1>
+    <p>This site is configured in <code>BLOG_ONLY</code> mode.<br>The blog listing is available at the homepage (<a href="/">/</a>).</p>
+  </div>
+{{ else }}
+  <section class="py-6 space-y-10">
+    <div>
+      <h1 class="text-4xl md:text-5xl font-bold tracking-tighter">Blog</h1>
+      <p class="text-muted-foreground mt-1">Posts, notes, and articles.</p>
+    </div>
+    {{ $p := .Paginate (.RegularPages.ByDate.Reverse) 12 }}
+    {{ if not $p.HasPrev }}
+      {{ $crumbs := dict "@context" "https://schema.org" "@type" "BreadcrumbList" "itemListElement" (slice (dict "@type" "ListItem" "position" 1 "name" "Home") (dict "@type" "ListItem" "position" 2 "name" "Blog")) }}
+      <script type="application/ld+json">{{ $crumbs | jsonify | safeJS }}</script>
+      {{ $collection := dict "@context" "https://schema.org" "@type" "CollectionPage" "name" "Blog" "description" "Posts, notes, and articles." }}
+      <script type="application/ld+json">{{ $collection | jsonify | safeJS }}</script>
+      {{ $items := slice }}
+      {{ range $idx, $pg := first 12 $p.Pages }}
+        {{ $items = $items | append (dict "@type" "ListItem" "position" (add $idx 1) "name" $pg.Title "url" $pg.RelPermalink) }}
+      {{ end }}
+      {{ if gt (len $items) 0 }}
+        {{ $itemList := dict "@context" "https://schema.org" "@type" "ItemList" "itemListElement" $items }}
+        <script type="application/ld+json">{{ $itemList | jsonify | safeJS }}</script>
+      {{ end }}
+    {{ end }}
+    <div class="space-y-3" id="blog-search">
+      <label class="block" for="blog-search-input">
+        <span class="sr-only">Search posts</span>
+        <input id="blog-search-input" type="search" placeholder="Search posts by title, description, tags... (press / to focus)" class="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring focus:ring-ring" />
+      </label>
+      <div class="hidden" id="blog-search-tags" aria-live="polite"></div>
+      {{/* Server-side tag pills (visible only without JS) */}}
+      <noscript>
+      {{ $allTags := slice }}
+      {{ range .RegularPages }}
+        {{ range .Params.tags }}
+          {{ $allTags = $allTags | append . }}
+        {{ end }}
+      {{ end }}
+      {{ $uniqueTags := $allTags | uniq | sort }}
+      <details class="text-xs">
+      <summary class="cursor-pointer text-muted-foreground hover:text-foreground py-1">Filter by tag ({{ len $uniqueTags }} tags)</summary>
+      <div class="flex flex-wrap gap-2 text-xs mt-2">
+      {{ range $uniqueTags }}
+        <a href="{{ (printf "/tags/%s/" .) | relURL }}" class="inline-flex items-center rounded-full border px-2 py-1 text-xs font-medium bg-muted text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors">#{{ . }}</a>
+      {{ end }}
+      </div>
+      </details>
+      </noscript>
+      <div class="text-xs text-muted-foreground" id="blog-search-status" aria-live="polite"></div>
+    </div>
+    {{ if eq (len $p.Pages) 0 }}
+      <p class="text-sm text-muted-foreground">No posts yet. Add Markdown files under <code>content/blog</code>.</p>
+    {{ else }}
+    <ul class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3" id="blog-server-list">
+        {{ range $p.Pages }}
+          {{ $cover := .Params.cover }}
+    <li class="border rounded-lg overflow-hidden flex flex-col transition-colors">
+            {{ $permalink := .RelPermalink }}
+            {{ with $cover }}
+              <a href="{{ $permalink }}" class="block aspect-video bg-muted">
+                <img src="{{ . | relURL }}" alt="" class="w-full h-full object-cover" loading="lazy" />
+              </a>
+            {{ end }}
+            <div class="p-4 flex flex-col gap-2 grow">
+              <h2 class="font-semibold text-lg leading-tight">
+                <a href="{{ .RelPermalink }}" class="underline underline-offset-4 hover:bg-muted">{{ .Title }}</a>
+              </h2>
+              <div class="text-xs text-muted-foreground">{{ with .Date }}{{ . | time.Format "2006-01-02" }}{{ else }}{{ with .Params.year }}{{ . }}{{ end }}{{ end }}</div>
+              {{ with .Params.description }}<p class="text-sm text-muted-foreground line-clamp-3">{{ . }}</p>{{ end }}
+              {{ if or .Params.categories .Params.tags }}
+                <div class="mt-auto flex flex-wrap gap-2 text-xs text-muted-foreground">
+                  {{ range .Params.categories }}
+                    <a href="{{ (printf "/categories/%s/" .) | relURL }}" class="px-2 py-0.5 rounded bg-muted">{{ . }}</a>
+                  {{ end }}
+                  {{ range .Params.tags }}
+                    <a href="{{ (printf "/tags/%s/" .) | relURL }}" class="px-2 py-0.5 rounded bg-muted">#{{ . }}</a>
+                  {{ end }}
+                </div>
+              {{ end }}
+            </div>
+          </li>
+        {{ end }}
+      </ul>
+      {{ partial "pagination.html" . }}
+    {{ end }}
+  <script defer src="/assets/js/search.js" data-index-url="/post/index.json"></script>
+  </section>
+{{ end }}
+{{ end }}

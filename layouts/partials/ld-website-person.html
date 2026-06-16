@@ -1,0 +1,27 @@
+{{/* WebSite and Person JSON-LD, modeled after v1 (Hugo v0.111 compatible) */}}
+{{ $siteUrl := .Site.Params.siteUrl }} {{ $base := .Site.Params.basePath |
+default "" }} {{/* Build social links safely */}} {{ $github := "" }} {{ with
+.Site.Params.githubHandler }}{{ $github = printf "https://github.com/%s" . }}{{
+end }} {{ $linkedin := "" }} {{ with .Site.Params.linkedinHandler }}{{ $linkedin
+= printf "https://www.linkedin.com/in/%s" . }}{{ end }} {{ $twitter := "" }} {{
+with .Site.Params.twitterHandler }}{{ $twitter = printf "https://twitter.com/%s"
+. }}{{ end }} {{ $sameAs := slice }} {{ if $github }}{{ $sameAs = $sameAs |
+append $github }}{{ end }} {{ if $linkedin }}{{ $sameAs = $sameAs | append
+$linkedin }}{{ end }} {{ if $twitter }}{{ $sameAs = $sameAs | append $twitter
+}}{{ end }} {{/* Website JSON-LD */}} {{ $website := dict "@context"
+"https://schema.org" "@type" "WebSite" "name" (printf "About %s" .Site.Title) }}
+{{ if $siteUrl }} {{ $website = merge $website (dict "url" (print $siteUrl
+$base)) }} {{ end }}
+{{ $searchUrl := print $siteUrl "search?q={search_term_string}" }}
+{{ $website = merge $website (dict "potentialAction" (dict "@type" "SearchAction" "target" (dict "@type" "EntryPoint" "urlTemplate" $searchUrl) "query-input" "required name=search_term_string")) }}
+<script type="application/ld+json">
+  {{ $website | jsonify | safeJS }}
+</script>
+
+{{/* Person JSON-LD */}} {{ $person := dict "@context" "https://schema.org"
+"@type" "Person" "name" .Site.Params.author }} {{ if $siteUrl }} {{ $person =
+merge $person (dict "url" (print $siteUrl $base)) }} {{ end }} {{ if gt (len
+$sameAs) 0 }} {{ $person = merge $person (dict "sameAs" $sameAs) }} {{ end }}
+<script type="application/ld+json">
+  {{ $person | jsonify | safeJS }}
+</script>

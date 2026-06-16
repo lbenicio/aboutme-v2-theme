@@ -1,0 +1,8 @@
+<div class="debug-regular-pages" style="font-family:monospace;font-size:12px;margin:1rem 0;padding:1rem;border:1px dashed #ccc;background:#fafafa;">
+  <strong>RegularPages dump (temporary):</strong>
+  <ol>
+  {{ range $i, $p := .Site.RegularPages }}
+    <li>{{ $i }} • rel={{ $p.RelPermalink }} • kind={{ $p.Kind }} • section={{ $p.Section }} • draft={{ $p.Draft }}</li>
+  {{ end }}
+  </ol>
+</div>

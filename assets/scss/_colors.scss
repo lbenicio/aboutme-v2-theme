@@ -1,0 +1,90 @@
+// ─── Color Utilities ──────────────────────────────────────────────────────────
+// Background and text color classes using CSS custom properties
+
+// ── Background colors ──────────────────────────────────────────────────────────
+.bg-background            { background-color: HSL(var(--background)); }
+.bg-foreground            { background-color: HSL(var(--foreground)); }
+.bg-card                  { background-color: HSL(var(--card)); }
+.bg-card\/50              { background-color: HSL(var(--card) / 0.5); }
+.bg-popover               { background-color: HSL(var(--popover)); }
+.bg-primary               { background-color: HSL(var(--primary)); }
+.bg-primary\/10           { background-color: HSL(var(--primary) / 0.1); }
+.bg-primary-foreground    { background-color: HSL(var(--primary-foreground)); }
+.bg-secondary             { background-color: HSL(var(--secondary)); }
+.bg-secondary-foreground  { background-color: HSL(var(--secondary-foreground)); }
+.bg-muted                 { background-color: HSL(var(--muted)); }
+.bg-muted\/30             { background-color: HSL(var(--muted) / 0.3); }
+.bg-muted\/70             { background-color: HSL(var(--muted) / 0.7); }
+.bg-accent                { background-color: HSL(var(--accent)); }
+.bg-accent\/10            { background-color: HSL(var(--accent) / 0.1); }
+.bg-accent\/90            { background-color: HSL(var(--accent) / 0.9); }
+.bg-accent-foreground     { background-color: HSL(var(--accent-foreground)); }
+.bg-destructive           { background-color: HSL(var(--destructive)); }
+.bg-destructive-foreground { background-color: HSL(var(--destructive-foreground)); }
+.bg-border                { background-color: HSL(var(--border)); }
+.bg-input                 { background-color: HSL(var(--input)); }
+.bg-ring                  { background-color: HSL(var(--ring)); }
+.bg-transparent           { background-color: transparent; }
+
+// Semi-transparent variations
+.bg-background\/95        { background-color: HSL(var(--background) / 0.95); }
+.bg-white\/70             { background-color: HSL(0 0% 100% / 0.7); }
+
+// ── Text colors ────────────────────────────────────────────────────────────────
+.text-foreground           { color: HSL(var(--foreground)); }
+.text-foreground\/70       { color: HSL(var(--foreground) / 0.7); }
+.text-card-foreground      { color: HSL(var(--card-foreground)); }
+.text-popover-foreground   { color: HSL(var(--popover-foreground)); }
+.text-primary              { color: HSL(var(--primary)); }
+.text-primary-foreground   { color: HSL(var(--primary-foreground)); }
+.text-secondary-foreground { color: HSL(var(--secondary-foreground)); }
+.text-muted-foreground     { color: HSL(var(--muted-foreground)); }
+.text-muted-foreground\/70 { color: HSL(var(--muted-foreground) / 0.7); }
+.text-muted-foreground\/80 { color: HSL(var(--muted-foreground) / 0.8); }
+.text-muted-foreground\/90 { color: HSL(var(--muted-foreground) / 0.9); }
+.text-accent               { color: HSL(var(--accent)); }
+.text-accent-foreground    { color: HSL(var(--accent-foreground)); }
+.text-destructive          { color: HSL(var(--destructive)); }
+.text-destructive-foreground { color: HSL(var(--destructive-foreground)); }
+
+// Specific legacy colors used in about page timeline categories
+.text-blue-500    { color: #3b82f6; }
+.text-emerald-500 { color: #10b981; }
+.text-indigo-500  { color: #6366f1; }
+.text-amber-600   { color: #d97706; }
+.text-fuchsia-500 { color: #d946ef; }
+.text-teal-500    { color: #14b8a6; }
+.text-cyan-600    { color: #0891b2; }
+.text-slate-500   { color: #64748b; }
+.text-red-500     { color: #ef4444; }
+.text-red-600     { color: #dc2626; }
+.text-slate-900   { color: #0f172a; }
+.text-white       { color: #ffffff; }
+
+// Specific legacy background colors for timeline categories
+.bg-blue-500\/15    { background-color: HSL(217 91% 60% / 0.15); }
+.bg-emerald-500\/15 { background-color: HSL(160 84% 39% / 0.15); }
+.bg-indigo-500\/15  { background-color: HSL(239 84% 67% / 0.15); }
+.bg-amber-500\/15   { background-color: HSL(38 92% 50% / 0.15); }
+.bg-fuchsia-500\/15 { background-color: HSL(292 84% 61% / 0.15); }
+.bg-teal-500\/15    { background-color: HSL(173 80% 40% / 0.15); }
+.bg-cyan-500\/15    { background-color: HSL(189 94% 43% / 0.15); }
+.bg-slate-500\/15   { background-color: HSL(215 19% 35% / 0.15); }
+.bg-red-500\/15     { background-color: HSL(0 84% 60% / 0.15); }
+
+// ── Gradient backgrounds ───────────────────────────────────────────────────────
+.bg-gradient-to-b {
+  background-image: linear-gradient(to bottom, var(--tw-gradient-stops, transparent, transparent));
+}
+
+// Gradient stops (used in timeline)
+.from-primary\/60 {
+  --tw-gradient-from: HSL(var(--primary) / 0.6);
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to, transparent);
+}
+.via-primary\/20 {
+  --tw-gradient-stops: var(--tw-gradient-from, transparent), HSL(var(--primary) / 0.2), var(--tw-gradient-to, transparent);
+}
+.to-transparent {
+  --tw-gradient-to: transparent;
+}

@@ -1,0 +1,64 @@
+// ─── Spacing Utilities (margin, padding, gap) ────────────────────────────────
+// Based on a 0.25rem (4px) scale
+
+$spacers: (
+  0: 0,
+  0\.5: 0.125rem,
+  1: 0.25rem,
+  1\.5: 0.375rem,
+  2: 0.5rem,
+  3: 0.75rem,
+  4: 1rem,
+  5: 1.25rem,
+  6: 1.5rem,
+  7: 1.75rem,
+  8: 2rem,
+  10: 2.5rem,
+  12: 3rem,
+  16: 4rem,
+);
+
+// ── Gap ────────────────────────────────────────────────────────────────────────
+@each $name, $size in $spacers {
+  .gap-#{$name} { gap: $size; }
+}
+
+// ── Space between (flex/grid children) ─────────────────────────────────────────
+@each $name, $size in $spacers {
+  .space-x-#{$name} > * + * { margin-left: $size; }
+  .space-y-#{$name} > * + * { margin-top: $size; }
+}
+
+// ── Padding ────────────────────────────────────────────────────────────────────
+@each $name, $size in $spacers {
+  .p-#{$name}  { padding: $size; }
+  .px-#{$name} { padding-left: $size; padding-right: $size; }
+  .py-#{$name} { padding-top: $size; padding-bottom: $size; }
+  .pt-#{$name} { padding-top: $size; }
+  .pr-#{$name} { padding-right: $size; }
+  .pb-#{$name} { padding-bottom: $size; }
+  .pl-#{$name} { padding-left: $size; }
+}
+
+// ── Margin ─────────────────────────────────────────────────────────────────────
+@each $name, $size in $spacers {
+  .m-#{$name}  { margin: $size; }
+  .mx-#{$name} { margin-left: $size; margin-right: $size; }
+  .my-#{$name} { margin-top: $size; margin-bottom: $size; }
+  .mt-#{$name} { margin-top: $size; }
+  .mr-#{$name} { margin-right: $size; }
+  .mb-#{$name} { margin-bottom: $size; }
+  .ml-#{$name} { margin-left: $size; }
+}
+
+// ── Auto margins ───────────────────────────────────────────────────────────────
+.mx-auto { margin-left: auto; margin-right: auto; }
+.ml-auto { margin-left: auto; }
+.mr-auto { margin-right: auto; }
+.mt-auto { margin-top: auto; }
+
+// ── Negative margins ───────────────────────────────────────────────────────────
+.-ml-1 { margin-left: -0.25rem; }
+.-ml-3 { margin-left: -0.75rem; }
+.-left-3 { left: -0.75rem; }
+.-left-7px { left: -7px; }

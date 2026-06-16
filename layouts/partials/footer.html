@@ -1,0 +1,88 @@
+<footer class="border-t" role="contentinfo" aria-label="Footer">
+  <div
+    class="w-full mx-auto px-4 md:px-6 py-6 flex flex-col sm:flex-row items-center justify-between gap-4"
+  >
+    <div class="text-sm text-muted-foreground text-center sm:text-left">
+      &copy; {{ now.Format "2006" }} {{ .Site.Params.author }}. All rights
+      reserved.
+    </div>
+    {{ $social := slice }} {{ with .Site.Params.githubHandler }}{{ $social =
+    $social | append (dict "name" "GitHub" "url" (printf "https://github.com/%s"
+    .)) }}{{ end }} {{ with .Site.Params.linkedinHandler }}{{ $social = $social
+    | append (dict "name" "LinkedIn" "url" (printf
+    "https://www.linkedin.com/in/%s" .)) }}{{ end }} {{ with
+    .Site.Params.twitterHandler }}{{ $social = $social | append (dict "name"
+    "Twitter" "url" (printf "https://twitter.com/%s" .)) }}{{ end }} {{ $privacy
+    := .Site.Params.privacyUrl }} {{ $terms := .Site.Params.termsUrl }}
+    <div class="flex items-center gap-2">
+      {{ range $social }}
+      <a
+        href="{{ .url }}"
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="{{ .name }}"
+        class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 px-2 py-2 hover:bg-muted"
+      >
+        {{ if eq .name "GitHub" }}
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path
+            d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.5-.67 1.08-.82 1.7-.15.62-.2 1.27-.18 1.9V22"
+          />
+        </svg>
+        {{ else if eq .name "LinkedIn" }}
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="currentColor"
+        >
+          <path
+            d="M20.447 20.452H17.21V14.86c0-1.333-.027-3.046-1.858-3.046-1.86 0-2.145 1.45-2.145 2.948v5.69H9.069V9h3.112v1.561h.044c.434-.82 1.494-1.686 3.074-1.686 3.29 0 3.897 2.165 3.897 4.983v6.594zM5.337 7.433a1.805 1.805 0 11-.002-3.61 1.805 1.805 0 01.002 3.61zM6.763 20.452H3.911V9h2.852v11.452z"
+          />
+        </svg>
+        {{ else if eq .name "Twitter" }}
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="currentColor"
+        >
+          <path
+            d="M19.633 7.997c.013.177.013.354.013.53 0 5.386-4.099 11.599-11.6 11.599-2.31 0-4.457-.676-6.265-1.842.324.038.636.05.972.05 1.91 0 3.67-.65 5.07-1.755a4.099 4.099 0 01-3.827-2.84c.25.039.5.064.763.064.363 0 .726-.051 1.065-.139a4.091 4.091 0 01-3.282-4.015v-.051c.538.3 1.162.482 1.824.507a4.082 4.082 0 01-1.826-3.405c0-.751.2-1.435.551-2.034a11.63 11.63 0 008.44 4.281 4.615 4.615 0 01-.101-.938 4.091 4.091 0 017.078-2.799 8.1 8.1 0 002.595-.988 4.112 4.112 0 01-1.8 2.261 8.2 8.2 0 002.357-.638 8.824 8.824 0 01-2.047 2.115z"
+          />
+        </svg>
+        {{ end }}
+        <span class="sr-only">{{ .name }}</span>
+      </a>
+      {{ end }} {{ with $privacy }}
+      <a
+        href="{{ . }}"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="text-xs text-muted-foreground hover:text-primary"
+        >Privacy</a
+      >
+      {{ end }} {{ with $terms }}
+      <a
+        href="{{ . }}"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="text-xs text-muted-foreground hover:text-primary"
+        >Terms</a
+      >
+      {{ end }}
+    </div>
+  </div>
+</footer>

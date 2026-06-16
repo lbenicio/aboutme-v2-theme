@@ -1,0 +1,31 @@
+{{ define "main" }}
+<section class="space-y-10 py-6">
+  {{ $mode := .Site.Params.appMode | default "FULL" }}
+  {{/* Contact config from page front matter, with site-param fallbacks */}}
+  {{ $contactEmail := .Params.email | default .Site.Params.contactEmail | default "" }}
+  {{/* JSON-LD: Breadcrumbs and ContactPoint */}}
+  {{ $siteUrl := .Site.Params.siteUrl }}
+  {{ $contactUrl := "" }}
+  {{ if $siteUrl }}{{ $contactUrl = print $siteUrl (relURL .RelPermalink) }}{{ end }}
+  {{ $home := dict "@type" "ListItem" "position" 1 "name" "Home" }}
+  {{ if $siteUrl }}{{ $home = merge $home (dict "item" (print $siteUrl "/")) }}{{ end }}
+  {{ $contact := dict "@type" "ListItem" "position" 2 "name" "Contact" }}
+  {{ if $contactUrl }}{{ $contact = merge $contact (dict "item" $contactUrl) }}{{ end }}
+  {{ $crumbs := dict "@context" "https://schema.org" "@type" "BreadcrumbList" "itemListElement" (slice $home $contact) }}
+  <script type="application/ld+json">{{ $crumbs | jsonify | safeJS }}</script>
+  {{ with $contactEmail }}
+    {{ $cp := dict "@type" "ContactPoint" "contactType" "inquiries" "email" . }}
+    {{ if $contactUrl }}{{ $cp = merge $cp (dict "url" $contactUrl) }}{{ end }}
+    {{ $contactLd := dict "@context" "https://schema.org" "@type" "Person" "name" $.Site.Params.author "contactPoint" (slice $cp) }}
+    <script type="application/ld+json">{{ $contactLd | jsonify | safeJS }}</script>
+  {{ end }}
+  <div class="mx-auto px-4" {{ if eq $mode "ABOUT_ONLY" }}style="color: hsl(var(--foreground)) !important; --tw-prose-links: hsl(var(--foreground)); --tw-prose-headings: hsl(var(--foreground));"{{ end }}>
+    <section class="text-center mb-12">
+      <h1 class="text-4xl md:text-5xl font-bold tracking-tighter">Get In Touch</h1>
+      <p class="text-lg text-muted-foreground mt-4">Have a question or want to work together? Fill out the form below and I'll get back to you as soon as possible.</p>
+    </section>
+
+    {{ partial "contact-form.html" . }}
+  </div>
+</section>
+{{ end }}

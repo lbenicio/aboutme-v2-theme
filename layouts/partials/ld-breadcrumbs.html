@@ -1,0 +1,47 @@
+{{/* BreadcrumbList JSON-LD mirroring breadcrumbs partial */}}
+{{ $siteUrl := .Site.Params.siteUrl }}
+{{ $rel := .RelPermalink }}
+{{ $path := ($rel | strings.TrimPrefix "/" | strings.TrimSuffix "/") }}
+{{ if $path }}
+  {{ $parts := split $path "/" }}
+  {{ $items := slice }}
+
+  {{/* Home is first */}}
+  {{ $home := dict "@type" "ListItem" "position" 1 "name" "Home" }}
+  {{ if $siteUrl }}
+    {{ $home = merge $home (dict "item" (print $siteUrl "/")) }}
+  {{ end }}
+  {{ $items = $items | append $home }}
+
+  {{ $pos := 2 }}
+  {{ $accum := slice }}
+  {{ $siteMode := .Site.Params.appMode | default "FULL" }}
+  {{ $isBlogOnly := or (eq $siteMode "BLOG_ONLY") (eq .Site.Params.blogMode true) (eq .Site.Params.blogMode "true") }}
+
+  {{ range $i, $seg := $parts }}
+    {{ if or (eq $seg "p") (eq $seg "page") }}
+      {{ continue }}
+    {{ end }}
+    {{ $accum = $accum | append $seg }}
+    {{ $href := (print "/" (delimit $accum "/") "/") }}
+    {{/* If the segment is 'blog' and site is BLOG_ONLY, map to root */}}
+    {{ if and (eq $seg "post") $isBlogOnly }}
+      {{ $href = "/" }}
+    {{ end }}
+    {{ $label := (title (humanize $seg)) }}
+    {{ if and (gt $i 0) (or (eq (index $parts (sub $i 1)) "p") (eq (index $parts (sub $i 1)) "page")) }}
+      {{ $label = printf "Page %s" $seg }}
+    {{ end }}
+    {{ $item := dict "@type" "ListItem" "position" $pos "name" $label }}
+    {{ if $siteUrl }}
+      {{ $item = merge $item (dict "item" (print $siteUrl $href)) }}
+    {{ end }}
+    {{ $items = $items | append $item }}
+    {{ $pos = add $pos 1 }}
+  {{ end }}
+
+  {{ $ld := dict "@context" "https://schema.org" "@type" "BreadcrumbList" "itemListElement" $items }}
+  <script type="application/ld+json">
+    {{ $ld | jsonify | safeJS }}
+  </script>
+{{ end }}

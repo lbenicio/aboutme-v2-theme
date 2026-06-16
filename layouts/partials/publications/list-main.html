@@ -1,0 +1,188 @@
+<section class="py-6 space-y-8">
+  <div>
+    <h1 class="text-4xl md:text-5xl font-bold tracking-tighter">
+      Publications &amp; Research
+    </h1>
+    <p class="text-muted-foreground">
+      A selection of my publications and research projects.
+    </p>
+  </div>
+  {{/* JSON-LD for first page: breadcrumbs + collection + items */}}
+  {{ $sorted := sort .Pages (slice "Params.year" "Params.date" "Title") "desc" }}
+  {{ $p := .Paginate $sorted 1000 }}
+  {{ if not $p.HasPrev }}
+    {{ $crumbs := dict
+      "@context" "https://schema.org"
+      "@type" "BreadcrumbList"
+      "itemListElement" (slice
+        (dict "@type" "ListItem" "position" 1 "name" "Home")
+        (dict "@type" "ListItem" "position" 2 "name" "Publications")
+      )
+    }}
+    <script type="application/ld+json">
+      {{ $crumbs | jsonify | safeJS }}
+    </script>
+    {{ $collection := dict
+      "@context" "https://schema.org"
+      "@type" "CollectionPage"
+      "name" "Publications"
+      "description" "A selection of my publications and research projects."
+    }}
+    <script type="application/ld+json">
+      {{ $collection | jsonify | safeJS }}
+    </script>
+    {{ $items := slice }}
+    {{ range $idx, $pg := first 12 $p.Pages }}
+      {{ $items = $items | append (dict "@type" "ListItem" "position" (add $idx 1) "name" $pg.Title "url" $pg.RelPermalink) }}
+    {{ end }}
+    {{ if gt (len $items) 0 }}
+      {{ $itemList := dict "@context" "https://schema.org" "@type" "ItemList" "itemListElement" $items }}
+      <script type="application/ld+json">
+        {{ $itemList | jsonify | safeJS }}
+      </script>
+    {{ end }}
+  {{ end }}
+  <div class="space-y-3" id="blog-search">
+    <label class="block" for="blog-search-input">
+      <span class="sr-only">Search publications</span>
+      <input
+        id="blog-search-input"
+        type="search"
+        placeholder="Search by title, description, tags… (press / to focus)"
+        class="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring focus:ring-ring"
+      />
+    </label>
+    <div
+      class="hidden"
+      id="blog-search-tags"
+      aria-live="polite"
+    ></div>
+    {{/* Server-side tag pills (visible only without JS) */}}
+    <noscript>
+    {{ $allPubTags := slice }}
+    {{ range $sorted }}
+      {{ range .Params.tags }}
+        {{ $allPubTags = $allPubTags | append . }}
+      {{ end }}
+    {{ end }}
+    {{ $uniquePubTags := $allPubTags | uniq | sort }}
+    <details class="text-xs">
+    <summary class="cursor-pointer text-muted-foreground hover:text-foreground py-1">Filter by tag ({{ len $uniquePubTags }} tags)</summary>
+    <div class="flex flex-wrap gap-2 text-xs mt-2">
+    {{ range $uniquePubTags }}
+      <a href="{{ (printf "/tags/%s/" .) | relURL }}" class="inline-flex items-center rounded-full border px-2 py-1 text-xs font-medium bg-muted text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors">#{{ . }}</a>
+    {{ end }}
+    </div>
+    </details>
+    </noscript>
+    <div
+      class="text-xs text-muted-foreground"
+      id="blog-search-status"
+      aria-live="polite"
+    ></div>
+  </div>
+  {{/* Build groups by year from year or date */}}
+  {{ $byYear := dict }}
+  {{ range $p.Pages }}
+    {{ $pg := . }}
+    {{ $year := 0 }}
+    {{ if isset $pg.Params "year" }}
+      {{ $year = int $pg.Params.year }}
+    {{ else if isset $pg.Params "date" }}
+      {{ $s := printf "%v" $pg.Params.date }}
+      {{ $m := findRE "^[0-9]{4}$" $s }}
+      {{ if gt (len $m) 0 }}
+        {{ $year = int (index $m 0) }}
+      {{ else }}
+        {{ $year = int (dateFormat "2006" $pg.Params.date) }}
+      {{ end }}
+    {{ end }}
+    {{ $key := "Unknown" }}
+    {{ if gt $year 0 }}
+      {{ $key = printf "%d" $year }}
+    {{ end }}
+    {{ $bucket := index $byYear $key | default (slice) }}
+    {{ $bucket = $bucket | append $pg }}
+    {{ $byYear = merge $byYear (dict $key $bucket) }}
+  {{ end }}
+  {{/* Sort years desc, with Unknown last */}}
+  {{ $known := slice }}
+  {{ $hasUnknown := false }}
+  {{ range $k, $_ := $byYear }}
+    {{ if eq $k "Unknown" }}
+      {{ $hasUnknown = true }}
+    {{ else }}
+      {{ $known = $known | append $k }}
+    {{ end }}
+  {{ end }}
+  {{ $years := sort $known "value" "desc" }}
+  {{ if $hasUnknown }}
+    {{ $years = $years | append "Unknown" }}
+  {{ end }}
+
+  <div id="publications-server-list">
+    {{ range $years }}
+      {{ $y := . }}
+      <div class="space-y-3">
+        <h2 class="text-xl font-semibold tracking-tight">{{ $y }}</h2>
+        <ul class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 items-start">
+          {{ range (index $byYear $y) }}
+            {{ $pg := . }}
+            <li class="space-y-1 border rounded-lg p-4 h-full">
+              <h3 class="font-semibold leading-snug">
+                <a href="{{ $pg.RelPermalink }}" class="underline underline-offset-4">{{ $pg.Title }}</a>
+              </h3>
+              <div class="text-sm text-muted-foreground">
+                {{ $bits := slice }}
+                {{ with $pg.Params.author }}
+                  {{ $bits = $bits | append . }}
+                {{ end }}
+                {{ with $pg.Params.venue }}
+                  {{ $bits = $bits | append . }}
+                {{ end }}
+                {{ $year := 0 }}
+                {{ if isset $pg.Params "year" }}
+                  {{ $year = int $pg.Params.year }}
+                {{ else if isset $pg.Params "date" }}
+                  {{ $s := printf "%v" $pg.Params.date }}
+                  {{ $m := findRE "^[0-9]{4}$" $s }}
+                  {{ if gt (len $m) 0 }}
+                    {{ $year = int (index $m 0) }}
+                  {{ else }}
+                    {{ $year = int (dateFormat "2006" $pg.Params.date) }}
+                  {{ end }}
+                {{ end }}
+                {{ if gt $year 0 }}
+                  {{ $bits = $bits | append $year }}
+                {{ end }}
+                {{ delimit $bits " • " }}
+              </div>
+              {{ with $pg.Params.description }}
+                <p class="text-sm text-muted-foreground mt-1">{{ . }}</p>
+              {{ end }}
+              {{ with $pg.Params.doi }}
+                <div class="text-xs mt-2">
+                  <span class="text-muted-foreground">DOI:</span> {{ . }}
+                </div>
+              {{ end }}
+              {{ if $pg.Params.tags }}
+                <div class="mt-2 flex flex-wrap gap-1 text-xs text-muted-foreground">
+                  {{ range $pg.Params.tags }}<span class="px-2 py-0.5 rounded bg-muted">#{{ . }}</span>{{ end }}
+                </div>
+              {{ end }}
+              {{ with $pg.Params.link }}
+                <p class="mt-2">
+                  <a href="{{ . }}" target="_blank" rel="noopener" class="text-primary underline">PDF</a>
+                </p>
+              {{ end }}
+            </li>
+          {{ end }}
+        </ul>
+      </div>
+    {{ end }}
+  </div>
+
+  {{ partial "pagination.html" . }}
+  {{/* Client-side search script */}}
+  <script src="/assets/js/search.js" data-index-url="/publications/index.json"></script>
+</section>

@@ -1,0 +1,84 @@
+// ─── Typography Utilities ────────────────────────────────────────────────────
+// Font sizes, weights, line heights, letter spacing, and text alignment
+
+// ── Font sizes ─────────────────────────────────────────────────────────────────
+.text-\[10px\] { font-size: 10px; }
+.text-xs   { font-size: 0.75rem; line-height: 1rem; }
+.text-sm   { font-size: 0.875rem; line-height: 1.25rem; }
+.text-base { font-size: 1rem; line-height: 1.5rem; }
+.text-lg   { font-size: 1.125rem; line-height: 1.75rem; }
+.text-xl   { font-size: 1.25rem; line-height: 1.75rem; }
+.text-2xl  { font-size: 1.5rem; line-height: 2rem; }
+.text-3xl  { font-size: 1.875rem; line-height: 2.25rem; }
+.text-4xl  { font-size: 2.25rem; line-height: 2.5rem; }
+.text-5xl  { font-size: 3rem; line-height: 1; }
+.text-6xl  { font-size: 3.75rem; line-height: 1; }
+
+// ── Font weights ───────────────────────────────────────────────────────────────
+.font-normal    { font-weight: 400; }
+.font-medium    { font-weight: 500; }
+.font-semibold  { font-weight: 600; }
+.font-bold      { font-weight: 700; }
+.font-extrabold { font-weight: 800; }
+
+// ── Font families ──────────────────────────────────────────────────────────────
+.font-sans  { font-family: var(--font-sans); }
+.font-mono  { font-family: var(--font-mono); }
+.font-headline { font-family: var(--font-sans); }
+
+// ── Line height ────────────────────────────────────────────────────────────────
+.leading-none    { line-height: 1; }
+.leading-tight   { line-height: 1.25; }
+.leading-snug    { line-height: 1.375; }
+.leading-normal  { line-height: 1.5; }
+.leading-relaxed { line-height: 1.625; }
+
+// ── Letter spacing ─────────────────────────────────────────────────────────────
+.tracking-tighter { letter-spacing: -0.05em; }
+.tracking-tight   { letter-spacing: -0.025em; }
+.tracking-normal  { letter-spacing: 0; }
+.tracking-wide    { letter-spacing: 0.025em; }
+
+// ── Text alignment ─────────────────────────────────────────────────────────────
+.text-left    { text-align: left; }
+.text-center  { text-align: center; }
+.text-right   { text-align: right; }
+
+// ── Text decoration ────────────────────────────────────────────────────────────
+.underline            { text-decoration: underline; }
+.underline-offset-4   { text-underline-offset: 4px; }
+.no-underline         { text-decoration: none; }
+
+// ── Text transform ─────────────────────────────────────────────────────────────
+.uppercase { text-transform: uppercase; }
+.lowercase { text-transform: lowercase; }
+.capitalize { text-transform: capitalize; }
+
+// ── Text overflow ──────────────────────────────────────────────────────────────
+.truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.whitespace-nowrap { white-space: nowrap; }
+.whitespace-pre-wrap { white-space: pre-wrap; }
+
+.break-words { word-wrap: break-word; overflow-wrap: break-word; }
+.wrap-break-words { word-wrap: break-word; overflow-wrap: break-word; }
+
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+// ── List style ─────────────────────────────────────────────────────────────────
+.list-disc { list-style-type: disc; }
+.list-none { list-style-type: none; }
+
+// ── Tabular numbers ────────────────────────────────────────────────────────────
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}

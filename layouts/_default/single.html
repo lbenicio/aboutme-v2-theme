@@ -1,0 +1,37 @@
+{{ define "main" }}
+<article class="py-6">
+  <h1 class="text-3xl md:text-4xl font-bold tracking-tight">{{ .Title }}</h1>
+  {{/* Robust date display: prefer params.year, then params.date (year or full date), else .Date */}}
+  {{ $dateText := "" }}
+  {{ if isset .Params "year" }}
+    {{ $dateText = printf "%d" (int .Params.year) }}
+  {{ else if isset .Params "date" }}
+    {{ $s := printf "%v" .Params.date }}
+    {{ $m := findRE "^[0-9]{4}$" $s }}
+    {{ if gt (len $m) 0 }}
+      {{ $dateText = index $m 0 }}
+    {{ else }}
+      {{ $dateText = dateFormat "2006-01-02" .Params.date }}
+    {{ end }}
+  {{ else if .Date }}
+    {{ $dateText = time.Format "2006-01-02" .Date }}
+  {{ end }}
+  {{ if ne $dateText "" }}
+    <p class="mt-2 text-sm text-muted-foreground">{{ $dateText }}{{ if .Site.Params.showReadingTime }} · {{ $.ReadingTime }} min{{ end }}</p>
+  {{ end }}
+  <div class="prose dark:prose-invert mt-6 max-w-none">{{ .Content }}</div>
+  {{ with .Params.tags }}
+    <div class="mt-6 flex flex-wrap gap-2 text-xs text-muted-foreground">
+      {{ range . }}
+        <a href="{{ (printf "/tags/%s/" .) | relURL }}" class="px-2 py-0.5 rounded bg-muted">#{{ . }}</a>
+      {{ end }}
+    </div>
+  {{ end }}
+  {{ if and .Prev .Next }}
+    <nav class="mt-8 flex items-center justify-between text-sm">
+      {{ with .Prev }}<a class="underline underline-offset-4" href="{{ .RelPermalink }}"><span class="text-muted-foreground">← Previous</span></a>{{ end }}
+      {{ with .Next }}<a class="underline underline-offset-4" href="{{ .RelPermalink }}"><span class="text-muted-foreground">Next →</span></a>{{ end }}
+    </nav>
+  {{ end }}
+</article>
+{{ end }}
