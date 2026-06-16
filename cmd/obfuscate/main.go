@@ -531,20 +531,91 @@ func replaceInFile(filePath string, mapping map[string]string, dryRun, verbose b
 }
 
 func replaceHTML(content string, mapping map[string]string) string {
-	doc, err := html.Parse(strings.NewReader(content))
-	if err != nil {
-		return applyRegexReplace(content, mapping)
+	// First, handle inline scripts and styles (before HTML attribute replacement)
+	result := replaceJSText(content, mapping)
+	result = replaceCSSText(result, mapping)
+
+	// Replace class attributes
+	classRe := regexp.MustCompile(`class="([^"]*)"`)
+	result = classRe.ReplaceAllStringFunc(result, func(match string) string {
+		parts := classRe.FindStringSubmatch(match)
+		if len(parts) != 2 {
+			return match
+		}
+		var newClasses []string
+		for _, cls := range strings.Fields(parts[1]) {
+			cls = strings.Trim(cls, `"'`)
+			if cls == "" {
+				continue
+			}
+			if token := mapping["class:"+cls]; token != "" {
+				newClasses = append(newClasses, token)
+			} else {
+				newClasses = append(newClasses, cls)
+			}
+		}
+		return `class="` + strings.Join(newClasses, " ") + `"`
+	})
+
+	// Replace id attributes: id="foo" -> id="TOKEN"
+	idRe := regexp.MustCompile(`\bid="([^"]*)"`)
+	result = idRe.ReplaceAllStringFunc(result, func(match string) string {
+		parts := idRe.FindStringSubmatch(match)
+		if len(parts) != 2 {
+			return match
+		}
+		if token := mapping["id:"+parts[1]]; token != "" {
+			return `id="` + token + `"`
+		}
+		return match
+	})
+
+	// Replace data-* attribute names
+	dataRe := regexp.MustCompile(`\b(data-[A-Za-z0-9_-]+)(\s*=)`)
+	result = dataRe.ReplaceAllStringFunc(result, func(match string) string {
+		parts := dataRe.FindStringSubmatch(match)
+		if len(parts) != 3 {
+			return match
+		}
+		dataName := parts[1][5:] // strip "data-" prefix
+		if token := mapping["data:"+dataName]; token != "" {
+			return `data-` + token + parts[2]
+		}
+		return match
+	})
+
+	// Replace aria-* and other ID-reference attributes
+	for _, attr := range []string{"aria-controls", "aria-labelledby", "aria-describedby", "aria-owns", "aria-activedescendant", "for", "list"} {
+		attrRe := regexp.MustCompile(`\b` + attr + `="([^"]*)"`)
+		result = attrRe.ReplaceAllStringFunc(result, func(match string) string {
+			parts := attrRe.FindStringSubmatch(match)
+			if len(parts) != 2 {
+				return match
+			}
+			var refs []string
+			for _, ref := range strings.Fields(parts[1]) {
+				if token := mapping["id:"+ref]; token != "" {
+					refs = append(refs, token)
+				} else {
+					refs = append(refs, ref)
+				}
+			}
+			return attr + `="` + strings.Join(refs, " ") + `"`
+		})
 	}
 
-	var buf strings.Builder
-	replaceHTMLNode(doc, mapping)
-	html.Render(&buf, doc)
-	result := buf.String()
-
-	// Also apply JS/CSS replacements to inline scripts and styles
-	// that html.Render outputs without modification
-	result = replaceJSText(result, mapping)
-	result = replaceCSSText(result, mapping)
+	// Replace href="#id" fragment references
+	hrefRe := regexp.MustCompile(`\bhref="#([^"]*)"`)
+	result = hrefRe.ReplaceAllStringFunc(result, func(match string) string {
+		parts := hrefRe.FindStringSubmatch(match)
+		if len(parts) != 2 {
+			return match
+		}
+		if token := mapping["id:"+parts[1]]; token != "" {
+			return `href="#` + token + `"`
+		}
+		return match
+	})
 
 	return result
 }
