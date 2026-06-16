@@ -257,7 +257,7 @@ func extractFromNode(n *html.Node, seen map[string]bool, names *[]nameItem) {
 			switch key {
 			case "class":
 				for _, cls := range strings.Fields(val) {
-					cls = strings.TrimSpace(cls)
+					cls = strings.Trim(cls, `"'`)
 					if cls == "" {
 						continue
 					}
@@ -302,11 +302,17 @@ func extractCSSNames(content string) []nameItem {
 	blockRe := regexp.MustCompile(`([^{}]+)\{`)
 	for _, m := range blockRe.FindAllStringSubmatch(content, -1) {
 		selector := m[1]
-		// class selectors: .foo or .md\:flex (with escape chars)
-		for _, cm := range regexp.MustCompile(`\.([A-Za-z0-9_\\:\/-]+)`).FindAllStringSubmatch(selector, -1) {
-			// Unescape CSS class names (e.g. md\:flex -> md:flex)
+		// class selectors: .foo or .md\:flex or .min-h-\[calc(...)\] (with escape chars)
+		for _, cm := range regexp.MustCompile(`\.([A-Za-z0-9_\\:\/\-\[\]\(\)\.%]+)`).FindAllStringSubmatch(selector, -1) {
+			// Unescape CSS class names (e.g. md\:flex -> md:flex, \[ -> [)
 			name := strings.ReplaceAll(cm[1], "\\:", ":")
 			name = strings.ReplaceAll(name, "\\/", "/")
+			name = strings.ReplaceAll(name, "\\[", "[")
+			name = strings.ReplaceAll(name, "\\]", "]")
+			name = strings.ReplaceAll(name, "\\(", "(")
+			name = strings.ReplaceAll(name, "\\)", ")")
+			name = strings.ReplaceAll(name, "\\.", ".")
+			name = strings.ReplaceAll(name, "\\%", "%")
 			it := nameItem{Type: "class", Name: name}
 			if !seen[it.Key()] {
 				seen[it.Key()] = true
@@ -609,10 +615,20 @@ func replaceCSS(content string, mapping map[string]string) string {
 			continue
 		}
 		orig := key[6:]
-		// Match both .classname and .class\:name (escaped CSS)
-		escaped := strings.ReplaceAll(orig, ":", "\\:")
-		re := regexp.MustCompile(`\.(?:` + regexp.QuoteMeta(orig) + `|` + regexp.QuoteMeta(escaped) + `)\b`)
-		content = re.ReplaceAllString(content, "."+mapping[key])
+		// Escape special chars to match the CSS-escaped form in selectors
+		var cssForm strings.Builder
+		for _, r := range orig {
+			switch r {
+			case ':', '[', ']', '(', ')', '.', '%', '/':
+				cssForm.WriteByte('\\')
+				cssForm.WriteRune(r)
+			default:
+				cssForm.WriteRune(r)
+			}
+		}
+		// Use \Q...\E to match the CSS form literally, followed by { or , or :
+		re := regexp.MustCompile(`\.\Q` + cssForm.String() + `\E(\{|,|:)`)
+		content = re.ReplaceAllString(content, "."+mapping[key]+"$1")
 	}
 	// Replace id selectors
 	for _, key := range sorted {
@@ -633,6 +649,22 @@ func replaceCSS(content string, mapping map[string]string) string {
 		content = re.ReplaceAllString(content, "[data-"+mapping[key])
 	}
 	return content
+}
+
+// cssEscape returns the CSS-selector-escaped form of a class name.
+// e.g. "md:flex" -> "md\:flex", "min-h-[calc(100vh-10rem)]" -> "min-h-\[calc\(100vh-10rem\)\]"
+func cssEscape(name string) string {
+	r := strings.NewReplacer(
+		":", "\\:",
+		"[", "\\[",
+		"]", "\\]",
+		"(", "\\(",
+		")", "\\)",
+		".", "\\.",
+		"%", "\\%",
+		"/", "\\/",
+	)
+	return r.Replace(name)
 }
 
 func sortMappingByLength(mapping map[string]string) []string {
