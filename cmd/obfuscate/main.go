@@ -572,44 +572,59 @@ func replaceHTMLNode(n *html.Node, mapping map[string]string) {
 
 func replaceCSS(content string, mapping map[string]string) string {
 	// Replace class selectors: .original -> .token
-	for key, token := range mapping {
+	// Sort by length descending so longer names get replaced first, preventing
+	// partial matches (e.g. "flex" matching inside "flex-col")
+	sorted := sortMappingByLength(mapping)
+	for _, key := range sorted {
 		if !strings.HasPrefix(key, "class:") {
 			continue
 		}
 		orig := key[6:]
-		// Only replace in selector contexts (before { or ,)
 		re := regexp.MustCompile(`\.` + regexp.QuoteMeta(orig) + `\b`)
-		content = re.ReplaceAllString(content, "."+token)
+		content = re.ReplaceAllString(content, "."+mapping[key])
 	}
 	// Replace id selectors
-	for key, token := range mapping {
+	for _, key := range sorted {
 		if !strings.HasPrefix(key, "id:") {
 			continue
 		}
 		orig := key[3:]
 		re := regexp.MustCompile(`#` + regexp.QuoteMeta(orig) + `\b`)
-		content = re.ReplaceAllString(content, "#"+token)
+		content = re.ReplaceAllString(content, "#"+mapping[key])
 	}
 	// Replace data-* selectors
-	for key, token := range mapping {
+	for _, key := range sorted {
 		if !strings.HasPrefix(key, "data:") {
 			continue
 		}
 		orig := key[5:]
 		re := regexp.MustCompile(`\[\s*data-` + regexp.QuoteMeta(orig) + `\b`)
-		content = re.ReplaceAllString(content, "[data-"+token)
+		content = re.ReplaceAllString(content, "[data-"+mapping[key])
 	}
 	return content
 }
 
+func sortMappingByLength(mapping map[string]string) []string {
+	keys := make([]string, 0, len(mapping))
+	for k := range mapping {
+		keys = append(keys, k)
+	}
+	sort.Slice(keys, func(i, j int) bool {
+		return len(keys[i]) > len(keys[j])
+	})
+	return keys
+}
+
 func replaceJS(content string, mapping map[string]string) string {
-	// Replace class references in strings: 'classname' -> 'token'
-	for key, token := range mapping {
+	// Sort by length descending to prevent partial matches
+	sorted := sortMappingByLength(mapping)
+	for _, key := range sorted {
 		parts := strings.SplitN(key, ":", 2)
 		if len(parts) != 2 {
 			continue
 		}
 		typ, orig := parts[0], parts[1]
+		token := mapping[key]
 
 		switch typ {
 		case "class":
@@ -627,10 +642,8 @@ func replaceJS(content string, mapping map[string]string) string {
 			re = regexp.MustCompile(`(#` + regexp.QuoteMeta(orig) + `\b)`)
 			content = re.ReplaceAllString(content, "#"+token)
 		case "data":
-			// getAttribute('data-orig') or setAttribute('data-orig', ...)
 			re := regexp.MustCompile(`(\bdata-)` + regexp.QuoteMeta(orig) + `\b`)
 			content = re.ReplaceAllString(content, "data-"+token)
-			// dataset.origProp -> handled via data-name mapping
 		}
 	}
 	return content
