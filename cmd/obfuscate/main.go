@@ -302,9 +302,12 @@ func extractCSSNames(content string) []nameItem {
 	blockRe := regexp.MustCompile(`([^{}]+)\{`)
 	for _, m := range blockRe.FindAllStringSubmatch(content, -1) {
 		selector := m[1]
-		// class selectors: .foo
-		for _, cm := range regexp.MustCompile(`\.([A-Za-z0-9_-]+)`).FindAllStringSubmatch(selector, -1) {
-			it := nameItem{Type: "class", Name: cm[1]}
+		// class selectors: .foo or .md\:flex (with escape chars)
+		for _, cm := range regexp.MustCompile(`\.([A-Za-z0-9_\\:\/-]+)`).FindAllStringSubmatch(selector, -1) {
+			// Unescape CSS class names (e.g. md\:flex -> md:flex)
+			name := strings.ReplaceAll(cm[1], "\\:", ":")
+			name = strings.ReplaceAll(name, "\\/", "/")
+			it := nameItem{Type: "class", Name: name}
 			if !seen[it.Key()] {
 				seen[it.Key()] = true
 				names = append(names, it)
@@ -606,7 +609,9 @@ func replaceCSS(content string, mapping map[string]string) string {
 			continue
 		}
 		orig := key[6:]
-		re := regexp.MustCompile(`\.` + regexp.QuoteMeta(orig) + `\b`)
+		// Match both .classname and .class\:name (escaped CSS)
+		escaped := strings.ReplaceAll(orig, ":", "\\:")
+		re := regexp.MustCompile(`\.(?:` + regexp.QuoteMeta(orig) + `|` + regexp.QuoteMeta(escaped) + `)\b`)
 		content = re.ReplaceAllString(content, "."+mapping[key])
 	}
 	// Replace id selectors
