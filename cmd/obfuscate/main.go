@@ -535,15 +535,19 @@ func replaceHTML(content string, mapping map[string]string) string {
 	result := replaceJSText(content, mapping)
 	result = replaceCSSText(result, mapping)
 
-	// Replace class attributes
-	classRe := regexp.MustCompile(`class="([^"]*)"`)
+	// Replace class attributes: class="a b c" or class=cls
+	classRe := regexp.MustCompile(`class="([^"]*)"|class=([^\s>]+)`)
 	result = classRe.ReplaceAllStringFunc(result, func(match string) string {
 		parts := classRe.FindStringSubmatch(match)
-		if len(parts) != 2 {
+		val := parts[1]
+		if val == "" {
+			val = parts[2]
+		}
+		if val == "" {
 			return match
 		}
 		var newClasses []string
-		for _, cls := range strings.Fields(parts[1]) {
+		for _, cls := range strings.Fields(val) {
 			cls = strings.Trim(cls, `"'`)
 			if cls == "" {
 				continue
