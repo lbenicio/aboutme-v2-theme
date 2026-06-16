@@ -23,10 +23,10 @@
 <link rel="preload" href="{{ "assets/fonts/OpenSans-Regular.ttf" | relURL }}" as="font" type="font/ttf" crossorigin>
 {{/* Serve fonts.css via Hugo Pipes from assets/css */}}
 {{ if $isDev }}
-  {{ $f := resources.Get "css/fonts.css" | resources.ExecuteAsTemplate (printf "css/fonts-dev-%d.css" now.Unix) . }}
+  {{ $f := resources.Get "assets/css/fonts.css" | resources.ExecuteAsTemplate (printf "assets/css/fonts-dev-%d.css" now.Unix) . }}
   <link rel="stylesheet" href="{{ $f.RelPermalink }}" />
 {{ else }}
-  {{ $f := resources.Get "css/fonts.css" | minify | fingerprint }}
+  {{ $f := resources.Get "assets/css/fonts.css" | minify | fingerprint }}
   <link rel="stylesheet" href="{{ $f.RelPermalink }}" integrity="{{ $f.Data.Integrity }}" />
 {{ end }}
 
