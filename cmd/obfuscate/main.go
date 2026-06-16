@@ -750,9 +750,7 @@ func sortMappingByLength(mapping map[string]string) []string {
 }
 
 func replaceJS(content string, mapping map[string]string) string {
-	// Only replace inside string arguments to DOM methods.
-	// Avoid replacing bare .classname patterns that might match
-	// property accesses like n.style.transition.
+	// Replace class/id/data names inside string arguments in DOM method calls.
 	sorted := sortMappingByLength(mapping)
 	for _, key := range sorted {
 		parts := strings.SplitN(key, ":", 2)
@@ -764,26 +762,46 @@ func replaceJS(content string, mapping map[string]string) string {
 
 		switch typ {
 		case "class":
-			// getElementsByClassName('orig') or classList.add('orig')
-			re := regexp.MustCompile(`(getElementsByClassName|classList\.(?:add|remove|toggle|contains|replace))\(\s*['"]` + regexp.QuoteMeta(orig) + `['"]`)
-			content = re.ReplaceAllString(content, "${1}('"+token+"'")
-			// querySelector('.orig') or querySelectorAll('.orig')
-			re = regexp.MustCompile(`(querySelector(?:All)?\(\s*['"])(.*?)(['"]\s*\))`)
-			// Only replace inside querySelector strings
+			for _, method := range []string{"classList.add", "classList.remove", "classList.toggle", "classList.contains", "classList.replace", "getElementsByClassName"} {
+				content = replaceStringArg(content, method, orig, token)
+			}
 			content = replaceInSelectorStrings(content, orig, token)
 		case "id":
-			// getElementById('orig')
-			re := regexp.MustCompile(`(getElementById\(\s*['"])` + regexp.QuoteMeta(orig) + `(['"])`)
-			content = re.ReplaceAllString(content, "${1}"+token+"${2}")
-			// querySelector('#orig')
+			content = replaceStringArg(content, "getElementById", orig, token)
 			content = replaceInSelectorStrings(content, "#"+orig, "#"+token)
 		case "data":
-			// getAttribute('data-orig') / setAttribute('data-orig', ...)
 			re := regexp.MustCompile(`([gs]etAttribute\(\s*['"]data-)` + regexp.QuoteMeta(orig) + `(['"]\s*[,)])`)
 			content = re.ReplaceAllString(content, "${1}"+token+"${2}")
 		}
 	}
 	return content
+}
+
+// replaceStringArg replaces a quoted string argument in a method call.
+func replaceStringArg(content, method, orig, token string) string {
+	prefix := method + "("
+	result := content
+	offset := 0
+	for {
+		idx := strings.Index(result[offset:], prefix)
+		if idx == -1 {
+			break
+		}
+		idx += offset
+		end := strings.Index(result[idx:], ")")
+		if end == -1 {
+			break
+		}
+		end += idx
+		args := result[idx+len(prefix) : end]
+		newArgs := strings.ReplaceAll(args, "\""+orig+"\"", "\""+token+"\"")
+		newArgs = strings.ReplaceAll(newArgs, "'"+orig+"'", "'"+token+"'")
+		if newArgs != args {
+			result = result[:idx+len(prefix)] + newArgs + result[end:]
+		}
+		offset = idx + len(prefix) + len(newArgs)
+	}
+	return result
 }
 
 // replaceInSelectorStrings replaces .orig with .token only inside querySelector strings.
