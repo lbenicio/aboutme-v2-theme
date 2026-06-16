@@ -26,8 +26,8 @@
   {{ $f := resources.Get "assets/css/fonts.css" | resources.ExecuteAsTemplate (printf "assets/css/fonts-dev-%d.css" now.Unix) . }}
   <link rel="stylesheet" href="{{ $f.RelPermalink }}" />
 {{ else }}
-  {{ $f := resources.Get "assets/css/fonts.css" | minify | fingerprint }}
-  <link rel="stylesheet" href="{{ $f.RelPermalink }}" integrity="{{ $f.Data.Integrity }}" />
+  {{ $f := resources.Get "assets/css/fonts.css" | minify }}
+  <link rel="stylesheet" href="{{ $f.RelPermalink }}" />
 {{ end }}
 
 {{/* Render analytics only in production and when a website ID is configured */}}
