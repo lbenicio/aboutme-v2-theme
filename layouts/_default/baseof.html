@@ -11,7 +11,7 @@
         {{ partial "head-meta.html" . }} {{ partial "head-icons.html" . }} {{ partial "seo-meta.html" . }} {{ partial "ld-website-person.html" . }} {{ partial "ld-breadcrumbs.html" . }} {{/* SCSS via Hugo Pipes (no
         Node.js required) */}} {{ $isDev := or (eq (getenv "HUGO_ENV") "development") (eq (getenv "HUGO_ENVIRONMENT") "development") }} {{ if $isDev }} {{ $styles := resources.Get "scss/main.scss" | css.Sass }}
         <link rel="stylesheet" href="{{ $styles.RelPermalink }}" />
-        {{ else }} {{ $styles := resources.Get "scss/main.scss" | css.Sass | minify | fingerprint | resources.Copy "assets/css/main.css" }}
+        {{ else }} {{ $styles := resources.Get "scss/main.scss" | css.Sass | minify | fingerprint }}
         <link rel="stylesheet" href="{{ $styles.RelPermalink }}" integrity="{{ $styles.Data.Integrity }}" />
         {{ end }}
     </head>
