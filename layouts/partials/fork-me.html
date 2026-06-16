@@ -1,7 +1,7 @@
 {{/* GitHub "Fork me" stripe */}} {{ $enabled := default false .Site.Params.enableForkMe }} {{ if $enabled }} {{ $repo := .Site.Params.forkMeRepoUrl | default "" }} {{ if not $repo }}{{ with .Site.Params.githubHandler
 }}{{ $repo = printf "https://github.com/%s/aboutme" . }}{{ end }}{{ end }} {{ if $repo }}
 <div class="fixed right-0 top-20 sm:top-24 z-40 pointer-events-none" role="complementary" aria-label="GitHub repository">
-    <div class="pointer-events-auto w-22 sm:w-24 ml-auto pr-0">
+    <div class="pointer-events-auto ml-auto pr-0">
         <div class="flex items-center justify-center gap-2 rounded-l-full border bg-muted/70 dark:bg-muted/40 text-muted-foreground shadow-sm py-1 pl-4 pr-3 backdrop-blur-sm">
             <a
                 href="{{ $repo }}"
