@@ -626,9 +626,9 @@ func replaceCSS(content string, mapping map[string]string) string {
 				cssForm.WriteRune(r)
 			}
 		}
-		// Use \Q...\E to match the CSS form literally, followed by { or , or :
-		re := regexp.MustCompile(`\.\Q` + cssForm.String() + `\E(\{|,|:)`)
-		content = re.ReplaceAllString(content, "."+mapping[key]+"$1")
+		// Use \Q...\E to match the CSS form literally, then non-{ chars until {
+		re := regexp.MustCompile(`\.\Q` + cssForm.String() + `\E([^{]*)\{`)
+		content = re.ReplaceAllString(content, "."+mapping[key]+"$1{")
 	}
 	// Replace id selectors
 	for _, key := range sorted {
