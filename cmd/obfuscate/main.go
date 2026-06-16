@@ -530,7 +530,14 @@ func replaceHTML(content string, mapping map[string]string) string {
 	var buf strings.Builder
 	replaceHTMLNode(doc, mapping)
 	html.Render(&buf, doc)
-	return buf.String()
+	result := buf.String()
+
+	// Also apply JS/CSS replacements to inline scripts and styles
+	// that html.Render outputs without modification
+	result = replaceJSText(result, mapping)
+	result = replaceCSSText(result, mapping)
+
+	return result
 }
 
 func replaceHTMLNode(n *html.Node, mapping map[string]string) {
@@ -616,7 +623,9 @@ func sortMappingByLength(mapping map[string]string) []string {
 }
 
 func replaceJS(content string, mapping map[string]string) string {
-	// Sort by length descending to prevent partial matches
+	// Only replace inside string arguments to DOM methods.
+	// Avoid replacing bare .classname patterns that might match
+	// property accesses like n.style.transition.
 	sorted := sortMappingByLength(mapping)
 	for _, key := range sorted {
 		parts := strings.SplitN(key, ":", 2)
@@ -628,25 +637,74 @@ func replaceJS(content string, mapping map[string]string) string {
 
 		switch typ {
 		case "class":
-			// getElementsByClassName('orig')
-			re := regexp.MustCompile(`(getElementsByClassName\(\s*['"])` + regexp.QuoteMeta(orig) + `(['"])`)
-			content = re.ReplaceAllString(content, "${1}"+token+"${2}")
-			// querySelector('.orig')
-			re = regexp.MustCompile(`(\.` + regexp.QuoteMeta(orig) + `\b)`)
-			content = re.ReplaceAllString(content, "."+token)
+			// getElementsByClassName('orig') or classList.add('orig')
+			re := regexp.MustCompile(`(getElementsByClassName|classList\.(?:add|remove|toggle|contains|replace))\(\s*['"]` + regexp.QuoteMeta(orig) + `['"]`)
+			content = re.ReplaceAllString(content, "${1}('"+token+"'")
+			// querySelector('.orig') or querySelectorAll('.orig')
+			re = regexp.MustCompile(`(querySelector(?:All)?\(\s*['"])(.*?)(['"]\s*\))`)
+			// Only replace inside querySelector strings
+			content = replaceInSelectorStrings(content, orig, token)
 		case "id":
 			// getElementById('orig')
 			re := regexp.MustCompile(`(getElementById\(\s*['"])` + regexp.QuoteMeta(orig) + `(['"])`)
 			content = re.ReplaceAllString(content, "${1}"+token+"${2}")
 			// querySelector('#orig')
-			re = regexp.MustCompile(`(#` + regexp.QuoteMeta(orig) + `\b)`)
-			content = re.ReplaceAllString(content, "#"+token)
+			content = replaceInSelectorStrings(content, "#"+orig, "#"+token)
 		case "data":
-			re := regexp.MustCompile(`(\bdata-)` + regexp.QuoteMeta(orig) + `\b`)
-			content = re.ReplaceAllString(content, "data-"+token)
+			// getAttribute('data-orig') / setAttribute('data-orig', ...)
+			re := regexp.MustCompile(`([gs]etAttribute\(\s*['"]data-)` + regexp.QuoteMeta(orig) + `(['"]\s*[,)])`)
+			content = re.ReplaceAllString(content, "${1}"+token+"${2}")
 		}
 	}
 	return content
+}
+
+// replaceInSelectorStrings replaces .orig with .token only inside querySelector strings.
+func replaceInSelectorStrings(content, orig, token string) string {
+	// Match querySelector('...') or querySelectorAll('...')
+	re := regexp.MustCompile(`(querySelector(?:All)?\(\s*['"])([^'"]*)(['"]\s*\))`)
+	return re.ReplaceAllStringFunc(content, func(match string) string {
+		parts := re.FindStringSubmatch(match)
+		if len(parts) != 4 {
+			return match
+		}
+		prefix, selector, suffix := parts[1], parts[2], parts[3]
+		// Replace .orig with .token in the selector string
+		selector = strings.ReplaceAll(selector, orig, token)
+		return prefix + selector + suffix
+	})
+}
+
+// replaceJSText finds inline <script> blocks in HTML output and applies JS replacements.
+func replaceJSText(html string, mapping map[string]string) string {
+	scriptRe := regexp.MustCompile(`(?is)(<script[^>]*>)(.*?)(</script>)`)
+	return scriptRe.ReplaceAllStringFunc(html, func(match string) string {
+		parts := scriptRe.FindStringSubmatch(match)
+		if len(parts) != 4 {
+			return match
+		}
+		// Skip scripts with src= attribute
+		if strings.Contains(parts[1], "src=") {
+			return match
+		}
+		// Skip JSON-LD and import maps
+		if strings.Contains(parts[1], "application/ld+json") || strings.Contains(parts[1], "importmap") {
+			return match
+		}
+		return parts[1] + replaceJS(parts[2], mapping) + parts[3]
+	})
+}
+
+// replaceCSSText finds inline <style> blocks in HTML output and applies CSS replacements.
+func replaceCSSText(html string, mapping map[string]string) string {
+	styleRe := regexp.MustCompile(`(?is)(<style[^>]*>)(.*?)(</style>)`)
+	return styleRe.ReplaceAllStringFunc(html, func(match string) string {
+		parts := styleRe.FindStringSubmatch(match)
+		if len(parts) != 4 {
+			return match
+		}
+		return parts[1] + replaceCSS(parts[2], mapping) + parts[3]
+	})
 }
 
 func applyRegexReplace(content string, mapping map[string]string) string {
