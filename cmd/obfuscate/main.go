@@ -561,6 +561,25 @@ func replaceHTMLNode(n *html.Node, mapping map[string]string) {
 				if token != "" {
 					n.Attr[i].Val = token
 				}
+			case "for", "list", "aria-controls", "aria-labelledby", "aria-describedby", "aria-owns", "aria-activedescendant":
+				var refs []string
+				for _, ref := range strings.Fields(attr.Val) {
+					token := mapping["id:"+ref]
+					if token != "" {
+						refs = append(refs, token)
+					} else {
+						refs = append(refs, ref)
+					}
+				}
+				n.Attr[i].Val = strings.Join(refs, " ")
+			case "href":
+				// Replace #id fragment references
+				if strings.HasPrefix(attr.Val, "#") {
+					token := mapping["id:"+attr.Val[1:]]
+					if token != "" {
+						n.Attr[i].Val = "#" + token
+					}
+				}
 			default:
 				if strings.HasPrefix(key, "data-") {
 					dataName := key[5:]
