@@ -1,5 +1,5 @@
 name = "aboutme"
-min_version = "0.152.0"
+min_version = "0.163.0"
 license = "GPL-3.0-only"
 homepage = "https://github.com/lbenicio/aboutme-v2-theme"
 description = "A clean, SCSS-powered Hugo theme for personal websites, blogs, and portfolios with built-in search, dark mode, and multi-variant export support. No Node.js required."
