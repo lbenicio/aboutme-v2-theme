@@ -233,8 +233,8 @@
       <img src="{{ (printf "%s/%s" "assets/favicon" "favicon.svg") | relURL }}" alt="Logo" width="32" height="32" class="h-8 w-8" />
       <span class="font-bold text-lg font-headline pl-2">{{ .Site.Title }}</span>
     </a>
-    <div class="flex flex-1 items-center justify-end space-x-4 pr-2">
-  <nav class="hidden md:flex md:items-center md:space-x-6" aria-label="Main">
+    <div class="flex flex-1 items-center justify-end gap-4 md:gap-6 pr-2">
+  <nav class="hidden md:flex md:items-center md:gap-6" aria-label="Main">
         {{ range $links }}
           {{ $isExt := .external }}
           {{ $href := .href }}
@@ -257,9 +257,9 @@
       </nav>
       <button
         id="theme-toggle"
-                type="button"
-                class="text-lg md:text-sm font-medium transition-colors hover:text-primary text-muted-foreground cursor-pointer border-0 bg-transparent p-0"
-                onclick="toggleTheme(this)"
+        type="button"
+        class="text-lg md:text-sm font-medium transition-colors hover:text-primary text-muted-foreground"
+        onclick="toggleTheme(this)"
         aria-label="Toggle theme"
         title="Toggle theme"
       >
@@ -322,7 +322,7 @@
         <button
           id="mobile-menu-button"
           type="button"
-          class="inline-flex items-center justify-center bg-transparent hover:text-primary text-muted-foreground cursor-pointer transition-colors"
+          class="inline-flex items-center justify-center hover:text-primary text-muted-foreground transition-colors"
                     aria-label="Open menu"
           aria-controls="mobile-drawer"
           aria-expanded="false"

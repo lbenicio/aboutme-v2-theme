@@ -38,11 +38,35 @@ import (
 
 // Protected names that must never be obfuscated.
 var protectedSet = map[string]bool{
-	"class:dark":                  true,
-	"class:not-prose":             true,
+	// Theme-critical classes that must not be obfuscated
+	"class:dark":              true,
+	"class:not-prose":         true,
+	"class:sr-only":           true,
+	"class:not-sr-only":       true,
+	"class:focus:not-sr-only": true,
+	"class:skip-to-content":   true,
+	// Data attributes used by contact form and other interactive elements
 	"data:contact-form":           true,
 	"data:pgp-block":              true,
 	"data:newsletter-checkbox-id": true,
+	"data:contact-submit":         true,
+	"data:contact-loading":        true,
+	"data:contact-toast":          true,
+	"data:first-name":             true,
+	"data:last-name":              true,
+	"data:email":                  true,
+	"data:subject":                true,
+	"data:text":                   true,
+	"data:encrypt":                true,
+	"data:hp":                     true,
+	"data:pgp-error":              true,
+	"data:umami-event":            true,
+	"id:theme-toggle":             true,
+	"id:mobile-menu-button":       true,
+	"id:mobile-drawer":            true,
+	"id:mobile-drawer-overlay":    true,
+	"id:mobile-drawer-close":      true,
+	"id:contact-config":           true,
 }
 
 // nameItem represents a discovered name to potentially obfuscate.
@@ -501,12 +525,15 @@ func replaceInFile(filePath string, mapping map[string]string, dryRun, verbose b
 		return 0
 	}
 
+	// Count actual changes by comparing original vs replaced classes
 	count := 0
-	// Count changes approximately
-	for key := range mapping {
-		before := strings.Count(original, key)
-		after := strings.Count(result, key)
-		if before != after {
+	// Count based on total bytes changed
+	if len(result) != len(original) {
+		count = 1 // non-trivial change
+	}
+	// More precise: count how many mapping tokens appear in the result
+	for _, token := range mapping {
+		if strings.Count(result, token) > 0 && strings.Count(original, token) == 0 {
 			count++
 		}
 	}

@@ -15,10 +15,10 @@ description = "A clean, SCSS-powered Hugo theme for personal websites, blogs, an
   linkedinHandler = ""
   twitterHandler = ""
 
-# ── Page-level config (set in content/*/_index.md front matter) ───────────
+# ── Page-level config (set in content/*/index.md front matter) ───────────
 # Homepage  → content/_index.md         (heading, subtitle, avatar, socials)
-# About     → content/about/_index.md   (summary, name, role, skills, interests, researchInterests, certifications)
-# Contact   → content/contact/_index.md (postUrl, authToken, email, name, pgpKey)
+# About     → content/about/index.md    (summary, name, role, skills, interests, researchInterests, certifications)
+# Contact   → content/contact/index.md  (postUrl, authToken, email, name, pgpKey)
 #
 # Social handlers above serve as the global default and can be overridden
 # per-page via front matter (e.g. github: "myuser").
