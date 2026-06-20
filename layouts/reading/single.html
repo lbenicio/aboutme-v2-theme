@@ -2,9 +2,9 @@
 $siteUrl := .Site.Params.siteUrl }} {{ $dateStr := "" }} {{ with .Date }}{{
 $dateStr = time.Format "2006-01-02" . }}{{ end }} {{ $type := "Article" }} {{
 with .Params.venue }}{{ if eq (lower .) "book" }}{{ $type = "Book" }}{{ end }}{{
-end }} {{ $cover := .Params.cover }} {{ $coverAbs := "" }} {{ if and $cover
+{{ end }} {{ $cover := .Params.cover }} {{ $coverAbs := "" }} {{ if and $cover
 (hasPrefix $cover "http") }} {{ $coverAbs = $cover }} {{ else if $cover }} {{
-$coverAbs = print .Site.Params.basePath $cover }} {{ end }} {{ $coverLd :=
+$coverAbs = $cover | relURL }} {{ end }} {{ $coverLd :=
 $coverAbs }} {{ if and $coverAbs (not (hasPrefix $coverAbs "http")) $siteUrl }}
 {{ $coverLd = print $siteUrl (relURL $coverAbs) }} {{ end }} {{ $ld := dict
 "@context" "https://schema.org" "@type" $type "headline" .Title }} {{ if ne

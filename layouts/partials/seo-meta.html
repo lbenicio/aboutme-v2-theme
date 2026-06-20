@@ -27,7 +27,7 @@ blog/publications, website otherwise */}} {{ $type := "website" }} {{ if or (eq 
   {{ if hasPrefix . "http" }}
     {{ $img = . }}
   {{ else }}
-    {{ $img = print $basePath . }}
+    {{ $img = . | relURL }}
   {{ end }}
 {{ end }}
 {{ $imgAbs := $img }}
