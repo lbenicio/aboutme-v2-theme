@@ -10,6 +10,7 @@
       <h1 class="text-4xl md:text-5xl font-bold tracking-tighter">Blog</h1>
       <p class="text-muted-foreground mt-1">Posts, notes, and articles.</p>
     </div>
+  {{ partial "blog-subnav.html" . }}
   {{/* Select blog posts explicitly by Section - more robust than RelPermalink prefix */}}
   {{ $posts := where .Site.RegularPages "Section" "post" }}
   {{ $posts = where $posts "Kind" "page" }}
