@@ -6,6 +6,7 @@
 (async function () {
   const script = document.currentScript;
   const INDEX_URL = script?.dataset?.indexUrl || "/post/index.json";
+  const BASE_PATH = script?.dataset?.basePath || "";
   const CONTAINER_ID = "blog-results";
   const ITEMS_PER_PAGE = 12;
 
@@ -252,8 +253,8 @@
             post.tags?.length || post.categories?.length
               ? `
             <div class="mt-auto flex flex-wrap gap-2 text-xs text-muted-foreground">
-              ${(post.categories || []).map((c) => `<a href="/categories/${encodeURIComponent(c)}/" class="px-2 py-0.5 rounded bg-muted hover:bg-accent transition-colors">${c}</a>`).join("")}
-              ${(post.tags || []).map((t) => `<a href="/tags/${encodeURIComponent(t)}/" class="px-2 py-0.5 rounded bg-muted hover:bg-accent transition-colors">#${t}</a>`).join("")}
+              ${(post.categories || []).map((c) => `<a href="${BASE_PATH}/categories/${encodeURIComponent(c)}/" class="px-2 py-0.5 rounded bg-muted hover:bg-accent transition-colors">${c}</a>`).join("")}
+              ${(post.tags || []).map((t) => `<a href="${BASE_PATH}/tags/${encodeURIComponent(t)}/" class="px-2 py-0.5 rounded bg-muted hover:bg-accent transition-colors">#${t}</a>`).join("")}
             </div>
           `
               : ""

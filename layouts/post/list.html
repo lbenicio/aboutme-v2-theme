@@ -91,7 +91,7 @@
       </ul>
       {{ partial "pagination.html" . }}
     {{ end }}
-  {{ $searchJSUrl := "" }}{{ with resources.Get "assets/js/search.js" }}{{ $searchJSUrl = .RelPermalink }}{{ end }}{{ if $searchJSUrl }}<script defer src="{{ $searchJSUrl }}" data-index-url="{{ "post/index.json" | relURL }}"></script>{{ end }}
+  {{ $searchJSUrl := "" }}{{ with resources.Get "assets/js/search.js" }}{{ $searchJSUrl = .RelPermalink }}{{ end }}{{ if $searchJSUrl }}<script defer src="{{ $searchJSUrl }}" data-base-path="{{ strings.TrimRight "/" (relURL "") }}" data-index-url="{{ "post/index.json" | relURL }}"></script>{{ end }}
   </section>
 {{ end }}
 {{ end }}

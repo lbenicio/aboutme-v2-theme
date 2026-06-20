@@ -134,6 +134,6 @@
   </div>
 
   {{ partial "pagination.html" . }} {{/* Client-side search script */}}
-  {{ $searchJSUrl := "" }}{{ with resources.Get "assets/js/search.js" }}{{ $searchJSUrl = .RelPermalink }}{{ end }}{{ if $searchJSUrl }}<script src="{{ $searchJSUrl }}" data-index-url="{{ "reading/index.json" | relURL }}"></script>{{ end }}
+  {{ $searchJSUrl := "" }}{{ with resources.Get "assets/js/search.js" }}{{ $searchJSUrl = .RelPermalink }}{{ end }}{{ if $searchJSUrl }}<script src="{{ $searchJSUrl }}" data-base-path="{{ strings.TrimRight "/" (relURL "") }}" data-index-url="{{ "reading/index.json" | relURL }}"></script>{{ end }}
 </section>
 {{ end }}
