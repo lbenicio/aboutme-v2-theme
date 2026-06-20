@@ -405,6 +405,12 @@ func extractJSNames(content string) []nameItem {
 		{regexp.MustCompile(`[gs]etAttribute\(\s*['"]data-([A-Za-z0-9_-]+)['"]\s*[,)]`), "data", 1},
 		// dataset.prop
 		{regexp.MustCompile(`\.dataset\.([A-Za-z0-9_$]+)`), "data-camel", 1},
+		// className = "class1 class2" or className='class1 class2'
+		{regexp.MustCompile(`\.className\s*=\s*['"]([^'"]+)['"]`), "class", 1},
+		// class="..." inside template literals / innerHTML strings
+		{regexp.MustCompile(`class="([^"]*)"`), "class", 1},
+		// class='...' inside template literals (less common but handle it)
+		{regexp.MustCompile(`class='([^']*)'`), "class", 1},
 	}
 
 	for _, p := range patterns {
@@ -821,6 +827,10 @@ func replaceJS(content string, mapping map[string]string) string {
 				content = replaceStringArg(content, method, orig, token)
 			}
 			content = replaceInSelectorStrings(content, orig, token)
+			// Replace class names inside class="..." strings (innerHTML templates)
+			content = replaceInHTMLClassStrings(content, orig, token)
+			// Replace class names inside className="..." assignments
+			content = replaceInClassNameAssignments(content, orig, token)
 		case "id":
 			content = replaceStringArg(content, "getElementById", orig, token)
 			content = replaceInSelectorStrings(content, "#"+orig, "#"+token)
@@ -873,6 +883,46 @@ func replaceInSelectorStrings(content, orig, token string) string {
 		dotClassRe := regexp.MustCompile(`\.` + regexp.QuoteMeta(orig) + `\b`)
 		selector = dotClassRe.ReplaceAllString(selector, "."+token)
 		return prefix + selector + suffix
+	})
+}
+
+// replaceInHTMLClassStrings replaces class names inside class="..." template strings.
+func replaceInHTMLClassStrings(content, orig, token string) string {
+	// Match class="..." (common in innerHTML/template literals)
+	re := regexp.MustCompile(`class="([^"]*)"`)
+	return re.ReplaceAllStringFunc(content, func(match string) string {
+		parts := re.FindStringSubmatch(match)
+		if len(parts) != 2 {
+			return match
+		}
+		classes := strings.Fields(parts[1])
+		for i, cls := range classes {
+			if cls == orig {
+				classes[i] = token
+			}
+		}
+		return `class="` + strings.Join(classes, " ") + `"`
+	})
+}
+
+// replaceInClassNameAssignments replaces class names inside className="..." assignments.
+func replaceInClassNameAssignments(content, orig, token string) string {
+	// Match .className="..." or .className='...' (JS property assignment)
+	re := regexp.MustCompile(`\.className\s*=\s*['"]([^'"]+)['"]`)
+	return re.ReplaceAllStringFunc(content, func(match string) string {
+		parts := re.FindStringSubmatch(match)
+		if len(parts) != 2 {
+			return match
+		}
+		classes := strings.Fields(parts[1])
+		for i, cls := range classes {
+			if cls == orig {
+				classes[i] = token
+			}
+		}
+		// Preserve the original quote style
+		quote := string(match[len(match)-1])
+		return `.className=` + quote + strings.Join(classes, " ") + quote
 	})
 }
 
