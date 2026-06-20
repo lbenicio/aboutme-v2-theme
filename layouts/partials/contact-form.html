@@ -120,7 +120,7 @@ submission authToken – Bearer token for the submission endpoint email – Repl
                     try{
                       let bodyToSend = { hp, first_name: firstName, last_name: lastName, email, text, encrypt };
                       if (encrypt){
-                        try{ await import('/static/js/openpgp-shim.mjs'); }catch{ console.warn('Failed to load OpenPGP'); }
+                        try{ await import('/assets/js/openpgp-shim.mjs'); }catch{ console.warn('Failed to load OpenPGP'); }
                         try{
                           {{/* PGP key URL from front matter */}}
                           const pgpKeyUrl = '{{ $pgpKeyUrl }}';
