@@ -827,10 +827,6 @@ func replaceJS(content string, mapping map[string]string) string {
 				content = replaceStringArg(content, method, orig, token)
 			}
 			content = replaceInSelectorStrings(content, orig, token)
-			// Replace class names inside class="..." strings (innerHTML templates)
-			content = replaceInHTMLClassStrings(content, orig, token)
-			// Replace class names inside className="..." assignments
-			content = replaceInClassNameAssignments(content, orig, token)
 		case "id":
 			content = replaceStringArg(content, "getElementById", orig, token)
 			content = replaceInSelectorStrings(content, "#"+orig, "#"+token)
@@ -839,6 +835,8 @@ func replaceJS(content string, mapping map[string]string) string {
 			content = re.ReplaceAllString(content, "${1}"+token+"${2}")
 		}
 	}
+	// Single-pass replacement of class names in class="..." and className="..." strings
+	content = replaceAllClassStrings(content, mapping)
 	return content
 }
 
@@ -886,44 +884,65 @@ func replaceInSelectorStrings(content, orig, token string) string {
 	})
 }
 
-// replaceInHTMLClassStrings replaces class names inside class="..." template strings.
-func replaceInHTMLClassStrings(content, orig, token string) string {
-	// Match class="..." (common in innerHTML/template literals)
-	re := regexp.MustCompile(`class="([^"]*)"`)
-	return re.ReplaceAllStringFunc(content, func(match string) string {
-		parts := re.FindStringSubmatch(match)
+// replaceAllClassStrings does a single pass over the JS content, finding all
+// class="..." and className="..." strings and replacing class names using
+// the mapping. This is much faster than scanning per-class-name.
+func replaceAllClassStrings(content string, mapping map[string]string) string {
+	// Build a reverse lookup map for fast replacement: className → token
+	classMap := make(map[string]string)
+	for k, v := range mapping {
+		if strings.HasPrefix(k, "class:") {
+			classMap[strings.TrimPrefix(k, "class:")] = v
+		}
+	}
+	if len(classMap) == 0 {
+		return content
+	}
+
+	// Match class="..." in template strings / innerHTML
+	classAttrRe := regexp.MustCompile(`class="([^"]*)"`)
+	content = classAttrRe.ReplaceAllStringFunc(content, func(match string) string {
+		parts := classAttrRe.FindStringSubmatch(match)
 		if len(parts) != 2 {
 			return match
 		}
 		classes := strings.Fields(parts[1])
+		changed := false
 		for i, cls := range classes {
-			if cls == orig {
+			if token, ok := classMap[cls]; ok {
 				classes[i] = token
+				changed = true
 			}
+		}
+		if !changed {
+			return match
 		}
 		return `class="` + strings.Join(classes, " ") + `"`
 	})
-}
 
-// replaceInClassNameAssignments replaces class names inside className="..." assignments.
-func replaceInClassNameAssignments(content, orig, token string) string {
-	// Match .className="..." or .className='...' (JS property assignment)
-	re := regexp.MustCompile(`\.className\s*=\s*['"]([^'"]+)['"]`)
-	return re.ReplaceAllStringFunc(content, func(match string) string {
-		parts := re.FindStringSubmatch(match)
+	// Match className="..." assignments
+	classNameRe := regexp.MustCompile(`\.className\s*=\s*['"]([^'"]+)['"]`)
+	content = classNameRe.ReplaceAllStringFunc(content, func(match string) string {
+		parts := classNameRe.FindStringSubmatch(match)
 		if len(parts) != 2 {
 			return match
 		}
 		classes := strings.Fields(parts[1])
+		changed := false
 		for i, cls := range classes {
-			if cls == orig {
+			if token, ok := classMap[cls]; ok {
 				classes[i] = token
+				changed = true
 			}
 		}
-		// Preserve the original quote style
+		if !changed {
+			return match
+		}
 		quote := string(match[len(match)-1])
 		return `.className=` + quote + strings.Join(classes, " ") + quote
 	})
+
+	return content
 }
 
 // replaceJSText finds inline <script> blocks in HTML output and applies JS replacements.
