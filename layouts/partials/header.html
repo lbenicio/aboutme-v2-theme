@@ -230,7 +230,7 @@
 <header class="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60" role="banner">
   <div class="w-full flex h-16 items-center">
     <a href="{{ if $homeExt }}{{ $logoHref }}{{ else }}{{ $logoHref | relURL }}{{ end }}" class="mr-6 flex items-center space-x-2 ml-5" aria-label="Home"{{ if $homeExt }} target="_blank" rel="noopener noreferrer"{{ end }}>
-      <img src="{{ (printf "%s/%s" "assets/favicon" "favicon.svg") | relURL }}" alt="Logo" width="32" height="32" class="h-8 w-8" />
+      <img src="{{ (printf "%s/%s" "static/favicon" "favicon.svg") | relURL }}" alt="Logo" width="32" height="32" class="h-8 w-8" />
       <span class="font-bold text-lg font-headline pl-2">{{ .Site.Title }}</span>
     </a>
     <div class="flex flex-1 items-center justify-end gap-4 md:gap-6 pr-2">
@@ -351,7 +351,7 @@
 >
   <div class="flex items-center justify-between px-4 h-16 border-b">
     <a href="{{ if $homeExt }}{{ $logoHref }}{{ else }}{{ $logoHref | relURL }}{{ end }}" class="flex items-center space-x-2" aria-label="Home"{{ if $homeExt }} target="_blank" rel="noopener noreferrer"{{ end }}>
-      <img src="{{ (printf "%s/%s" "assets/favicon" "favicon.svg") | relURL }}" alt="Logo" width="24" height="24" class="h-6 w-6" />
+      <img src="{{ (printf "%s/%s" "static/favicon" "favicon.svg") | relURL }}" alt="Logo" width="24" height="24" class="h-6 w-6" />
       <span class="font-semibold text-base font-headline">{{ .Site.Title }}</span>
     </a>
   <button id="mobile-drawer-close" type="button" class="inline-flex h-9 w-9 items-center justify-center rounded-md hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" aria-label="Close menu" onclick="window.__closeMobileMenu('button')" data-umami-event="mobile_menu_close_click">

@@ -20,10 +20,10 @@
 {{ end }}
 
 {{/* Fonts: preload regular weight */}}
-<link rel="preload" href="{{ "assets/fonts/OpenSans-Regular.ttf" | relURL }}" as="font" type="font/ttf" crossorigin>
-{{/* Serve fonts.css via Hugo Pipes from assets/css */}}
+<link rel="preload" href="{{ "static/fonts/OpenSans-Regular.ttf" | relURL }}" as="font" type="font/ttf" crossorigin>
+{{/* Serve fonts.css via Hugo Pipes from assets/assets/css */}}
 {{ if $isDev }}
-  {{ $f := resources.Get "assets/css/fonts.css" | resources.ExecuteAsTemplate (printf "assets/css/fonts-dev-%d.css" now.Unix) . }}
+  {{ $f := resources.Get "assets/css/fonts.css" | resources.ExecuteAsTemplate (printf "static/css/fonts-dev-%d.css" now.Unix) . }}
   <link rel="stylesheet" href="{{ $f.RelPermalink }}" />
 {{ else }}
   {{ $f := resources.Get "assets/css/fonts.css" | minify }}

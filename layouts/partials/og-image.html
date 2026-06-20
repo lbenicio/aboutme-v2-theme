@@ -5,8 +5,8 @@
 {{ if and .Title .File }}
   {{ $title := .Title }}
   {{ $slug := .File.TranslationBaseName }}
-  {{ $ogBase := resources.Get "images/og-base.png" }}
-  {{ $font := resources.Get "fonts/OpenSans-Bold.ttf" }}
+  {{ $ogBase := resources.Get "assets/images/og-base.png" }}
+  {{ $font := resources.Get "assets/fonts/OpenSans-Bold.ttf" }}
   {{ if and $ogBase $font }}
     {{ $destPath := printf "assets/og/%s.png" $slug }}
     {{ if not (resources.Get $destPath) }}

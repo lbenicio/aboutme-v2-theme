@@ -7,8 +7,8 @@ front matter, else site description */}} {{ $desc := .Site.Params.description }}
 {{ with .Params.description }}{{ $desc = . }}{{ end }} {{/* Type: article for
 blog/publications, website otherwise */}} {{ $type := "website" }} {{ if or (eq .Section "post") (eq .Section "publications") }}{{ $type = "article" }}{{ end }}
 {{/* Resolve image: prefer generated OG for blog posts, else front matter cover, else configurable favicon fallback */}}
-{{ $ogBase := "assets/og" }}
-{{ $fp := "assets/favicon" }}
+{{ $ogBase := "static/og" }}
+{{ $fp := "static/favicon" }}
 {{ $img := printf "%s/android-chrome-512x512.png" $fp }}
 {{ if eq .Section "post" }}
   {{/* Prefer Hugo-generated OG image (via og-image.html partial), then static fallback */}}

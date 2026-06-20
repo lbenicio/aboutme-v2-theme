@@ -10,9 +10,9 @@
       <div class="shadow-lg rounded-lg border bg-card/50 hover:bg-card transition-colors">
         <div class="p-6 flex flex-col items-center">
           <picture>
-            <source srcset="{{ "assets/images/avatar/profile-picture.avif" | relURL }}" type="image/avif" />
-            <source srcset="{{ "assets/images/avatar/profile-picture.webp" | relURL }}" type="image/webp" />
-            <img src="{{ "assets/images/avatar/profile-picture.png" | relURL }}" alt="Profile Picture" width="128" height="128" class="rounded-full border-4 border-primary" loading="eager" />
+            <source srcset="{{ "static/images/avatar/profile-picture.avif" | relURL }}" type="image/avif" />
+            <source srcset="{{ "static/images/avatar/profile-picture.webp" | relURL }}" type="image/webp" />
+            <img src="{{ "static/images/avatar/profile-picture.png" | relURL }}" alt="Profile Picture" width="128" height="128" class="rounded-full border-4 border-primary" loading="eager" />
           </picture>
           <h2 class="text-2xl font-semibold mt-4">{{ .Params.name | default .Site.Params.author | default "Your Name" }}</h2>
           <p class="text-muted-foreground">{{ .Params.role | default "" }}</p>
@@ -291,11 +291,11 @@
     </div>
     <ul class="grid gap-6 md:grid-cols-3 min-w-0" role="list">
       {{ $aff := slice
-  (dict "key" "sbc" "name" "Sociedade Brasileira de Computação" "short" "SBC" "role" "Member" "href" "https://www.sbc.org.br/" "img" "assets/images/institutions/sbc" "alt" "Logo of Sociedade Brasileira de Computação (SBC)" "description" "Brazilian Computer Society promoting research, education, and technology dissemination." "formats" (slice "avif" "webp" "jpeg"))
-  (dict "key" "ime" "name" "Instituto de Matemática e Estatística – USP" "short" "IME‑USP" "role" "Alumnus" "href" "https://www.ime.usp.br/" "img" "assets/images/institutions/ime" "alt" "Logo of IME‑USP" "description" "Renowned institute at USP for mathematics, statistics, and computer science." "formats" (slice "avif" "webp" "png"))
-  (dict "key" "usp" "name" "Universidade de São Paulo" "short" "USP" "role" "Graduate" "href" "https://www5.usp.br/" "img" "assets/images/institutions/usp" "alt" "Logo of USP" "description" "Leading Latin American public research university." "formats" (slice "webp" "png"))
-  (dict "key" "fgv" "name" "Fundação Getulio Vargas" "short" "FGV" "role" "Postgraduate (Continuing Education)" "href" "https://portal.fgv.br/" "img" "assets/images/institutions/fgv" "alt" "Logo of FGV" "description" "Brazilian higher education institution and think tank known for public policy and management." "formats" (slice "avif" "webp" "png"))
-  (dict "key" "utoronto" "name" "University of Toronto" "short" "U of T" "role" "Professional / Research Community Engagement" "href" "https://www.utoronto.ca/" "img" "assets/images/institutions/utoronto" "alt" "Logo of the University of Toronto" "description" "Top-ranked Canadian research university with strong programs in CS and engineering." "formats" (slice "avif" "webp" "png"))
+  (dict "key" "sbc" "name" "Sociedade Brasileira de Computação" "short" "SBC" "role" "Member" "href" "https://www.sbc.org.br/" "img" "static/images/institutions/sbc" "alt" "Logo of Sociedade Brasileira de Computação (SBC)" "description" "Brazilian Computer Society promoting research, education, and technology dissemination." "formats" (slice "avif" "webp" "jpeg"))
+  (dict "key" "ime" "name" "Instituto de Matemática e Estatística – USP" "short" "IME‑USP" "role" "Alumnus" "href" "https://www.ime.usp.br/" "img" "static/images/institutions/ime" "alt" "Logo of IME‑USP" "description" "Renowned institute at USP for mathematics, statistics, and computer science." "formats" (slice "avif" "webp" "png"))
+  (dict "key" "usp" "name" "Universidade de São Paulo" "short" "USP" "role" "Graduate" "href" "https://www5.usp.br/" "img" "static/images/institutions/usp" "alt" "Logo of USP" "description" "Leading Latin American public research university." "formats" (slice "webp" "png"))
+  (dict "key" "fgv" "name" "Fundação Getulio Vargas" "short" "FGV" "role" "Postgraduate (Continuing Education)" "href" "https://portal.fgv.br/" "img" "static/images/institutions/fgv" "alt" "Logo of FGV" "description" "Brazilian higher education institution and think tank known for public policy and management." "formats" (slice "avif" "webp" "png"))
+  (dict "key" "utoronto" "name" "University of Toronto" "short" "U of T" "role" "Professional / Research Community Engagement" "href" "https://www.utoronto.ca/" "img" "static/images/institutions/utoronto" "alt" "Logo of the University of Toronto" "description" "Top-ranked Canadian research university with strong programs in CS and engineering." "formats" (slice "avif" "webp" "png"))
       }}
       {{ range $aff }}
         <li class="group relative min-w-0">

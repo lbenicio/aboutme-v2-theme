@@ -64,7 +64,7 @@
     </ul>
     {{ partial "pagination.html" . }}
   {{/* Client-side search script: fetched index JSON + dynamic rendering */}}
-  <script defer src="/assets/js/search.js" data-index-url="/post/index.json"></script>
+  <script defer src="/static/js/search.js" data-index-url="/post/index.json"></script>
   </section>
 {{ else if eq $mode "SINGLE" }}
   {{/* Single-mode: render the page specified by params.singleContent as the homepage */}}
@@ -132,9 +132,9 @@
     <section class="space-y-4">
       <div class="flex justify-center">
         <picture>
-          <source srcset="{{ (.Params.avatarAvif | default .Site.Params.profilePictureAvif | default "assets/images/avatar/profile-picture.avif") | relURL }}" type="image/avif" />
-          <source srcset="{{ (.Params.avatarWebp | default .Site.Params.profilePictureWebp | default "assets/images/avatar/profile-picture.webp") | relURL }}" type="image/webp" />
-          <img src="{{ (.Params.avatar | default .Site.Params.profilePicture | default "assets/images/avatar/profile-picture.png") | relURL }}" alt="{{ .Params.avatarAlt | default .Site.Params.profilePictureAlt | default "Profile Picture" }}" width="{{ .Params.avatarWidth | default .Site.Params.profilePictureWidth | default 128 }}" height="{{ .Params.avatarHeight | default .Site.Params.profilePictureHeight | default 128 }}" class="rounded-full border-4 border-primary shadow-md" loading="eager" />
+          <source srcset="{{ (.Params.avatarAvif | default .Site.Params.profilePictureAvif | default "static/images/avatar/profile-picture.avif") | relURL }}" type="image/avif" />
+          <source srcset="{{ (.Params.avatarWebp | default .Site.Params.profilePictureWebp | default "static/images/avatar/profile-picture.webp") | relURL }}" type="image/webp" />
+          <img src="{{ (.Params.avatar | default .Site.Params.profilePicture | default "static/images/avatar/profile-picture.png") | relURL }}" alt="{{ .Params.avatarAlt | default .Site.Params.profilePictureAlt | default "Profile Picture" }}" width="{{ .Params.avatarWidth | default .Site.Params.profilePictureWidth | default 128 }}" height="{{ .Params.avatarHeight | default .Site.Params.profilePictureHeight | default 128 }}" class="rounded-full border-4 border-primary shadow-md" loading="eager" />
         </picture>
       </div>
       {{ $social := slice }}
