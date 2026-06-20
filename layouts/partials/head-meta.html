@@ -19,8 +19,9 @@
 	{{ end }}
 {{ end }}
 
-{{/* Fonts: preload regular weight */}}
-<link rel="preload" href="{{ "static/fonts/OpenSans-Regular.ttf" | relURL }}" as="font" type="font/ttf" crossorigin>
+{{/* Fonts: preload regular weight from assets/assets/fonts/ */}}
+{{ $fontRegular := resources.Get "assets/fonts/OpenSans-Regular.ttf" }}
+{{ with $fontRegular }}<link rel="preload" href="{{ .RelPermalink }}" as="font" type="font/ttf" crossorigin>{{ end }}
 {{/* Serve fonts.css via Hugo Pipes from assets/assets/css */}}
 {{ if $isDev }}
   {{ $f := resources.Get "assets/css/fonts.css" | resources.ExecuteAsTemplate (printf "static/css/fonts-dev-%d.css" now.Unix) . }}
