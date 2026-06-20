@@ -66,12 +66,12 @@
       <footer class="mt-8 text-sm text-muted-foreground">
         {{ if .Params.categories }}
           <div class="mb-2">Categories:
-            {{ range $i, $c := .Params.categories }}{{ if $i }}, {{ end }}<a href="{{ (printf "/categories/%s/" $c) | relURL }}">{{ $c }}</a>{{ end }}
+            {{ range $i, $c := .Params.categories }}{{ if $i }}, {{ end }}<a href="{{ (printf "categories/%s/" $c) | relURL }}">{{ $c }}</a>{{ end }}
           </div>
         {{ end }}
         {{ if .Params.tags }}
           <div>Tags:
-            {{ range $i, $t := .Params.tags }}{{ if $i }}, {{ end }}<a href="{{ (printf "/tags/%s/" $t) | relURL }}">#{{ $t }}</a>{{ end }}
+            {{ range $i, $t := .Params.tags }}{{ if $i }}, {{ end }}<a href="{{ (printf "tags/%s/" $t) | relURL }}">#{{ $t }}</a>{{ end }}
           </div>
         {{ end }}
       </footer>

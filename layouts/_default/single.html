@@ -23,7 +23,7 @@
   {{ with .Params.tags }}
     <div class="mt-6 flex flex-wrap gap-2 text-xs text-muted-foreground">
       {{ range . }}
-        <a href="{{ (printf "/tags/%s/" .) | relURL }}" class="px-2 py-0.5 rounded bg-muted">#{{ . }}</a>
+        <a href="{{ (printf "tags/%s/" .) | relURL }}" class="px-2 py-0.5 rounded bg-muted">#{{ . }}</a>
       {{ end }}
     </div>
   {{ end }}
