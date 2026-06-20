@@ -61,6 +61,10 @@ var protectedSet = map[string]bool{
 	"data:hp":                     true,
 	"data:pgp-error":              true,
 	"data:umami-event":            true,
+	// Search JS data attributes (must not be obfuscated)
+	"data:index-url":              true,
+	"data:base-path":              true,
+	"data:visible-count":          true,
 	"id:theme-toggle":             true,
 	"id:mobile-menu-button":       true,
 	"id:mobile-drawer":            true,
