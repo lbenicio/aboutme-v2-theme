@@ -29,6 +29,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"runtime"
 	"sort"
 	"strings"
 	"sync"
@@ -122,17 +123,21 @@ func main() {
 	var totalReplacements int
 	var wg sync.WaitGroup
 
-	// Process files in parallel batches
-	sem := make(chan struct{}, 8)
-	for _, f := range files {
-		wg.Add(1)
-		sem <- struct{}{}
-		go func(filePath string) {
-			defer wg.Done()
-			defer func() { <-sem }()
+	// Process files in parallel batches (3× CPU cores)
+		workers := runtime.NumCPU() * 3
+		if *verbose {
+			fmt.Fprintf(os.Stderr, "Using %d workers (%d CPUs × 3)\n", workers, runtime.NumCPU())
+		}
+		sem := make(chan struct{}, workers)
+		for _, f := range files {
+			wg.Add(1)
+			sem <- struct{}{}
+			go func(filePath string) {
+				defer wg.Done()
+				defer func() { <-sem }()
 
-			count := replaceInFile(filePath, mapping, *dryRun, *verbose)
-			mu.Lock()
+				count := replaceInFile(filePath, mapping, *dryRun, *verbose)
+				mu.Lock()
 			totalReplacements += count
 			mu.Unlock()
 		}(f)
@@ -179,11 +184,12 @@ func walkFiles(dir string) []string {
 }
 
 func collectNames(files []string, verbose bool) []nameItem {
+	workers := runtime.NumCPU() * 3
 	var (
 		mu  sync.Mutex
 		all = make(map[string]nameItem)
 		wg  sync.WaitGroup
-		sem = make(chan struct{}, 8)
+		sem = make(chan struct{}, workers)
 	)
 
 	for _, f := range files {
