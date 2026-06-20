@@ -845,8 +845,9 @@ func replaceInSelectorStrings(content, orig, token string) string {
 			return match
 		}
 		prefix, selector, suffix := parts[1], parts[2], parts[3]
-		// Replace .orig with .token in the selector string
-		selector = strings.ReplaceAll(selector, orig, token)
+		// Only replace .classname (CSS class selector syntax), never substrings in attribute selectors
+		dotClassRe := regexp.MustCompile(`\.` + regexp.QuoteMeta(orig) + `\b`)
+		selector = dotClassRe.ReplaceAllString(selector, "."+token)
 		return prefix + selector + suffix
 	})
 }
