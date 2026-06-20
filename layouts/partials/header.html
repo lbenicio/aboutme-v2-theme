@@ -213,10 +213,10 @@
   {{ $contactHref  := cond $aboutExt (print $aboutBase "/contact")  "/contact" }}
 
   {{/* Publications — in PUBLICATIONS_ONLY mode the content lives at "/" */}}
-  {{ $pubsHref := cond $pubExt $pubBase (cond (eq $siteMode "PUBLICATIONS_ONLY") "/" "/publications") }}
+  	  {{ $pubsHref := cond $pubExt $pubBase (cond (eq $siteMode "PUBLICATIONS_ONLY") "" "/publications") }}
 
   {{/* Blog — in BLOG_ONLY mode the content lives at "/" */}}
-  {{ $blogHref := cond $blogExt $blogBase (cond (eq $siteMode "BLOG_ONLY") "/" "/post") }}
+  	  {{ $blogHref := cond $blogExt $blogBase (cond (eq $siteMode "BLOG_ONLY") "" "/post") }}
 
   {{/* Append all items in consistent order */}}
   {{ $links = $links | append (dict "label" "About"        "href" $aboutHref    "external" $aboutExt) }}

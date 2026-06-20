@@ -5,13 +5,29 @@
 .prose {
   max-width: 75ch;
   color: HSL(var(--foreground));
+  line-height: 1.75;
 
+  // Paragraphs and spacing
+  p, ul, ol, blockquote, pre, table, figure, hr {
+    margin-top: 1.25em;
+    margin-bottom: 1.25em;
+  }
+
+  // Headings with proper spacing
   h1, h2, h3, h4, h5, h6 {
     color: HSL(var(--foreground));
     font-weight: 700;
     line-height: 1.25;
+    margin-top: 2em;
+    margin-bottom: 0.75em;
   }
 
+  h1 { font-size: 2.25em; }
+  h2 { font-size: 1.75em; }
+  h3 { font-size: 1.5em; }
+  h4 { font-size: 1.25em; }
+
+  // Links
   a {
     color: HSL(var(--foreground));
     text-decoration: underline;
@@ -20,6 +36,17 @@
 
   strong, b { color: HSL(var(--foreground)); }
 
+  // Lists
+  ul, ol {
+    padding-left: 1.625em;
+  }
+  ul { list-style-type: disc; }
+  ol { list-style-type: decimal; }
+  li { margin-top: 0.25em; margin-bottom: 0.25em; }
+  ul > li::marker { color: HSL(var(--muted-foreground)); }
+  ol > li::marker { color: HSL(var(--muted-foreground)); }
+
+  // Blockquotes
   blockquote {
     color: HSL(var(--foreground));
     border-left: 4px solid HSL(var(--border));
@@ -27,12 +54,16 @@
     font-style: italic;
   }
 
-  hr { border-color: HSL(var(--border)); }
+  // Images
+  img {
+    border-radius: var(--radius);
+    margin-top: 2em;
+    margin-bottom: 2em;
+  }
 
-  ol > li::marker { color: HSL(var(--muted-foreground)); }
-  ul > li::marker { color: HSL(var(--muted-foreground)); }
+  hr { border-color: HSL(var(--border)); margin-top: 2em; margin-bottom: 2em; }
 
-  th { border-color: HSL(var(--border)); }
+    th { border-color: HSL(var(--border)); }
   td { border-color: HSL(var(--border)); }
 
   // Inline code
@@ -70,6 +101,11 @@
 
 .prose-xl {
   font-size: 1.25rem;
+}
+
+// Override max-width for full-width prose
+.max-w-none {
+  max-width: none !important;
 }
 
 .not-prose {
