@@ -1,0 +1,76 @@
+{{/* calendar layout — posts organized by year → month → day */}}
+{{ define "main" }}
+{{ $posts := where .Site.RegularPages "Section" "post" }}
+{{ $posts = where $posts "Kind" "page" }}
+{{ $posts = where $posts "Draft" "ne" true }}
+
+{{/* Build year → month → posts map using Hugo's dict */}}
+{{ $calendar := dict }}
+{{ range $posts }}
+  {{ $year := .Date.Format "2006" }}
+  {{ $monthKey := .Date.Format "2006-01" }}
+  {{ $monthName := .Date.Format "January" }}
+
+  {{ $yearMap := index $calendar $year | default dict }}
+  {{ $monthMap := index $yearMap $monthName | default slice }}
+  {{ $monthMap = $monthMap | append . }}
+  {{ $yearMap = merge $yearMap (dict $monthName $monthMap) }}
+  {{ $calendar = merge $calendar (dict $year $yearMap) }}
+{{ end }}
+
+{{/* Sort years descending */}}
+{{ $yearKeys := slice }}
+{{ range $year, $_ := $calendar }}
+  {{ $yearKeys = $yearKeys | append $year }}
+{{ end }}
+{{ $yearKeys = sort $yearKeys "value" "desc" }}
+
+{{ $monthOrder := slice "January" "February" "March" "April" "May" "June" "July" "August" "September" "October" "November" "December" }}
+
+<section class="py-6">
+  <h1 class="text-4xl md:text-5xl font-bold tracking-tighter mb-1">Calendar</h1>
+  <p class="text-muted-foreground mt-1 mb-4">Posts organized by date.</p>
+
+  {{ partial "blog-subnav.html" . }}
+
+  {{ range $yearKeys }}
+    {{ $year := . }}
+    {{ $yearMap := index $calendar $year }}
+
+    {{/* Count total posts for the year */}}
+    {{ $yearTotal := 0 }}
+    {{ range $month, $monthPosts := $yearMap }}
+      {{ $yearTotal = add $yearTotal (len $monthPosts) }}
+    {{ end }}
+
+    <details class="mb-6" {{ if eq (len $yearKeys) 1 }}open{{ end }}>
+      <summary class="text-2xl font-bold cursor-pointer hover:text-primary transition-colors py-2 marker:text-muted-foreground">
+        {{ $year }}
+        <span class="text-base font-normal text-muted-foreground ml-2">({{ $yearTotal }} posts)</span>
+      </summary>
+
+      <div class="mt-4 space-y-6 ml-2">
+        {{/* Iterate months in order */}}
+        {{ range $monthOrder }}
+          {{ $monthName := . }}
+          {{ $monthPosts := index $yearMap $monthName | default slice }}
+
+          {{ if gt (len $monthPosts) 0 }}
+            <div>
+              <h3 class="text-lg font-semibold mb-3">{{ $monthName }} <span class="text-sm font-normal text-muted-foreground">({{ len $monthPosts }})</span></h3>
+              <ul class="space-y-1.5">
+                {{ range sort $monthPosts "Date" "desc" }}
+                  <li class="flex items-baseline gap-3">
+                    <time datetime="{{ .Date.Format "2006-01-02" }}" class="text-xs text-muted-foreground whitespace-nowrap tabular-nums w-10">{{ .Date.Format "02" }}</time>
+                    <a href="{{ .RelPermalink }}" class="text-sm hover:text-primary transition-colors truncate">{{ .Title }}</a>
+                  </li>
+                {{ end }}
+              </ul>
+            </div>
+          {{ end }}
+        {{ end }}
+      </div>
+    </details>
+  {{ end }}
+</section>
+{{ end }}

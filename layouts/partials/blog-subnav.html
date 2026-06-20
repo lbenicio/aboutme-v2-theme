@@ -1,50 +1,51 @@
-{{/* blog-subnav.html — Sub-navigation for blog listing pages */}}
-{{ $tagsPage := .Site.GetPage "taxonomy" "tags" }}
-{{ $catsPage := .Site.GetPage "taxonomy" "categories" }}
-{{ $posts := where .Site.RegularPages "Section" "post" }}
-{{ $posts = where $posts "Kind" "page" }}
-{{ $posts = where $posts "Draft" "ne" true }}
+{{/* blog-subnav.html — Secondary navigation for blog section */}}
+<nav class="flex items-center gap-6 text-sm border-b pb-3 mb-6" aria-label="Blog sections">
+  {{ $current := strings.Trim .RelPermalink "/" }}
 
-{{/* Collect years from posts */}}
-{{ $years := slice }}
-{{ range $posts }}
-  {{ with .Date }}
-    {{ $year := .Format "2006" }}
-    {{ if not (in $years $year) }}
-      {{ $years = $years | append $year }}
+  {{/* Active check helper */}}
+  {{ $isActive := false }}
+
+  {{/* Tags */}}
+  {{ $tagsURL := "tags/" | relURL }}
+  {{ $tagsActive := hasPrefix $current (strings.Trim $tagsURL "/") }}
+  <a href="{{ $tagsURL }}" class="font-medium transition-colors {{ if $tagsActive }}text-primary{{ else }}text-muted-foreground hover:text-foreground{{ end }}">
+    Tags
+  </a>
+
+  {{/* Categories */}}
+  {{ $catsURL := "categories/" | relURL }}
+  {{ $catsActive := hasPrefix $current (strings.Trim $catsURL "/") }}
+  <a href="{{ $catsURL }}" class="font-medium transition-colors {{ if $catsActive }}text-primary{{ else }}text-muted-foreground hover:text-foreground{{ end }}">
+    Categories
+  </a>
+
+  {{/* Calendar */}}
+  {{ $calURL := "calendar/" | relURL }}
+  {{ $calActive := hasPrefix $current (strings.Trim $calURL "/") }}
+  <a href="{{ $calURL }}" class="font-medium transition-colors {{ if $calActive }}text-primary{{ else }}text-muted-foreground hover:text-foreground{{ end }}">
+    Calendar
+  </a>
+
+  {{/* Year archive links */}}
+  {{ $posts := where .Site.RegularPages "Section" "post" }}
+  {{ $posts = where $posts "Kind" "page" }}
+  {{ $posts = where $posts "Draft" "ne" true }}
+  {{ $years := slice }}
+  {{ range $posts }}
+    {{ with .Date }}
+      {{ $year := .Format "2006" }}
+      {{ if not (in $years $year) }}
+        {{ $years = $years | append $year }}
+      {{ end }}
     {{ end }}
   {{ end }}
-{{ end }}
-{{ $years = sort $years "value" "desc" }}
+  {{ $years = sort $years "value" "desc" }}
 
-<nav class="flex flex-wrap items-center gap-3 text-sm mb-4" aria-label="Blog navigation">
-  {{/* Tags link */}}
-  {{ with $tagsPage }}
-    <a href="{{ .RelPermalink }}" class="inline-flex items-center gap-1 rounded-full border px-3 py-1.5 text-xs font-medium bg-muted text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors">
-      Tags
-      <span class="opacity-60">({{ len .Pages }})</span>
+  {{ range first 3 $years }}
+    {{ $yearHref := (printf "post/%s/" .) | relURL }}
+    {{ $yearActive := hasPrefix $current (printf "post/%s" .) }}
+    <a href="{{ $yearHref }}" class="font-medium transition-colors {{ if $yearActive }}text-primary{{ else }}text-muted-foreground hover:text-foreground{{ end }}">
+      {{ . }}
     </a>
-  {{ end }}
-
-  {{/* Categories link */}}
-  {{ with $catsPage }}
-    <a href="{{ .RelPermalink }}" class="inline-flex items-center gap-1 rounded-full border px-3 py-1.5 text-xs font-medium bg-muted text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors">
-      Categories
-      <span class="opacity-60">({{ len .Pages }})</span>
-    </a>
-  {{ end }}
-
-  {{/* Year filter links */}}
-  {{ range $years }}
-    {{ $year := . }}
-    {{ $yearPosts := where $posts "Date.Year" (int $year) }}
-    {{ $count := len $yearPosts }}
-    {{ if gt $count 0 }}
-      {{ $yearHref := (printf "post/%s/" $year) | relURL }}
-      <a href="{{ $yearHref }}" class="inline-flex items-center gap-1 rounded-full border px-3 py-1.5 text-xs font-medium bg-muted text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors">
-        {{ $year }}
-        <span class="opacity-60">({{ $count }})</span>
-      </a>
-    {{ end }}
   {{ end }}
 </nav>
