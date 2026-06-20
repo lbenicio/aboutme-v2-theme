@@ -72,6 +72,16 @@ var protectedSet = map[string]bool{
 	"id:mobile-drawer-overlay":    true,
 	"id:mobile-drawer-close":      true,
 	"id:contact-config":           true,
+	// Blog search IDs (must not be obfuscated — JS references them)
+	"id:blog-search":              true,
+	"id:blog-search-input":        true,
+	"id:blog-search-tags":         true,
+	"id:blog-search-status":       true,
+	"id:blog-server-list":         true,
+	"id:blog-results":             true,
+	"id:blog-clear-filters":       true,
+	"id:blog-toggle-tags":         true,
+	"id:reading-server-list":      true,
 }
 
 // nameItem represents a discovered name to potentially obfuscate.
@@ -598,18 +608,22 @@ func replaceHTML(content string, mapping map[string]string) string {
 		return `class="` + strings.Join(newClasses, " ") + `"`
 	})
 
-	// Replace id attributes: id="foo" -> id="TOKEN"
-	idRe := regexp.MustCompile(`\bid="([^"]*)"`)
-	result = idRe.ReplaceAllStringFunc(result, func(match string) string {
-		parts := idRe.FindStringSubmatch(match)
-		if len(parts) != 2 {
+	// Replace id attributes: id="foo" or id=bar (minified HTML may remove quotes)
+		idRe := regexp.MustCompile(`\bid="([^"]*)"|\bid=([^\s>]+)`)
+		result = idRe.ReplaceAllStringFunc(result, func(match string) string {
+			parts := idRe.FindStringSubmatch(match)
+			val := parts[1]
+			if val == "" {
+				val = parts[2]
+			}
+			if val == "" {
+				return match
+			}
+			if token := mapping["id:"+val]; token != "" {
+				return `id="` + token + `"`
+			}
 			return match
-		}
-		if token := mapping["id:"+parts[1]]; token != "" {
-			return `id="` + token + `"`
-		}
-		return match
-	})
+		})
 
 	// Replace data-* attribute names
 	dataRe := regexp.MustCompile(`\b(data-[A-Za-z0-9_-]+)(\s*=)`)
