@@ -64,7 +64,7 @@
     </ul>
     {{ partial "pagination.html" . }}
   {{/* Client-side search script: fetched index JSON + dynamic rendering */}}
-  <script defer src="/assets/js/search.js" data-index-url="/post/index.json"></script>
+  {{ $searchJSUrl := "" }}{{ with resources.Get "assets/js/search.js" }}{{ $searchJSUrl = .RelPermalink }}{{ end }}{{ if $searchJSUrl }}<script defer src="{{ $searchJSUrl }}" data-index-url="{{ "post/index.json" | relURL }}"></script>{{ end }}
   </section>
 {{ else if eq $mode "SINGLE" }}
   {{/* Single-mode: render the page specified by params.singleContent as the homepage */}}

@@ -184,5 +184,5 @@
 
   {{ partial "pagination.html" . }}
   {{/* Client-side search script */}}
-  <script src="/assets/js/search.js" data-index-url="/publications/index.json"></script>
+  {{ $searchJSUrl := "" }}{{ with resources.Get "assets/js/search.js" }}{{ $searchJSUrl = .RelPermalink }}{{ end }}{{ if $searchJSUrl }}<script src="{{ $searchJSUrl }}" data-index-url="{{ "publications/index.json" | relURL }}"></script>{{ end }}
 </section>
