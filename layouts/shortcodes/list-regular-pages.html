@@ -1,4 +1,4 @@
-<div class="debug-regular-pages" style="font-family:monospace;font-size:12px;margin:1rem 0;padding:1rem;border:1px dashed #ccc;background:#fafafa;">
+<div {{ partial "obfuscate/cls" "debug-regular-pages" | safeHTMLAttr }} style="font-family:monospace;font-size:12px;margin:1rem 0;padding:1rem;border:1px dashed #ccc;background:#fafafa;">
   <strong>RegularPages dump (temporary):</strong>
   <ol>
   {{ range $i, $p := .Site.RegularPages }}

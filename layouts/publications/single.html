@@ -5,7 +5,7 @@
 }} {{ else }} {{ $year = int (dateFormat "2006" .Params.date) }} {{ end }} {{
 else if .Date }} {{ $year = int (time.Format "2006" .Date) }} {{ end }}
 
-<article class="py-6">
+<article {{ partial "obfuscate/cls" "py-6" | safeHTMLAttr }}>
   {{/* JSON-LD for publications */}} {{ $siteUrl := .Site.Params.siteUrl }} {{
   $basePath := .Site.Params.basePath | default "" }} {{ $dateStr := "" }} {{
   with .Date }}{{ $dateStr = time.Format "2006-01-02" . }}{{ end }} {{ $type :=
@@ -22,38 +22,38 @@ else if .Date }} {{ $year = int (time.Format "2006" .Date) }} {{ end }}
   <script type="application/ld+json">
     {{ $pubLd | jsonify | safeJS }}
   </script>
-  <header class="mb-4 not-prose">
-    <h1 class="text-3xl md:text-4xl font-bold tracking-tight">{{ .Title }}</h1>
-    <div class="mt-2 text-sm text-muted-foreground flex flex-wrap items-center">
+  <header {{ partial "obfuscate/cls" "mb-4 not-prose" | safeHTMLAttr }}>
+    <h1 {{ partial "obfuscate/cls" "text-3xl md:text-4xl font-bold tracking-tight" | safeHTMLAttr }}>{{ .Title }}</h1>
+    <div {{ partial "obfuscate/cls" "mt-2 text-sm text-muted-foreground flex flex-wrap items-center" | safeHTMLAttr }}>
       {{ with .Params.author }}<span>{{ . }}</span>{{ end }} {{ with
-      .Params.venue }}{{ if or . $.Params.author }}<span class="mx-2">·</span>{{
-      end }}<span>{{ . }}</span>{{ end }} {{ if gt $year 0 }}<span class="mx-2"
+      .Params.venue }}{{ if or . $.Params.author }}<span {{ partial "obfuscate/cls" "mx-2" | safeHTMLAttr }}>·</span>{{
+      end }}<span>{{ . }}</span>{{ end }} {{ if gt $year 0 }}<span {{ partial "obfuscate/cls" "mx-2" | safeHTMLAttr }}
         >·</span
       ><span>{{ $year }}</span>{{ end }}
     </div>
   </header>
 
-  <div class="prose dark:prose-invert mt-6 max-w-none">
+  <div {{ partial "obfuscate/cls" "prose dark:prose-invert mt-6 max-w-none" | safeHTMLAttr }}>
     {{ .Content }}
   </div>
 
   {{ with .Params.tags }}
   <div
-    class="mt-6 flex flex-wrap gap-2 text-xs text-muted-foreground not-prose"
+    {{ partial "obfuscate/cls" "mt-6 flex flex-wrap gap-2 text-xs text-muted-foreground not-prose" | safeHTMLAttr }}
   >
-    {{ range . }}<span class="px-2 py-0.5 rounded bg-muted">#{{ . }}</span>{{
+    {{ range . }}<span {{ partial "obfuscate/cls" "px-2 py-0.5 rounded bg-muted" | safeHTMLAttr }}>#{{ . }}</span>{{
     end }}
   </div>
   {{ end }} {{ if or .Prev .Next }}
-  <nav class="mt-8 flex items-center justify-between text-sm not-prose">
+  <nav {{ partial "obfuscate/cls" "mt-8 flex items-center justify-between text-sm not-prose" | safeHTMLAttr }}>
     {{ with .Prev }}<a
-      class="underline underline-offset-4"
+      {{ partial "obfuscate/cls" "underline underline-offset-4" | safeHTMLAttr }}
       href="{{ .RelPermalink }}"
-      ><span class="text-muted-foreground">← Previous</span> {{ .Title }}</a
+      ><span {{ partial "obfuscate/cls" "text-muted-foreground" | safeHTMLAttr }}>← Previous</span> {{ .Title }}</a
     >{{ end }} {{ with .Next }}<a
-      class="underline underline-offset-4"
+      {{ partial "obfuscate/cls" "underline underline-offset-4" | safeHTMLAttr }}
       href="{{ .RelPermalink }}"
-      >{{ .Title }} <span class="text-muted-foreground">Next →</span></a
+      >{{ .Title }} <span {{ partial "obfuscate/cls" "text-muted-foreground" | safeHTMLAttr }}>Next →</span></a
     >{{ end }}
   </nav>
   {{ end }}

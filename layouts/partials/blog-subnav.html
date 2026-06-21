@@ -1,25 +1,28 @@
 {{/* blog-subnav.html — Secondary navigation for blog section */}}
-<nav class="flex items-center gap-6 text-sm border-b pb-3 mb-6" aria-label="Blog sections">
+<nav {{ partial "obfuscate/cls" "flex items-center gap-6 text-sm border-b pb-3 mb-6" | safeHTMLAttr }} aria-label="Blog sections">
   {{ $current := strings.Trim .RelPermalink "/" }}
 
   {{/* Tags */}}
   {{ $tagsURL := "tags/" | relURL }}
   {{ $tagsActive := hasPrefix $current (strings.Trim $tagsURL "/") }}
-  <a href="{{ $tagsURL }}" class="font-medium transition-colors {{ if $tagsActive }}text-primary{{ else }}text-muted-foreground hover:text-foreground{{ end }}">
+  {{ $tagCls := cond $tagsActive "font-medium transition-colors text-primary" "font-medium transition-colors text-muted-foreground hover:text-foreground" }}
+  <a href="{{ $tagsURL }}" {{ partial "obfuscate/cls" $tagCls | safeHTMLAttr }}>
     Tags
   </a>
 
   {{/* Categories */}}
   {{ $catsURL := "categories/" | relURL }}
   {{ $catsActive := hasPrefix $current (strings.Trim $catsURL "/") }}
-  <a href="{{ $catsURL }}" class="font-medium transition-colors {{ if $catsActive }}text-primary{{ else }}text-muted-foreground hover:text-foreground{{ end }}">
+  {{ $catCls := cond $catsActive "font-medium transition-colors text-primary" "font-medium transition-colors text-muted-foreground hover:text-foreground" }}
+  <a href="{{ $catsURL }}" {{ partial "obfuscate/cls" $catCls | safeHTMLAttr }}>
     Categories
   </a>
 
   {{/* Calendar */}}
   {{ $calURL := "calendar/" | relURL }}
   {{ $calActive := hasPrefix $current (strings.Trim $calURL "/") }}
-  <a href="{{ $calURL }}" class="font-medium transition-colors {{ if $calActive }}text-primary{{ else }}text-muted-foreground hover:text-foreground{{ end }}">
+  {{ $calCls := cond $calActive "font-medium transition-colors text-primary" "font-medium transition-colors text-muted-foreground hover:text-foreground" }}
+  <a href="{{ $calURL }}" {{ partial "obfuscate/cls" $calCls | safeHTMLAttr }}>
     Calendar
   </a>
 </nav>

@@ -8,10 +8,10 @@
   {{- $map := dict "about" "About" "contact" "Contact" "tools" "Tools" "cheat-sheets" "Cheat Sheets" "reading" "Reading" "reading-list" "Reading List" "publications" "Publications" "post" "Blog" "tag" "Tag" "tags" "Tag" "category" "Category" "categories" "Category" "page" "Page" "p" "Page" -}}
   {{- $siteMode := .Site.Params.appMode | default "FULL" -}}
   {{- $isBlogOnly := or (eq $siteMode "BLOG_ONLY") (eq .Site.Params.blogMode true) (eq .Site.Params.blogMode "true") -}}
-    <nav class="mt-7 mb-1 text-xs" aria-label="Breadcrumb">
-      <ol class="flex flex-wrap items-center gap-1 text-muted-foreground">
+    <nav {{ partial "obfuscate/cls" "mt-7 mb-1 text-xs" | safeHTMLAttr }} aria-label="Breadcrumb">
+      <ol {{ partial "obfuscate/cls" "flex flex-wrap items-center gap-1 text-muted-foreground" | safeHTMLAttr }}>
         <li>
-          <a href="{{ "/" | relURL }}" class="hover:text-primary underline underline-offset-4">Home</a>
+          <a href="{{ "/" | relURL }}" {{ partial "obfuscate/cls" "hover:text-primary underline underline-offset-4" | safeHTMLAttr }}>Home</a>
         </li>
         {{- $lastIdx := sub (len $parts) 1 -}}
         {{- range $i, $seg := $parts -}}
@@ -42,12 +42,12 @@
             {{- $scratch.Set "href" $computedHref -}}
           {{- end -}}
 
-          <li class="flex items-center gap-1">
-            <span class="px-1">/</span>
+          <li {{ partial "obfuscate/cls" "flex items-center gap-1" | safeHTMLAttr }}>
+            <span {{ partial "obfuscate/cls" "px-1" | safeHTMLAttr }}>/</span>
             {{- if $isLast -}}
-              <span class="text-foreground">{{ $label }}</span>
+              <span {{ partial "obfuscate/cls" "text-foreground" | safeHTMLAttr }}>{{ $label }}</span>
             {{- else -}}
-              <a href="{{ $scratch.Get "href" | relURL }}" class="hover:text-primary underline underline-offset-4">{{ $label }}</a>
+              <a href="{{ $scratch.Get "href" | relURL }}" {{ partial "obfuscate/cls" "hover:text-primary underline underline-offset-4" | safeHTMLAttr }}>{{ $label }}</a>
             {{- end -}}
           </li>
         {{- end -}}

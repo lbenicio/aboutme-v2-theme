@@ -1,6 +1,6 @@
 {{ define "main" }}
-<article class="py-6">
-  <h1 class="text-3xl md:text-4xl font-bold tracking-tight">{{ .Title }}</h1>
+<article {{ partial "obfuscate/cls" "py-6" | safeHTMLAttr }}>
+  <h1 {{ partial "obfuscate/cls" "text-3xl md:text-4xl font-bold tracking-tight" | safeHTMLAttr }}>{{ .Title }}</h1>
   {{/* Robust date display: prefer params.year, then params.date (year or full date), else .Date */}}
   {{ $dateText := "" }}
   {{ if isset .Params "year" }}
@@ -17,20 +17,20 @@
     {{ $dateText = time.Format "2006-01-02" .Date }}
   {{ end }}
   {{ if ne $dateText "" }}
-    <p class="mt-2 text-sm text-muted-foreground">{{ $dateText }}{{ if .Site.Params.showReadingTime }} · {{ $.ReadingTime }} min{{ end }}</p>
+    <p {{ partial "obfuscate/cls" "mt-2 text-sm text-muted-foreground" | safeHTMLAttr }}>{{ $dateText }}{{ if .Site.Params.showReadingTime }} · {{ $.ReadingTime }} min{{ end }}</p>
   {{ end }}
-  <div class="prose dark:prose-invert mt-6 max-w-none">{{ .Content }}</div>
+  <div {{ partial "obfuscate/cls" "prose dark:prose-invert mt-6 max-w-none" | safeHTMLAttr }}>{{ .Content }}</div>
   {{ with .Params.tags }}
-    <div class="mt-6 flex flex-wrap gap-2 text-xs text-muted-foreground">
+    <div {{ partial "obfuscate/cls" "mt-6 flex flex-wrap gap-2 text-xs text-muted-foreground" | safeHTMLAttr }}>
       {{ range . }}
-        <a href="{{ (printf "tags/%s/" .) | relURL }}" class="px-2 py-0.5 rounded bg-muted">#{{ . }}</a>
+        <a href="{{ (printf "tags/%s/" .) | relURL }}" {{ partial "obfuscate/cls" "px-2 py-0.5 rounded bg-muted" | safeHTMLAttr }}>#{{ . }}</a>
       {{ end }}
     </div>
   {{ end }}
   {{ if and .Prev .Next }}
-    <nav class="mt-8 flex items-center justify-between text-sm">
-      {{ with .Prev }}<a class="underline underline-offset-4" href="{{ .RelPermalink }}"><span class="text-muted-foreground">← Previous</span></a>{{ end }}
-      {{ with .Next }}<a class="underline underline-offset-4" href="{{ .RelPermalink }}"><span class="text-muted-foreground">Next →</span></a>{{ end }}
+    <nav {{ partial "obfuscate/cls" "mt-8 flex items-center justify-between text-sm" | safeHTMLAttr }}>
+      {{ with .Prev }}<a {{ partial "obfuscate/cls" "underline underline-offset-4" | safeHTMLAttr }} href="{{ .RelPermalink }}"><span {{ partial "obfuscate/cls" "text-muted-foreground" | safeHTMLAttr }}>← Previous</span></a>{{ end }}
+      {{ with .Next }}<a {{ partial "obfuscate/cls" "underline underline-offset-4" | safeHTMLAttr }} href="{{ .RelPermalink }}"><span {{ partial "obfuscate/cls" "text-muted-foreground" | safeHTMLAttr }}>Next →</span></a>{{ end }}
     </nav>
   {{ end }}
 </article>

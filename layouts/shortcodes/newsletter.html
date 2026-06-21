@@ -1,4 +1,4 @@
-<div class="mt-6">
+<div {{ partial "obfuscate/cls" "mt-6" | safeHTMLAttr }}>
   <p>{{ .Inner }}</p>
   {{/* Allow optional overrides when using the shortcode: action, nonce, checkboxId, checkboxValue, checkboxName */}}
   {{ $action := .Get "action" | default .Site.Params.newsletterPostUrl }}
@@ -6,10 +6,10 @@
   {{ $checkboxId := .Get "checkboxId" | default .Site.Params.newsletterCheckboxId }}
   {{ $checkboxValue := .Get "checkboxValue" | default .Site.Params.newsletterCheckboxValue }}
   {{ $checkboxName := .Get "checkboxName" | default .Site.Params.newsletterCheckboxName | default "l" }}
-  <form action="{{ $action }}" method="post" class="mt-4 space-y-2 listmonk-form" data-newsletter-checkbox-id="{{ $checkboxId | default "newsletter-checkbox" }}">
+  <form action="{{ $action }}" method="post" {{ partial "obfuscate/cls" "mt-4 space-y-2 listmonk-form" | safeHTMLAttr }} data-newsletter-checkbox-id="{{ $checkboxId | default "newsletter-checkbox" }}">
     <input type="hidden" name="nonce" value="{{ $nonce }}" />
-    <input type="text" name="name" placeholder="Your name (optional)" class="w-full rounded-md border px-3 py-2" />
-    <input type="email" name="email" placeholder="you@example.com" required class="w-full rounded-md border px-3 py-2" />
+    <input type="text" name="name" placeholder="Your name (optional)" {{ partial "obfuscate/cls" "w-full rounded-md border px-3 py-2" | safeHTMLAttr }} />
+    <input type="email" name="email" placeholder="you@example.com" required {{ partial "obfuscate/cls" "w-full rounded-md border px-3 py-2" | safeHTMLAttr }} />
     {{ if $checkboxId }}
       {{/* Render a hidden input for checkbox-driven backends so it is not visible to the visitor but still posted. */}}
       <input type="hidden" id="{{ $checkboxId }}" name="{{ $checkboxName }}" value="{{ $checkboxValue }}" />
@@ -17,9 +17,9 @@
       {{/* Fallback hidden input when no checkbox id is present in params */}}
       <input type="hidden" id="newsletter-checkbox" name="{{ $checkboxName }}" value="{{ $checkboxValue }}" />
     {{ end }}
-    <div class="flex gap-2">
-      <button type="submit" class="rounded-md px-4 py-2 bg-accent text-primary">Subscribe</button>
-      <a href="/" class="rounded-md px-4 py-2 border text-primary">Cancel</a>
+    <div {{ partial "obfuscate/cls" "flex gap-2" | safeHTMLAttr }}>
+      <button type="submit" {{ partial "obfuscate/cls" "rounded-md px-4 py-2 bg-accent text-primary" | safeHTMLAttr }}>Subscribe</button>
+      <a href="/" {{ partial "obfuscate/cls" "rounded-md px-4 py-2 border text-primary" | safeHTMLAttr }}>Cancel</a>
     </div>
   </form>
 </div>

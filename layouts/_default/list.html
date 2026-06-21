@@ -5,22 +5,22 @@
   {{ $isTags := eq .Data.Plural "tags" }}
   {{ $prefix := cond $isTags "#" "" }}
   {{ $subtitle := cond $isTags "Browse posts by tag." "Browse posts by category." }}
-  <section class="py-6">
-    <h1 class="text-4xl md:text-5xl font-bold tracking-tighter mb-1">{{ .Title }}</h1>
-    <p class="text-muted-foreground mt-1 mb-4">{{ $subtitle }}</p>
+  <section {{ partial "obfuscate/cls" "py-6" | safeHTMLAttr }}>
+    <h1 {{ partial "obfuscate/cls" "text-4xl md:text-5xl font-bold tracking-tighter mb-1" | safeHTMLAttr }}>{{ .Title }}</h1>
+    <p {{ partial "obfuscate/cls" "text-muted-foreground mt-1 mb-4" | safeHTMLAttr }}>{{ $subtitle }}</p>
 
     {{ partial "blog-subnav.html" . }}
 
     {{ $terms := .Data.Terms.Alphabetical }}
     {{ if eq (len $terms) 0 }}
-      <p class="text-sm text-muted-foreground">Nothing here yet.</p>
+      <p {{ partial "obfuscate/cls" "text-sm text-muted-foreground" | safeHTMLAttr }}>Nothing here yet.</p>
     {{ else }}
-      <div class="grid gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+      <div {{ partial "obfuscate/cls" "grid gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5" | safeHTMLAttr }}>
         {{ range $terms }}
           <a href="{{ .Page.RelPermalink }}"
-             class="flex items-center justify-between rounded-lg border px-4 py-3 bg-card hover:bg-accent hover:text-accent-foreground transition-colors">
-            <span class="font-medium truncate">{{ $prefix }}{{ .Page.Title }}</span>
-            <span class="text-xs text-muted-foreground tabular-nums ml-2 shrink-0">{{ .Count }}</span>
+             {{ partial "obfuscate/cls" "flex items-center justify-between rounded-lg border px-4 py-3 bg-card hover:bg-accent hover:text-accent-foreground transition-colors" | safeHTMLAttr }}>
+            <span {{ partial "obfuscate/cls" "font-medium truncate" | safeHTMLAttr }}>{{ $prefix }}{{ .Page.Title }}</span>
+            <span {{ partial "obfuscate/cls" "text-xs text-muted-foreground tabular-nums ml-2 shrink-0" | safeHTMLAttr }}>{{ .Count }}</span>
           </a>
         {{ end }}
       </div>
@@ -29,32 +29,32 @@
 {{ else if eq .Kind "term" }}
   {{/* Term listing (posts with a specific tag/category) — grid */}}
   {{ $prefix := cond (eq .Data.Plural "tags") "#" "" }}
-  <section class="py-6">
-    <h1 class="text-4xl md:text-5xl font-bold tracking-tighter mb-1">{{ $prefix }}{{ .Title }}</h1>
-    <p class="text-muted-foreground mt-1 mb-4">{{ len .Pages }} post{{ if ne (len .Pages) 1 }}s{{ end }} in {{ lower .Data.Singular }} &ldquo;{{ .Title }}&rdquo;.</p>
+  <section {{ partial "obfuscate/cls" "py-6" | safeHTMLAttr }}>
+    <h1 {{ partial "obfuscate/cls" "text-4xl md:text-5xl font-bold tracking-tighter mb-1" | safeHTMLAttr }}>{{ $prefix }}{{ .Title }}</h1>
+    <p {{ partial "obfuscate/cls" "text-muted-foreground mt-1 mb-4" | safeHTMLAttr }}>{{ len .Pages }} post{{ if ne (len .Pages) 1 }}s{{ end }} in {{ lower .Data.Singular }} &ldquo;{{ .Title }}&rdquo;.</p>
 
     {{ partial "blog-subnav.html" . }}
 
     {{ $p := .Paginate .Pages 24 }}
     {{ if eq (len $p.Pages) 0 }}
-      <p class="text-sm text-muted-foreground">No posts yet.</p>
+      <p {{ partial "obfuscate/cls" "text-sm text-muted-foreground" | safeHTMLAttr }}>No posts yet.</p>
     {{ else }}
-      <ul class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      <ul {{ partial "obfuscate/cls" "grid gap-6 sm:grid-cols-2 lg:grid-cols-3" | safeHTMLAttr }}>
         {{ range $p.Pages }}
           {{ $cover := .Params.cover }}
-          <li class="border rounded-lg overflow-hidden flex flex-col transition-colors">
+          <li {{ partial "obfuscate/cls" "border rounded-lg overflow-hidden flex flex-col transition-colors" | safeHTMLAttr }}>
             {{ $permalink := .RelPermalink }}
             {{ with $cover }}
-              <a href="{{ $permalink }}" class="block aspect-video bg-muted">
-                <img src="{{ . | relURL }}" alt="" class="w-full h-full object-cover" loading="lazy" />
+              <a href="{{ $permalink }}" {{ partial "obfuscate/cls" "block aspect-video bg-muted" | safeHTMLAttr }}>
+                <img src="{{ . | relURL }}" alt="" {{ partial "obfuscate/cls" "w-full h-full object-cover" | safeHTMLAttr }} loading="lazy" />
               </a>
             {{ end }}
-            <div class="p-4 flex flex-col gap-2 grow">
-              <h2 class="font-semibold text-lg leading-tight">
-                <a href="{{ .RelPermalink }}" class="underline underline-offset-4 hover:bg-muted">{{ .Title }}</a>
+            <div {{ partial "obfuscate/cls" "p-4 flex flex-col gap-2 grow" | safeHTMLAttr }}>
+              <h2 {{ partial "obfuscate/cls" "font-semibold text-lg leading-tight" | safeHTMLAttr }}>
+                <a href="{{ .RelPermalink }}" {{ partial "obfuscate/cls" "underline underline-offset-4 hover:bg-muted" | safeHTMLAttr }}>{{ .Title }}</a>
               </h2>
-              <div class="text-xs text-muted-foreground">{{ .Date | time.Format "2006-01-02" }}</div>
-              {{ with .Params.description }}<p class="text-sm text-muted-foreground line-clamp-3">{{ . }}</p>{{ end }}
+              <div {{ partial "obfuscate/cls" "text-xs text-muted-foreground" | safeHTMLAttr }}>{{ .Date | time.Format "2006-01-02" }}</div>
+              {{ with .Params.description }}<p {{ partial "obfuscate/cls" "text-sm text-muted-foreground line-clamp-3" | safeHTMLAttr }}>{{ . }}</p>{{ end }}
             </div>
           </li>
         {{ end }}
@@ -67,11 +67,11 @@
   <section>
     <h1>{{ .Title }}</h1>
     {{ $p := .Paginate .Pages }}
-    <ul class="post-list">
+    <ul {{ partial "obfuscate/cls" "post-list" | safeHTMLAttr }}>
       {{ range $p.Pages }}
       <li>
         <a href="{{ .RelPermalink }}">{{ .Title }}</a>
-        {{ with .Date }}<span class="meta">
+        {{ with .Date }}<span {{ partial "obfuscate/cls" "meta" | safeHTMLAttr }}>
           · {{ . | time.Format "2006-01-02" }}</span
         >{{ end }} {{ with .Params.description }}
         <p>{{ . }}</p>

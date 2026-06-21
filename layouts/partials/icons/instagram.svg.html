@@ -1,2 +1,2 @@
 {{ $class := .class | default "inline-block align-middle h-4 w-4" }}
-<svg class="{{ $class }}" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" role="img"><title>{{ .title }}</title><path d="M7 2h10a5 5 0 015 5v10a5 5 0 01-5 5H7a5 5 0 01-5-5V7a5 5 0 015-5zm5 6.5A4.5 4.5 0 1016.5 13 4.5 4.5 0 0012 8.5zM18 6.2a1.2 1.2 0 11-1.2-1.2A1.2 1.2 0 0118 6.2z"/></svg>
+<svg {{ partial "obfuscate/cls" $class | safeHTMLAttr }} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" role="img"><title>{{ .title }}</title><path d="M7 2h10a5 5 0 015 5v10a5 5 0 01-5 5H7a5 5 0 01-5-5V7a5 5 0 015-5zm5 6.5A4.5 4.5 0 1016.5 13 4.5 4.5 0 0012 8.5zM18 6.2a1.2 1.2 0 11-1.2-1.2A1.2 1.2 0 0118 6.2z"/></svg>

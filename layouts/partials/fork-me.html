@@ -1,13 +1,13 @@
 {{/* GitHub "Fork me" stripe */}} {{ $enabled := default false .Site.Params.enableForkMe }} {{ if $enabled }} {{ $repo := .Site.Params.forkMeRepoUrl | default "" }} {{ if not $repo }}{{ with .Site.Params.githubHandler
 }}{{ $repo = printf "https://github.com/%s/aboutme" . }}{{ end }}{{ end }} {{ if $repo }}
-<div class="fixed right-0 top-20 sm:top-24 z-40 pointer-events-none" role="complementary" aria-label="GitHub repository">
-    <div class="pointer-events-auto ml-auto pr-0">
-        <div class="flex items-center justify-center gap-2 rounded-l-full border bg-muted/70 dark:bg-muted/40 text-muted-foreground shadow-sm py-1 pl-4 pr-3 backdrop-blur-sm">
+<div {{ partial "obfuscate/cls" "fixed right-0 top-20 sm:top-24 z-40 pointer-events-none" | safeHTMLAttr }} role="complementary" aria-label="GitHub repository">
+    <div {{ partial "obfuscate/cls" "pointer-events-auto ml-auto pr-0" | safeHTMLAttr }}>
+        <div {{ partial "obfuscate/cls" "flex items-center justify-center gap-2 rounded-l-full border bg-muted/70 dark:bg-muted/40 text-muted-foreground shadow-sm py-1 pl-4 pr-3 backdrop-blur-sm" | safeHTMLAttr }}>
             <a
                 href="{{ $repo }}"
                 target="_blank"
                 rel="noopener noreferrer"
-                class="flex items-center gap-2 underline underline-offset-4 hover:text-primary text-[10px] sm:text-xs font-medium py-2 ml-1"
+                {{ partial "obfuscate/cls" "flex items-center gap-2 underline underline-offset-4 hover:text-primary text-[10px] sm:text-xs font-medium py-2 ml-1" | safeHTMLAttr }}
                 aria-label="View source on GitHub"
             >
                 {{/* Lucide GitHub icon (inlined) */}}
@@ -21,7 +21,7 @@
                     stroke-width="2"
                     stroke-linecap="round"
                     stroke-linejoin="round"
-                    class="lucide lucide-github h-4 w-4 shrink-0"
+                    {{ partial "obfuscate/cls" "lucide lucide-github h-4 w-4 shrink-0" | safeHTMLAttr }}
                     aria-hidden="true"
                 >
                     <path
@@ -29,7 +29,7 @@
                     />
                     <path d="M9 18c-4.51 2-5-2-7-2" />
                 </svg>
-                <span class="whitespace-nowrap">Fork me</span>
+                <span {{ partial "obfuscate/cls" "whitespace-nowrap" | safeHTMLAttr }}>Fork me</span>
             </a>
         </div>
     </div>

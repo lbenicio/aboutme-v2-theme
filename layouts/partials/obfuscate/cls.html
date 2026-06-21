@@ -1,0 +1,17 @@
+{{/* obfuscate/cls.html — obfuscates a space-separated class string.
+     Usage: partial "obfuscate/cls" "text-primary bg-card rounded-lg"
+     Returns the full class="..." attribute string. */}}
+{{ $classes := partialCached "obfuscate/map" . "map" }}
+{{ $input := . }}
+{{ $parts := split $input " " }}
+{{ $out := slice }}
+{{ range $parts }}
+  {{ $t := trim . " " }}
+  {{ if ne $t "" }}
+    {{ $mapped := index $classes $t | default $t }}
+    {{ $out = $out | append $mapped }}
+  {{ end }}
+{{ end }}
+{{ if gt (len $out) 0 }}
+  class="{{ delimit $out " " }}"
+{{ end }}

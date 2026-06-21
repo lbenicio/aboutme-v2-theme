@@ -6,33 +6,33 @@
 {{ $posts = where $posts "Draft" "ne" true }}
 {{ $posts = sort $posts "Date" "desc" }}
 
-<section class="py-6 space-y-10">
+<section {{ partial "obfuscate/cls" "py-6 space-y-10" | safeHTMLAttr }}>
   <div>
-    <h1 class="text-4xl md:text-5xl font-bold tracking-tighter">{{ $year }}</h1>
-    <p class="text-muted-foreground mt-1">{{ len $posts }} post{{ if ne (len $posts) 1 }}s{{ end }} from {{ $year }}</p>
+    <h1 {{ partial "obfuscate/cls" "text-4xl md:text-5xl font-bold tracking-tighter" | safeHTMLAttr }}>{{ $year }}</h1>
+    <p {{ partial "obfuscate/cls" "text-muted-foreground mt-1" | safeHTMLAttr }}>{{ len $posts }} post{{ if ne (len $posts) 1 }}s{{ end }} from {{ $year }}</p>
   </div>
 
   {{ partial "blog-subnav.html" . }}
 
   {{ if eq (len $posts) 0 }}
-    <p class="text-sm text-muted-foreground">No posts from {{ $year }}.</p>
+    <p {{ partial "obfuscate/cls" "text-sm text-muted-foreground" | safeHTMLAttr }}>No posts from {{ $year }}.</p>
   {{ else }}
-    <ul class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+    <ul {{ partial "obfuscate/cls" "grid gap-6 sm:grid-cols-2 lg:grid-cols-3" | safeHTMLAttr }}>
       {{ range $posts }}
         {{ $cover := .Params.cover }}
-        <li class="border rounded-lg overflow-hidden flex flex-col transition-colors">
+        <li {{ partial "obfuscate/cls" "border rounded-lg overflow-hidden flex flex-col transition-colors" | safeHTMLAttr }}>
           {{ $permalink := .RelPermalink }}
           {{ with $cover }}
-            <a href="{{ $permalink }}" class="block aspect-video bg-muted">
-              <img src="{{ . | relURL }}" alt="" class="w-full h-full object-cover" loading="lazy" />
+            <a href="{{ $permalink }}" {{ partial "obfuscate/cls" "block aspect-video bg-muted" | safeHTMLAttr }}>
+              <img src="{{ . | relURL }}" alt="" {{ partial "obfuscate/cls" "w-full h-full object-cover" | safeHTMLAttr }} loading="lazy" />
             </a>
           {{ end }}
-          <div class="p-4 flex flex-col gap-2 grow">
-            <h2 class="font-semibold text-lg leading-tight">
-              <a href="{{ .RelPermalink }}" class="underline underline-offset-4 hover:bg-muted">{{ .Title }}</a>
+          <div {{ partial "obfuscate/cls" "p-4 flex flex-col gap-2 grow" | safeHTMLAttr }}>
+            <h2 {{ partial "obfuscate/cls" "font-semibold text-lg leading-tight" | safeHTMLAttr }}>
+              <a href="{{ .RelPermalink }}" {{ partial "obfuscate/cls" "underline underline-offset-4 hover:bg-muted" | safeHTMLAttr }}>{{ .Title }}</a>
             </h2>
-            <div class="text-xs text-muted-foreground">{{ .Date | time.Format "2006-01-02" }}</div>
-            {{ with .Params.description }}<p class="text-sm text-muted-foreground line-clamp-3">{{ . }}</p>{{ end }}
+            <div {{ partial "obfuscate/cls" "text-xs text-muted-foreground" | safeHTMLAttr }}>{{ .Date | time.Format "2006-01-02" }}</div>
+            {{ with .Params.description }}<p {{ partial "obfuscate/cls" "text-sm text-muted-foreground line-clamp-3" | safeHTMLAttr }}>{{ . }}</p>{{ end }}
           </div>
         </li>
       {{ end }}

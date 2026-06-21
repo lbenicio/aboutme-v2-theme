@@ -1,8 +1,8 @@
-<footer class="border-t" role="contentinfo" aria-label="Footer">
+<footer {{ partial "obfuscate/cls" "border-t" | safeHTMLAttr }} role="contentinfo" aria-label="Footer">
   <div
-    class="w-full mx-auto px-4 md:px-6 py-6 flex flex-col sm:flex-row items-center justify-between gap-4"
+    {{ partial "obfuscate/cls" "w-full mx-auto px-4 md:px-6 py-6 flex flex-col sm:flex-row items-center justify-between gap-4" | safeHTMLAttr }}
   >
-    <div class="text-sm text-muted-foreground text-center sm:text-left">
+    <div {{ partial "obfuscate/cls" "text-sm text-muted-foreground text-center sm:text-left" | safeHTMLAttr }}>
       &copy; {{ now.Format "2006" }} {{ .Site.Params.author }}. All rights
       reserved.
     </div>
@@ -14,14 +14,14 @@
     .Site.Params.twitterHandler }}{{ $social = $social | append (dict "name"
     "Twitter" "url" (printf "https://twitter.com/%s" .)) }}{{ end }} {{ $privacy
     := .Site.Params.privacyUrl }} {{ $terms := .Site.Params.termsUrl }}
-    <div class="flex items-center gap-2">
+    <div {{ partial "obfuscate/cls" "flex items-center gap-2" | safeHTMLAttr }}>
       {{ range $social }}
       <a
         href="{{ .url }}"
         target="_blank"
         rel="noopener noreferrer"
         aria-label="{{ .name }}"
-        class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 px-2 py-2 hover:bg-muted"
+        {{ partial "obfuscate/cls" "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 px-2 py-2 hover:bg-muted" | safeHTMLAttr }}
       >
         {{ if eq .name "GitHub" }}
         <svg
@@ -64,14 +64,14 @@
           />
         </svg>
         {{ end }}
-        <span class="sr-only">{{ .name }}</span>
+        <span {{ partial "obfuscate/cls" "sr-only" | safeHTMLAttr }}>{{ .name }}</span>
       </a>
       {{ end }} {{ with $privacy }}
       <a
         href="{{ . }}"
         target="_blank"
         rel="noopener noreferrer"
-        class="text-xs text-muted-foreground hover:text-primary"
+        {{ partial "obfuscate/cls" "text-xs text-muted-foreground hover:text-primary" | safeHTMLAttr }}
         >Privacy</a
       >
       {{ end }} {{ with $terms }}
@@ -79,7 +79,7 @@
         href="{{ . }}"
         target="_blank"
         rel="noopener noreferrer"
-        class="text-xs text-muted-foreground hover:text-primary"
+        {{ partial "obfuscate/cls" "text-xs text-muted-foreground hover:text-primary" | safeHTMLAttr }}
         >Terms</a
       >
       {{ end }}

@@ -84,36 +84,40 @@
 {{ end }}
 
 {{/* ── Page header ── */}}
-<section class="py-6">
-  <h1 class="text-4xl md:text-5xl font-bold tracking-tighter mb-1">Calendar</h1>
-  <p class="text-muted-foreground mt-1 mb-4">Posts organized by date.</p>
+<section {{ partial "obfuscate/cls" "py-6" | safeHTMLAttr }}>
+  <h1 {{ partial "obfuscate/cls" "text-4xl md:text-5xl font-bold tracking-tighter mb-1" | safeHTMLAttr }}>Calendar</h1>
+</h1>  <p {{ partial "obfuscate/cls" "text-muted-foreground mt-1 mb-4" | safeHTMLAttr }}>Posts organized</p> by date.</p>
 
   {{ partial "blog-subnav.html" . }}
 
   {{/* ── View switcher ── */}}
-  <div class="flex items-center gap-4 mb-6 text-sm">
-    <a href="{{ $calBase }}" class="font-medium {{ if ne $view "year" }}text-primary{{ else }}text-muted-foreground hover:text-foreground{{ end }}">Month</a>
-    <a href="{{ printf "%s%s/" $calBase (now.Format "2006") }}" class="font-medium {{ if eq $view "year" }}text-primary{{ else }}text-muted-foreground hover:text-foreground{{ end }}">Year</a>
+  <div {{ partial "obfuscate/cls" "flex items-center gap-4 mb-6 text-sm" | safeHTMLAttr }}>
+    {{ $monthLinkCls := "font-medium" }}
+    {{ if ne $view "year" }}{{ $monthLinkCls = printf "%s %s" $monthLinkCls "text-primary" }}{{ else }}{{ $monthLinkCls = printf "%s %s" $monthLinkCls "text-muted-foreground hover:text-foreground" }}{{ end }}
+    <a href="{{ $calBase }}" {{ partial "obfuscate/cls" $monthLinkCls | safeHTMLAttr }}>Month</a>
+    {{ $yearLinkCls := "font-medium" }}
+    {{ if eq $view "year" }}{{ $yearLinkCls = printf "%s %s" $yearLinkCls "text-primary" }}{{ else }}{{ $yearLinkCls = printf "%s %s" $yearLinkCls "text-muted-foreground hover:text-foreground" }}{{ end }}
+    <a href="{{ printf "%s%s/" $calBase (now.Format "2006") }}" {{ partial "obfuscate/cls" $yearLinkCls | safeHTMLAttr }}>Year</a>
   </div>
 
   {{/* ═══════════════════════════════════════════════════════════ */}}
   {{/* ── YEAR VIEW ── */}}
   {{/* ═══════════════════════════════════════════════════════════ */}}
   {{ if eq $view "year" }}
-    <div class="flex items-center justify-between mb-4">
-      <a href="{{ printf "%s%d/" $calBase (sub (int $year) 1) }}" class="text-sm font-medium text-muted-foreground hover:text-foreground">&larr; {{ sub (int $year) 1 }}</a>
-      <h2 class="text-xl font-bold">{{ $year }}</h2>
-      <a href="{{ printf "%s%d/" $calBase (add (int $year) 1) }}" class="text-sm font-medium text-muted-foreground hover:text-foreground">{{ add (int $year) 1 }} &rarr;</a>
+    <div {{ partial "obfuscate/cls" "flex items-center justify-between mb-4" | safeHTMLAttr }}>
+      <a href="{{ printf "%s%d/" $calBase (sub (int $year) 1) }}" {{ partial "obfuscate/cls" "text-sm font-medium text-muted-foreground hover:text-foreground" | safeHTMLAttr }}>&larr; {{ sub (int $year) 1 }}</a>
+      <h2 {{ partial "obfuscate/cls" "text-xl font-bold" | safeHTMLAttr }}>{{ $year }}</h2>
+      <a href="{{ printf "%s%d/" $calBase (add (int $year) 1) }}" {{ partial "obfuscate/cls" "text-sm font-medium text-muted-foreground hover:text-foreground" | safeHTMLAttr }}>{{ add (int $year) 1 }} &rarr;</a>
     </div>
-    <div class="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6">
+    <div {{ partial "obfuscate/cls" "grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6" | safeHTMLAttr }}>
       {{ range $mIdx, $mName := $monthOrder }}
         {{ $mk := printf "%02d" (add $mIdx 1) }}
         {{ $mTotal := 0 }}
-        <a href="{{ printf "%s%s/%s/" $calBase $year $mk }}" class="rounded-lg border p-2 bg-card hover:bg-accent transition-colors block">
-          <h3 class="font-semibold text-xs text-center mb-1">{{ substr $mName 0 3 }}</h3>
-          <div class="grid grid-cols-7 gap-px text-center">
+        <a href="{{ printf "%s%s/%s/" $calBase $year $mk }}" {{ partial "obfuscate/cls" "rounded-lg border p-2 bg-card hover:bg-accent transition-colors block" | safeHTMLAttr }}>
+          <h3 {{ partial "obfuscate/cls" "font-semibold text-xs text-center mb-1" | safeHTMLAttr }}>{{ substr $mName 0 3 }}</h3>
+          <div {{ partial "obfuscate/cls" "grid grid-cols-7 gap-px text-center" | safeHTMLAttr }}>
             {{ range slice "M" "T" "W" "T" "F" "S" "S" }}
-              <span class="text-[8px] text-muted-foreground/50 py-0.5">{{ . }}</span>
+              <span {{ partial "obfuscate/cls" "text-[8px] text-muted-foreground/50 py-0.5" | safeHTMLAttr }}>{{ . }}</span>
             {{ end }}
             {{ $fd := printf "%s-%s-01" $year $mk }}
             {{ $ft := time.AsTime $fd }}
@@ -130,10 +134,12 @@
                   {{ $has = true }}{{ $mTotal = add $mTotal 1 }}
                 {{ end }}
               {{ end }}
-              <span class="text-[8px] py-0.5 rounded-sm {{ if $has }}bg-accent font-bold{{ end }}">{{ . }}</span>
+              {{ $dayCellCls := "text-[8px] py-0.5 rounded-sm" }}
+              {{ if $has }}{{ $dayCellCls = printf "%s %s" $dayCellCls "bg-accent font-bold" }}{{ end }}
+              <span {{ partial "obfuscate/cls" $dayCellCls | safeHTMLAttr }}>{{ . }}</span>
             {{ end }}
           </div>
-          {{ if gt $mTotal 0 }}<p class="text-[9px] text-muted-foreground text-center mt-1">{{ $mTotal }} post{{ if gt $mTotal 1 }}s{{ end }}</p>{{ end }}
+          {{ if gt $mTotal 0 }}<p {{ partial "obfuscate/cls" "text-[9px] text-muted-foreground text-center mt-1" | safeHTMLAttr }}>{{ $mTotal }} post{{ if gt $mTotal 1 }}s{{ end }}</p>{{ end }}
         </a>
       {{ end }}
     </div>
@@ -154,31 +160,31 @@
 
     {{ $dateLabel := printf "%s %d, %s" $monthName $dayNum $year }}
 
-    <div class="flex items-center justify-between mb-4">
-      <a href="{{ printf "%s%s/%02d/%02d/" $calBase $prevDY $prevDM $prevDay }}" class="text-sm font-medium text-muted-foreground hover:text-foreground">&larr; {{ index (slice "" "Jan" "Feb" "Mar" "Apr" "May" "Jun" "Jul" "Aug" "Sep" "Oct" "Nov" "Dec") $prevDM }} {{ $prevDay }}</a>
-      <h2 class="text-xl font-bold">{{ $dateLabel }}</h2>
-      <a href="{{ printf "%s%s/%02d/%02d/" $calBase $nextDY $nextDM $nextDay }}" class="text-sm font-medium text-muted-foreground hover:text-foreground">{{ index (slice "" "Jan" "Feb" "Mar" "Apr" "May" "Jun" "Jul" "Aug" "Sep" "Oct" "Nov" "Dec") $nextDM }} {{ $nextDay }} &rarr;</a>
+    <div {{ partial "obfuscate/cls" "flex items-center justify-between mb-4" | safeHTMLAttr }}>
+      <a href="{{ printf "%s%s/%02d/%02d/" $calBase $prevDY $prevDM $prevDay }}" {{ partial "obfuscate/cls" "text-sm font-medium text-muted-foreground hover:text-foreground" | safeHTMLAttr }}>&larr; {{ index (slice "" "Jan" "Feb" "Mar" "Apr" "May" "Jun" "Jul" "Aug" "Sep" "Oct" "Nov" "Dec") $prevDM }} {{ $prevDay }}</a>
+      <h2 {{ partial "obfuscate/cls" "text-xl font-bold" | safeHTMLAttr }}>{{ $dateLabel }}</h2>
+      <a href="{{ printf "%s%s/%02d/%02d/" $calBase $nextDY $nextDM $nextDay }}" {{ partial "obfuscate/cls" "text-sm font-medium text-muted-foreground hover:text-foreground" | safeHTMLAttr }}>{{ index (slice "" "Jan" "Feb" "Mar" "Apr" "May" "Jun" "Jul" "Aug" "Sep" "Oct" "Nov" "Dec") $nextDM }} {{ $nextDay }} &rarr;</a>
     </div>
 
     {{ if eq (len $dayPosts) 0 }}
-      <p class="text-sm text-muted-foreground">No posts on this day.</p>
+      <p {{ partial "obfuscate/cls" "text-sm text-muted-foreground" | safeHTMLAttr }}>No posts on this day.</p>
     {{ else }}
-      <ul class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      <ul {{ partial "obfuscate/cls" "grid gap-6 sm:grid-cols-2 lg:grid-cols-3" | safeHTMLAttr }}>
         {{ range $dayPosts }}
           {{ $cover := .Params.cover }}
-          <li class="border rounded-lg overflow-hidden flex flex-col transition-colors">
+          <li {{ partial "obfuscate/cls" "border rounded-lg overflow-hidden flex flex-col transition-colors" | safeHTMLAttr }}>
             {{ $permalink := .RelPermalink }}
             {{ with $cover }}
-              <a href="{{ $permalink }}" class="block aspect-video bg-muted">
-                <img src="{{ . | relURL }}" alt="" class="w-full h-full object-cover" loading="lazy" />
+              <a href="{{ $permalink }}" {{ partial "obfuscate/cls" "block aspect-video bg-muted" | safeHTMLAttr }}>
+                <img src="{{ . | relURL }}" alt="" {{ partial "obfuscate/cls" "w-full h-full object-cover" | safeHTMLAttr }} loading="lazy" />
               </a>
             {{ end }}
-            <div class="p-4 flex flex-col gap-2 grow">
-              <h2 class="font-semibold text-lg leading-tight">
-                <a href="{{ .RelPermalink }}" class="underline underline-offset-4 hover:bg-muted">{{ .Title }}</a>
+            <div {{ partial "obfuscate/cls" "p-4 flex flex-col gap-2 grow" | safeHTMLAttr }}>
+              <h2 {{ partial "obfuscate/cls" "font-semibold text-lg leading-tight" | safeHTMLAttr }}>
+                <a href="{{ .RelPermalink }}" {{ partial "obfuscate/cls" "underline underline-offset-4 hover:bg-muted" | safeHTMLAttr }}>{{ .Title }}</a>
               </h2>
-              <div class="text-xs text-muted-foreground">{{ .Date | time.Format "2006-01-02" }}</div>
-              {{ with .Params.description }}<p class="text-sm text-muted-foreground line-clamp-3">{{ . }}</p>{{ end }}
+              <div {{ partial "obfuscate/cls" "text-xs text-muted-foreground" | safeHTMLAttr }}>{{ .Date | time.Format "2006-01-02" }}</div>
+              {{ with .Params.description }}<p {{ partial "obfuscate/cls" "text-sm text-muted-foreground line-clamp-3" | safeHTMLAttr }}>{{ . }}</p>{{ end }}
             </div>
           </li>
         {{ end }}
@@ -189,21 +195,21 @@
   {{/* ── MONTH VIEW (default) ── */}}
   {{/* ═══════════════════════════════════════════════════════════ */}}
   {{ else }}
-    <div class="flex items-center justify-between mb-4">
-      <a href="{{ printf "%s%s/%02d/" $calBase $prevY $prevM }}" class="text-sm font-medium text-muted-foreground hover:text-foreground">&larr; {{ index (slice "" "Jan" "Feb" "Mar" "Apr" "May" "Jun" "Jul" "Aug" "Sep" "Oct" "Nov" "Dec") $prevM }} {{ $prevY }}</a>
-      <h2 class="text-xl font-bold">{{ $monthName }} {{ $year }}</h2>
-      <a href="{{ printf "%s%s/%02d/" $calBase $nextY $nextM }}" class="text-sm font-medium text-muted-foreground hover:text-foreground">{{ index (slice "" "Jan" "Feb" "Mar" "Apr" "May" "Jun" "Jul" "Aug" "Sep" "Oct" "Nov" "Dec") $nextM }} {{ $nextY }} &rarr;</a>
+    <div {{ partial "obfuscate/cls" "flex items-center justify-between mb-4" | safeHTMLAttr }}>
+      <a href="{{ printf "%s%s/%02d/" $calBase $prevY $prevM }}" {{ partial "obfuscate/cls" "text-sm font-medium text-muted-foreground hover:text-foreground" | safeHTMLAttr }}>&larr; {{ index (slice "" "Jan" "Feb" "Mar" "Apr" "May" "Jun" "Jul" "Aug" "Sep" "Oct" "Nov" "Dec") $prevM }} {{ $prevY }}</a>
+      <h2 {{ partial "obfuscate/cls" "text-xl font-bold" | safeHTMLAttr }}>{{ $monthName }} {{ $year }}</h2>
+      <a href="{{ printf "%s%s/%02d/" $calBase $nextY $nextM }}" {{ partial "obfuscate/cls" "text-sm font-medium text-muted-foreground hover:text-foreground" | safeHTMLAttr }}>{{ index (slice "" "Jan" "Feb" "Mar" "Apr" "May" "Jun" "Jul" "Aug" "Sep" "Oct" "Nov" "Dec") $nextM }} {{ $nextY }} &rarr;</a>
     </div>
 
-    <div class="rounded-lg border overflow-hidden mb-6">
-      <div class="grid grid-cols-7 bg-muted text-center">
+    <div {{ partial "obfuscate/cls" "rounded-lg border overflow-hidden mb-6" | safeHTMLAttr }}>
+      <div {{ partial "obfuscate/cls" "grid grid-cols-7 bg-muted text-center" | safeHTMLAttr }}>
         {{ range $dayNames }}
-          <span class="text-xs font-medium py-2 text-muted-foreground">{{ . }}</span>
+          <span {{ partial "obfuscate/cls" "text-xs font-medium py-2 text-muted-foreground" | safeHTMLAttr }}>{{ . }}</span>
         {{ end }}
       </div>
-      <div class="grid grid-cols-7">
+      <div {{ partial "obfuscate/cls" "grid grid-cols-7" | safeHTMLAttr }}>
         {{/* Empty cells before 1st */}}
-        {{ range seq 0 (sub $firstDow 1) }}<div class="border-b border-r min-h-[80px] p-1 bg-muted/30"></div>{{ end }}
+        {{ range seq 0 (sub $firstDow 1) }}<div {{ partial "obfuscate/cls" "border-b border-r min-h-[80px] p-1 bg-muted/30" | safeHTMLAttr }}></div>{{ end }}
         {{/* Day cells */}}
         {{ range seq 1 $dim }}
           {{ $dk := printf "%02d" . }}
@@ -215,14 +221,17 @@
           {{ end }}
           {{ $hasPosts := gt (len $dp) 0 }}
           {{ $isToday := and (eq $year (now.Format "2006")) (eq $monthKey (now.Format "01")) (eq $dk (now.Format "02")) }}
-          <div class="border-b border-r min-h-[80px] p-1 {{ if $hasPosts }}bg-accent/10{{ end }} {{ if $isToday }}ring-2 ring-primary ring-inset{{ end }}">
+          {{ $dayCls := "border-b border-r min-h-[80px] p-1" }}
+          {{ if $hasPosts }}{{ $dayCls = printf "%s %s" $dayCls "bg-accent/10" }}{{ end }}
+          {{ if $isToday }}{{ $dayCls = printf "%s %s" $dayCls "ring-2 ring-primary ring-inset" }}{{ end }}
+          <div {{ partial "obfuscate/cls" $dayCls | safeHTMLAttr }}>
             {{ if $hasPosts }}
-              <a href="{{ printf "%s%s/%s/%s/" $calBase $year $monthKey $dk }}" class="text-xs font-medium text-primary hover:underline tabular-nums">{{ . }}</a>
+              <a href="{{ printf "%s%s/%s/%s/" $calBase $year $monthKey $dk }}" {{ partial "obfuscate/cls" "text-xs font-medium text-primary hover:underline tabular-nums" | safeHTMLAttr }}>{{ . }}</a>
             {{ else }}
-              <span class="text-xs font-medium text-muted-foreground tabular-nums">{{ . }}</span>
+              <span {{ partial "obfuscate/cls" "text-xs font-medium text-muted-foreground tabular-nums" | safeHTMLAttr }}>{{ . }}</span>
             {{ end }}
             {{ range $dp }}
-              <a href="{{ .RelPermalink }}" class="block text-[10px] leading-tight mt-0.5 text-muted-foreground hover:text-primary truncate" title="{{ .Title }}">{{ .Title }}</a>
+              <a href="{{ .RelPermalink }}" {{ partial "obfuscate/cls" "block text-[10px] leading-tight mt-0.5 text-muted-foreground hover:text-primary truncate" | safeHTMLAttr }} title="{{ .Title }}">{{ .Title }}</a>
             {{ end }}
           </div>
         {{ end }}
@@ -231,23 +240,23 @@
 
     {{/* Post list for this month */}}
     {{ if gt (len $monthPosts) 0 }}
-      <h3 class="text-lg font-semibold mb-3">{{ len $monthPosts }} post{{ if gt (len $monthPosts) 1 }}s{{ end }} in {{ $monthName }} {{ $year }}</h3>
-      <ul class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      <h3 {{ partial "obfuscate/cls" "text-lg font-semibold mb-3" | safeHTMLAttr }}>{{ len $monthPosts }} post{{ if gt (len $monthPosts) 1 }}s{{ end }} in {{ $monthName }} {{ $year }}</h3>
+      <ul {{ partial "obfuscate/cls" "grid gap-6 sm:grid-cols-2 lg:grid-cols-3" | safeHTMLAttr }}>
         {{ range $monthPosts }}
           {{ $cover := .Params.cover }}
-          <li class="border rounded-lg overflow-hidden flex flex-col transition-colors">
+          <li {{ partial "obfuscate/cls" "border rounded-lg overflow-hidden flex flex-col transition-colors" | safeHTMLAttr }}>
             {{ $permalink := .RelPermalink }}
             {{ with $cover }}
-              <a href="{{ $permalink }}" class="block aspect-video bg-muted">
-                <img src="{{ . | relURL }}" alt="" class="w-full h-full object-cover" loading="lazy" />
+              <a href="{{ $permalink }}" {{ partial "obfuscate/cls" "block aspect-video bg-muted" | safeHTMLAttr }}>
+                <img src="{{ . | relURL }}" alt="" {{ partial "obfuscate/cls" "w-full h-full object-cover" | safeHTMLAttr }} loading="lazy" />
               </a>
             {{ end }}
-            <div class="p-4 flex flex-col gap-2 grow">
-              <h2 class="font-semibold text-lg leading-tight">
-                <a href="{{ .RelPermalink }}" class="underline underline-offset-4 hover:bg-muted">{{ .Title }}</a>
+            <div {{ partial "obfuscate/cls" "p-4 flex flex-col gap-2 grow" | safeHTMLAttr }}>
+              <h2 {{ partial "obfuscate/cls" "font-semibold text-lg leading-tight" | safeHTMLAttr }}>
+                <a href="{{ .RelPermalink }}" {{ partial "obfuscate/cls" "underline underline-offset-4 hover:bg-muted" | safeHTMLAttr }}>{{ .Title }}</a>
               </h2>
-              <div class="text-xs text-muted-foreground">{{ .Date | time.Format "2006-01-02" }}</div>
-              {{ with .Params.description }}<p class="text-sm text-muted-foreground line-clamp-3">{{ . }}</p>{{ end }}
+              <div {{ partial "obfuscate/cls" "text-xs text-muted-foreground" | safeHTMLAttr }}>{{ .Date | time.Format "2006-01-02" }}</div>
+              {{ with .Params.description }}<p {{ partial "obfuscate/cls" "text-sm text-muted-foreground line-clamp-3" | safeHTMLAttr }}>{{ . }}</p>{{ end }}
             </div>
           </li>
         {{ end }}

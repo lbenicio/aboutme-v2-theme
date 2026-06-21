@@ -227,14 +227,14 @@
   {{ $links = $links | append (dict "label" "Contact"      "href" $contactHref  "external" $aboutExt) }}
 {{ end }}
 
-<header class="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60" role="banner">
-  <div class="w-full flex h-16 items-center">
-    <a href="{{ if $homeExt }}{{ $logoHref }}{{ else }}{{ $logoHref | relURL }}{{ end }}" class="mr-6 flex items-center space-x-2 ml-5" aria-label="Home"{{ if $homeExt }} target="_blank" rel="noopener noreferrer"{{ end }}>
-      <img src="{{ (printf "%s/%s" "static/favicon" "favicon.svg") | relURL }}" alt="Logo" width="32" height="32" class="h-8 w-8" />
-      <span class="font-bold text-lg font-headline pl-2">{{ .Site.Title }}</span>
+<header {{ partial "obfuscate/cls" "sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60" | safeHTMLAttr }} role="banner">
+  <div {{ partial "obfuscate/cls" "w-full flex h-16 items-center" | safeHTMLAttr }}>
+    <a href="{{ if $homeExt }}{{ $logoHref }}{{ else }}{{ $logoHref | relURL }}{{ end }}" {{ partial "obfuscate/cls" "mr-6 flex items-center space-x-2 ml-5" | safeHTMLAttr }} aria-label="Home"{{ if $homeExt }} target="_blank" rel="noopener noreferrer"{{ end }}>
+      <img src="{{ (printf "%s/%s" "static/favicon" "favicon.svg") | relURL }}" alt="Logo" width="32" height="32" {{ partial "obfuscate/cls" "h-8 w-8" | safeHTMLAttr }} />
+      <span {{ partial "obfuscate/cls" "font-bold text-lg font-headline pl-2" | safeHTMLAttr }}>{{ .Site.Title }}</span>
     </a>
-    <div class="flex flex-1 items-center justify-end gap-4 pr-4">
-  <nav class="hidden md:flex md:items-center gap-6" aria-label="Main">
+    <div {{ partial "obfuscate/cls" "flex flex-1 items-center justify-end gap-4 pr-4" | safeHTMLAttr }}>
+  <nav {{ partial "obfuscate/cls" "hidden md:flex md:items-center gap-6" | safeHTMLAttr }} aria-label="Main">
         {{ range $links }}
           {{ $isExt := .external }}
           {{ $href := .href }}
@@ -248,9 +248,10 @@
               {{ $isActive = true }}
             {{ end }}
           {{ end }}
+          {{ $navItemCls := printf "text-lg md:text-sm font-medium transition-colors hover:text-primary %s" (cond $isActive "text-primary" "text-muted-foreground") }}
           <a href="{{ if $isExt }}{{ $href }}{{ else }}{{ $href | relURL }}{{ end }}"
             {{ if $isExt }}target="_blank" rel="noopener noreferrer"{{ end }}
-            class="text-lg md:text-sm font-medium transition-colors hover:text-primary {{ if $isActive }}text-primary{{ else }}text-muted-foreground{{ end }}"
+            {{ partial "obfuscate/cls" $navItemCls | safeHTMLAttr }}
             {{ if $isActive }}aria-current="page"{{ end }}
           >{{ $label }}</a>
         {{ end }}
@@ -258,7 +259,7 @@
       <button
         id="theme-toggle"
         type="button"
-        class="text-lg md:text-sm font-medium transition-colors hover:text-primary text-muted-foreground"
+        {{ partial "obfuscate/cls" "text-lg md:text-sm font-medium transition-colors hover:text-primary text-muted-foreground" | safeHTMLAttr }}
         onclick="toggleTheme(this)"
         aria-label="Toggle theme"
         title="Toggle theme"
@@ -266,7 +267,7 @@
         <!-- Lucide Moon (shown in light mode) -->
         <svg
           xmlns="http://www.w3.org/2000/svg"
-          class="theme-icon-moon lucide lucide-moon h-[1.2rem] w-[1.2rem]"
+          {{ partial "obfuscate/cls" "theme-icon-moon lucide lucide-moon h-[1.2rem] w-[1.2rem]" | safeHTMLAttr }}
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
@@ -280,7 +281,7 @@
         <!-- Lucide Sun (shown in dark mode) -->
         <svg
           xmlns="http://www.w3.org/2000/svg"
-          class="theme-icon-sun lucide lucide-sun h-[1.2rem] w-[1.2rem]" style="display:none"
+          {{ partial "obfuscate/cls" "theme-icon-sun lucide lucide-sun h-[1.2rem] w-[1.2rem]" | safeHTMLAttr }} style="display:none"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
@@ -302,7 +303,7 @@
         <!-- Lucide Monitor (shown in system mode) -->
         <svg
           xmlns="http://www.w3.org/2000/svg"
-          class="theme-icon-system lucide lucide-monitor h-[1.2rem] w-[1.2rem]" style="display:none"
+          {{ partial "obfuscate/cls" "theme-icon-system lucide lucide-monitor h-[1.2rem] w-[1.2rem]" | safeHTMLAttr }} style="display:none"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
@@ -315,22 +316,22 @@
           <line x1="8" y1="21" x2="16" y2="21" />
           <line x1="12" y1="17" x2="12" y2="21" />
         </svg>
-        <span class="sr-only">Toggle theme</span>
+        <span {{ partial "obfuscate/cls" "sr-only" | safeHTMLAttr }}>Toggle theme</span>
       </button>
       {{/* Mobile menu: off-canvas side drawer with full-height panel */}}
-      <div class="md:hidden mr-2">
+      <div {{ partial "obfuscate/cls" "md:hidden mr-2" | safeHTMLAttr }}>
         <button
           id="mobile-menu-button"
           type="button"
-          class="inline-flex items-center justify-center hover:text-primary text-muted-foreground transition-colors"
+          {{ partial "obfuscate/cls" "inline-flex items-center justify-center hover:text-primary text-muted-foreground transition-colors" | safeHTMLAttr }}
                     aria-label="Open menu"
           aria-controls="mobile-drawer"
           aria-expanded="false"
           onclick="window.__openMobileMenu('button')"
           data-umami-event="mobile_menu_open_click"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
-          <span class="sr-only">Open menu</span>
+          <svg xmlns="http://www.w3.org/2000/svg" {{ partial "obfuscate/cls" "h-6 w-6" | safeHTMLAttr }} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
+          <span {{ partial "obfuscate/cls" "sr-only" | safeHTMLAttr }}>Open menu</span>
         </button>
       </div>
 
@@ -339,41 +340,41 @@
 </header>
 
 {{/* Drawer root and overlay as direct children of <body> to avoid header stacking context issues */}}
-<div id="mobile-drawer-overlay" class="fixed inset-0 z-1000" style="background-color: hsl(var(--background));" hidden onclick="window.__closeMobileMenu('overlay')" data-umami-event="mobile_menu_overlay_click"></div>
+<div id="mobile-drawer-overlay" {{ partial "obfuscate/cls" "fixed inset-0 z-1000" | safeHTMLAttr }} style="background-color: hsl(var(--background));" hidden onclick="window.__closeMobileMenu('overlay')" data-umami-event="mobile_menu_overlay_click"></div>
 <aside
   id="mobile-drawer"
-  class="fixed inset-y-0 right-0 z-1001 w-80 max-w-[85vw] border-l bg-background text-foreground shadow-xl flex flex-col"
+  {{ partial "obfuscate/cls" "fixed inset-y-0 right-0 z-1001 w-80 max-w-[85vw] border-l bg-background text-foreground shadow-xl flex flex-col" | safeHTMLAttr }}
   role="dialog"
   aria-modal="true"
   aria-hidden="true"
   aria-label="Mobile navigation"
   style="transform: translateX(100%); transition: transform 200ms ease-out; will-change: transform;"
 >
-  <div class="flex items-center justify-between px-4 h-16 border-b">
-    <a href="{{ if $homeExt }}{{ $logoHref }}{{ else }}{{ $logoHref | relURL }}{{ end }}" class="flex items-center space-x-2" aria-label="Home"{{ if $homeExt }} target="_blank" rel="noopener noreferrer"{{ end }}>
-      <img src="{{ (printf "%s/%s" "static/favicon" "favicon.svg") | relURL }}" alt="Logo" width="24" height="24" class="h-6 w-6" />
-      <span class="font-semibold text-base font-headline">{{ .Site.Title }}</span>
+  <div {{ partial "obfuscate/cls" "flex items-center justify-between px-4 h-16 border-b" | safeHTMLAttr }}>
+    <a href="{{ if $homeExt }}{{ $logoHref }}{{ else }}{{ $logoHref | relURL }}{{ end }}" {{ partial "obfuscate/cls" "flex items-center space-x-2" | safeHTMLAttr }} aria-label="Home"{{ if $homeExt }} target="_blank" rel="noopener noreferrer"{{ end }}>
+      <img src="{{ (printf "%s/%s" "static/favicon" "favicon.svg") | relURL }}" alt="Logo" width="24" height="24" {{ partial "obfuscate/cls" "h-6 w-6" | safeHTMLAttr }} />
+      <span {{ partial "obfuscate/cls" "font-semibold text-base font-headline" | safeHTMLAttr }}>{{ .Site.Title }}</span>
     </a>
-  <button id="mobile-drawer-close" type="button" class="inline-flex h-9 w-9 items-center justify-center rounded-md hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" aria-label="Close menu" onclick="window.__closeMobileMenu('button')" data-umami-event="mobile_menu_close_click">
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
-      <span class="sr-only">Close</span>
+  <button id="mobile-drawer-close" type="button" {{ partial "obfuscate/cls" "inline-flex h-9 w-9 items-center justify-center rounded-md hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" | safeHTMLAttr }} aria-label="Close menu" onclick="window.__closeMobileMenu('button')" data-umami-event="mobile_menu_close_click">
+      <svg xmlns="http://www.w3.org/2000/svg" {{ partial "obfuscate/cls" "h-5 w-5" | safeHTMLAttr }} viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+      <span {{ partial "obfuscate/cls" "sr-only" | safeHTMLAttr }}>Close</span>
     </button>
   </div>
-  <nav class="flex-1 overflow-y-auto px-4 py-4">
-    <ul class="space-y-2">
+  <nav {{ partial "obfuscate/cls" "flex-1 overflow-y-auto px-4 py-4" | safeHTMLAttr }}>
+    <ul {{ partial "obfuscate/cls" "space-y-2" | safeHTMLAttr }}>
       {{ range $links }}
         <li>
           <a
             href="{{ if .external }}{{ .href }}{{ else }}{{ .href | relURL }}{{ end }}"
             {{ if .external }}target="_blank" rel="noopener noreferrer"{{ end }}
-            class="block rounded-md px-3 py-2 text-base font-medium text-muted-foreground hover:text-primary hover:bg-muted"
+            {{ partial "obfuscate/cls" "block rounded-md px-3 py-2 text-base font-medium text-muted-foreground hover:text-primary hover:bg-muted" | safeHTMLAttr }}
             onclick="window.__closeMobileMenu()"
           >{{ .label }}</a>
         </li>
       {{ end }}
     </ul>
   </nav>
-  <div class="p-4 border-t text-xs text-muted-foreground/80">
+  <div {{ partial "obfuscate/cls" "p-4 border-t text-xs text-muted-foreground/80" | safeHTMLAttr }}>
     <p>&copy; {{ now.Format "2006" }} {{ .Site.Params.author | default .Site.Title }}</p>
   </div>
 </aside>

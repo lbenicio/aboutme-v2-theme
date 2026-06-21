@@ -1,10 +1,10 @@
 {{ define "main" }}
-<section class="py-6 space-y-8">
+<section {{ partial "obfuscate/cls" "py-6 space-y-8" | safeHTMLAttr }}>
   <div>
-    <h1 class="text-4xl md:text-5xl font-bold tracking-tighter">
+    <h1 {{ partial "obfuscate/cls" "text-4xl md:text-5xl font-bold tracking-tighter" | safeHTMLAttr }}>
       Reading List
     </h1>
-    <p class="text-muted-foreground">
+    <p {{ partial "obfuscate/cls" "text-muted-foreground" | safeHTMLAttr }}>
       A living list of books and articles I recommend.
     </p>
   </div>
@@ -35,18 +35,18 @@
     {{ $itemList | jsonify | safeJS }}
   </script>
   {{ end }} {{ end }}
-  <div class="space-y-3" id="blog-search">
-    <label class="block" for="blog-search-input">
-      <span class="sr-only">Search reading items</span>
+  <div {{ partial "obfuscate/cls" "space-y-3" | safeHTMLAttr }} id="blog-search">
+    <label {{ partial "obfuscate/cls" "block" | safeHTMLAttr }} for="blog-search-input">
+      <span {{ partial "obfuscate/cls" "sr-only" | safeHTMLAttr }}>Search reading items</span>
       <input
         id="blog-search-input"
         type="search"
         placeholder="Search by title, description, tags… (press / to focus)"
-        class="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring focus:ring-ring"
+        {{ partial "obfuscate/cls" "w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring focus:ring-ring" | safeHTMLAttr }}
       />
     </label>
     <div
-      class="hidden"
+      {{ partial "obfuscate/cls" "hidden" | safeHTMLAttr }}
       id="blog-search-tags"
       aria-live="polite"
     ></div>
@@ -59,17 +59,17 @@
       {{ end }}
     {{ end }}
     {{ $uniqueReadingTags := $allReadingTags | uniq | sort }}
-    <details class="text-xs">
-    <summary class="cursor-pointer text-muted-foreground hover:text-foreground py-1">Filter by tag ({{ len $uniqueReadingTags }} tags)</summary>
-    <div class="flex flex-wrap gap-2 text-xs mt-2">
+    <details {{ partial "obfuscate/cls" "text-xs" | safeHTMLAttr }}>
+    <summary {{ partial "obfuscate/cls" "cursor-pointer text-muted-foreground hover:text-foreground py-1" | safeHTMLAttr }}>Filter by tag ({{ len $uniqueReadingTags }} tags)</summary>
+    <div {{ partial "obfuscate/cls" "flex flex-wrap gap-2 text-xs mt-2" | safeHTMLAttr }}>
     {{ range $uniqueReadingTags }}
-      <a href="{{ (printf "tags/%s/" .) | relURL }}" class="inline-flex items-center rounded-full border px-2 py-1 text-xs font-medium bg-muted text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors">#{{ . }}</a>
+      <a href="{{ (printf "tags/%s/" .) | relURL }}" {{ partial "obfuscate/cls" "inline-flex items-center rounded-full border px-2 py-1 text-xs font-medium bg-muted text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors" | safeHTMLAttr }}>#{{ . }}</a>
     {{ end }}
     </div>
     </details>
     </noscript>
     <div
-      class="text-xs text-muted-foreground"
+      {{ partial "obfuscate/cls" "text-xs text-muted-foreground" | safeHTMLAttr }}
       id="blog-search-status"
       aria-live="polite"
     ></div>
@@ -92,21 +92,21 @@
 
   <div id="reading-server-list">
     {{ range $years }} {{ $y := . }}
-    <div class="space-y-3">
-      <h2 class="text-xl font-semibold tracking-tight">{{ $y }}</h2>
+    <div {{ partial "obfuscate/cls" "space-y-3" | safeHTMLAttr }}>
+      <h2 {{ partial "obfuscate/cls" "text-xl font-semibold tracking-tight" | safeHTMLAttr }}>{{ $y }}</h2>
       <ul
-        class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 items-start"
+        {{ partial "obfuscate/cls" "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 items-start" | safeHTMLAttr }}
       >
         {{ range (index $byYear $y) }} {{ $pg := . }}
-        <li class="space-y-2 border rounded-lg p-4 h-full">
-          <h3 class="font-semibold leading-snug">
+        <li {{ partial "obfuscate/cls" "space-y-2 border rounded-lg p-4 h-full" | safeHTMLAttr }}>
+          <h3 {{ partial "obfuscate/cls" "font-semibold leading-snug" | safeHTMLAttr }}>
             <a
               href="{{ $pg.RelPermalink }}"
-              class="underline underline-offset-4"
+              {{ partial "obfuscate/cls" "underline underline-offset-4" | safeHTMLAttr }}
               >{{ $pg.Title }}</a
             >
           </h3>
-          <div class="text-sm text-muted-foreground">
+          <div {{ partial "obfuscate/cls" "text-sm text-muted-foreground" | safeHTMLAttr }}>
             {{ $bits := slice }} {{ with $pg.Params.author }}{{ $bits = $bits |
             append . }}{{ end }} {{ with $pg.Params.venue }}{{ $bits = $bits |
             append . }}{{ end }} {{ $year := 0 }} {{ if isset $pg.Params "year"
@@ -117,11 +117,11 @@
             = $bits | append $year }}{{ end }} {{ delimit $bits " • " }}
           </div>
           {{ with $pg.Params.description }}
-          <p class="text-sm text-muted-foreground mt-1">{{ . }}</p>
+          <p {{ partial "obfuscate/cls" "text-sm text-muted-foreground mt-1" | safeHTMLAttr }}>{{ . }}</p>
           {{ end }} {{ if $pg.Params.tags }}
-          <div class="mt-2 flex flex-wrap gap-1 text-xs text-muted-foreground">
+          <div {{ partial "obfuscate/cls" "mt-2 flex flex-wrap gap-1 text-xs text-muted-foreground" | safeHTMLAttr }}>
             {{ range $pg.Params.tags }}<span
-              class="px-2 py-0.5 rounded bg-muted"
+              {{ partial "obfuscate/cls" "px-2 py-0.5 rounded bg-muted" | safeHTMLAttr }}
               >#{{ . }}</span
             >{{ end }}
           </div>

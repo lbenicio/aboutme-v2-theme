@@ -1,0 +1,20 @@
+{{/* obfuscate/css.html — applies class-name obfuscation to a compiled CSS string.
+     Sorts by length-descending to prevent substring collisions (".flex-col" before ".flex"). */}}
+{{ $css := .css }}
+{{ $map := .map }}
+
+{{/* Build sortable keys with padded length prefix: "018:supports-backdrop" */}}
+{{ $keyPairs := slice }}
+{{ range $k, $v := $map }}
+  {{ if ne $k $v }}
+    {{ $keyPairs = $keyPairs | append (printf "%03d:%s" (len $k) $k) }}
+  {{ end }}
+{{ end }}
+
+{{/* Sort descending by length (prefix is first, so string sort works) */}}
+{{ range sort $keyPairs "value" "desc" }}
+  {{ $orig := slicestr . 4 }}
+  {{ $css = replace $css (printf ".%s" $orig) (printf ".%s" (index $map $orig)) }}
+{{ end }}
+
+{{ return $css }}

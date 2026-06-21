@@ -1,4 +1,4 @@
-<div class="mt-6">
+<div {{ partial "obfuscate/cls" "mt-6" | safeHTMLAttr }}>
   {{ if .Inner }}
     <p>{{ .Inner }}</p>
   {{ end }}

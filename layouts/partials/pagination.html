@@ -1,11 +1,11 @@
 {{ with .Paginator }}{{ if gt .TotalPages 1 }}
-<nav class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-6" role="navigation" aria-label="Pagination">
-  <span class="text-sm text-muted-foreground order-1"
+<nav {{ partial "obfuscate/cls" "flex flex-col sm:flex-row items-center justify-between gap-4 pt-6" | safeHTMLAttr }} role="navigation" aria-label="Pagination">
+  <span {{ partial "obfuscate/cls" "text-sm text-muted-foreground order-1" | safeHTMLAttr }}
     >Page {{ .PageNumber }} of {{ .TotalPages }}</span
   >
-  <div class="flex items-center gap-1 order-2 sm:order-3">
+  <div {{ partial "obfuscate/cls" "flex items-center gap-1 order-2 sm:order-3" | safeHTMLAttr }}>
     {{ if .HasPrev }}<a
-      class="text-sm px-3 py-1.5 rounded-md border bg-background hover:bg-muted transition-colors"
+      {{ partial "obfuscate/cls" "text-sm px-3 py-1.5 rounded-md border bg-background hover:bg-muted transition-colors" | safeHTMLAttr }}
       href="{{ .Prev.URL }}"
       aria-label="Previous page"
       >← Prev</a
@@ -16,24 +16,24 @@
     {{ $start := math.Max 1 (math.Sub $current 2) }}
     {{ $end := math.Min $total (math.Add $current 2) }}
     {{ if gt $start 1 }}
-      <a class="text-sm px-2 py-1.5 rounded-md hover:bg-muted transition-colors text-muted-foreground" href="{{ .First.URL }}" aria-label="Page 1">1</a>
-      {{ if gt $start 2 }}<span class="text-sm px-1 text-muted-foreground">…</span>{{ end }}
+      <a {{ partial "obfuscate/cls" "text-sm px-2 py-1.5 rounded-md hover:bg-muted transition-colors text-muted-foreground" | safeHTMLAttr }} href="{{ .First.URL }}" aria-label="Page 1">1</a>
+      {{ if gt $start 2 }}<span {{ partial "obfuscate/cls" "text-sm px-1 text-muted-foreground" | safeHTMLAttr }}>…</span>{{ end }}
     {{ end }}
     {{ range seq $start $end }}
       {{ if eq . $current }}
-        <span class="text-sm px-2 py-1.5 rounded-md bg-primary text-primary-foreground font-medium" aria-current="page">{{ . }}</span>
+        <span {{ partial "obfuscate/cls" "text-sm px-2 py-1.5 rounded-md bg-primary text-primary-foreground font-medium" | safeHTMLAttr }} aria-current="page">{{ . }}</span>
       {{ else }}
         {{ $url := index $.Paginator.Pagers (math.Sub . 1) }}
-        <a class="text-sm px-2 py-1.5 rounded-md hover:bg-muted transition-colors text-muted-foreground" href="{{ $url.URL }}" aria-label="Page {{ . }}">{{ . }}</a>
+        <a {{ partial "obfuscate/cls" "text-sm px-2 py-1.5 rounded-md hover:bg-muted transition-colors text-muted-foreground" | safeHTMLAttr }} href="{{ $url.URL }}" aria-label="Page {{ . }}">{{ . }}</a>
       {{ end }}
     {{ end }}
     {{ if lt $end $total }}
-      {{ if lt $end (math.Sub $total 1) }}<span class="text-sm px-1 text-muted-foreground">…</span>{{ end }}
+      {{ if lt $end (math.Sub $total 1) }}<span {{ partial "obfuscate/cls" "text-sm px-1 text-muted-foreground" | safeHTMLAttr }}>…</span>{{ end }}
       {{ $last := index $.Paginator.Pagers (math.Sub $total 1) }}
-      <a class="text-sm px-2 py-1.5 rounded-md hover:bg-muted transition-colors text-muted-foreground" href="{{ $last.URL }}" aria-label="Page {{ $total }}">{{ $total }}</a>
+      <a {{ partial "obfuscate/cls" "text-sm px-2 py-1.5 rounded-md hover:bg-muted transition-colors text-muted-foreground" | safeHTMLAttr }} href="{{ $last.URL }}" aria-label="Page {{ $total }}">{{ $total }}</a>
     {{ end }}
     {{ if .HasNext }}<a
-      class="text-sm px-3 py-1.5 rounded-md border bg-background hover:bg-muted transition-colors"
+      {{ partial "obfuscate/cls" "text-sm px-3 py-1.5 rounded-md border bg-background hover:bg-muted transition-colors" | safeHTMLAttr }}
       href="{{ .Next.URL }}"
       aria-label="Next page"
       >Next →</a
