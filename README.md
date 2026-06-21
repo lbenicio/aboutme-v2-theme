@@ -29,65 +29,83 @@ A modern, production-ready Hugo theme for personal websites, portfolios, and blo
 ### Installation
 
 1. **Create a new Hugo site**:
-   ```bash
-   hugo new-site my-site
-   cd my-site
-   ```
+
+    ```bash
+    hugo new-site my-site
+    ```
+
+    ```bash
+    cd my-site
+    ```
 
 2. **Add the theme**:
-   ```bash
-   # Option 1: Git submodule (recommended for development)
-   git submodule add https://github.com/lbenicio/aboutme-v2-theme.git themes/aboutme-v2-theme
-   
-   # Option 2: Clone directly
-   git clone https://github.com/lbenicio/aboutme-v2-theme.git themes/aboutme-v2-theme
-   ```
+   Option 1: Git submodule (recommended for development)
+
+    ```bash
+    git submodule add https://github.com/lbenicio/aboutme-v2-theme.git themes/aboutme-v2-theme
+    ```
+
+    Option 2: Clone directly
+
+    ```bash
+    git clone https://github.com/lbenicio/aboutme-v2-theme.git themes/aboutme-v2-theme
+    ```
 
 3. **Configure your site**:
    Add to your `hugo.toml`:
-   ```toml
-   theme = "aboutme-v2-theme"
-   ```
+
+    ```toml
+    theme = "aboutme-v2-theme"
+    ```
 
 4. **Install dependencies**:
-   ```bash
-   cd themes/aboutme-v2-theme
-   npm install
-   ```
+
+    ```bash
+    cd themes/aboutme-v2-theme
+    ```
+
+    ```bash
+    npm install
+    ```
 
 5. **Start the development server**:
-   ```bash
-   # From the theme directory
-   npm run start:dev
-   
-   # Or from your site root
-   hugo server --themesDir ../..
-   ```
+
+    From the theme directory
+
+    ```bash
+    npm run start:dev
+    ```
+
+    Or from your site root
+
+    ```bash
+    hugo server --themesDir ../..
+    ```
 
 ## 📁 Project Structure
 
 ```
 aboutme-v2-theme/
 ├── assets/
-│   ├── css/           # Tailwind CSS entry point
-│   └── js/            # JavaScript components
+│   ├── css/  Tailwind CSS entry point
+│   └── js/   JavaScript components
 ├── layouts/
-│   ├── _default/       # Default Hugo templates
-│   ├── about/         # About page section
-│   ├── contact/       # Contact page section
-│   ├── partials/      # Reusable components
-│   ├── post/          # Blog post templates
+│   ├── _default/ Default Hugo templates
+│   ├── about/   About page section
+│   ├── contact/ Contact page section
+│   ├── partials/Reusable components
+│   ├── post/ Blog post templates
 │   ├── publications/  # Publications section
-│   ├── reading/       # Reading list section
+│   ├── reading/ Reading list section
 │   ├── shortcodes/    # Hugo shortcodes
-│   └── timeline/      # Timeline section
+│   └── timeline/Timeline section
 ├── static/
-│   ├── assets/        # Static assets (images, fonts)
-│   └── fonts/         # Custom fonts
-├── scripts/           # Build and utility scripts
-├── tests/             # Unit and E2E tests
-├── theme.toml         # Theme configuration
-└── package.json       # Node.js dependencies
+│   ├── assets/  Static assets (images, fonts)
+│   └── fonts/   Custom fonts
+├── scripts/  Build and utility scripts
+├── tests/    Unit and E2E tests
+├── theme.toml   Theme configuration
+└── package.json Node.js dependencies
 ```
 
 ## ⚙️ Configuration
@@ -158,14 +176,14 @@ The theme uses frontmatter in your content files to configure data structures:
 Title: "Timeline"
 description: "A chronological timeline of milestones"
 timeline:
-  - date: 2024-06
-    title: "Your Milestone"
-    category: career
-    description: "Description of the milestone"
-    links:
-      - label: "Related Link"
-        href: "/related-page/"
-    highlight: true
+    - date: 2024-06
+      title: "Your Milestone"
+      category: career
+      description: "Description of the milestone"
+      links:
+          - label: "Related Link"
+            href: "/related-page/"
+      highlight: true
 ---
 ```
 
@@ -176,19 +194,19 @@ timeline:
 Title: "About Me"
 description: "About page description"
 certifications:
-  - id: aws-cloud-practitioner
-    name: AWS Certified Cloud Practitioner
-    issuer: Amazon Web Services
-    level: Foundational
-    issued: 2024-06
-    domainTags:
-      - cloud
-      - aws
-    skills:
-      - Cloud Concepts
-      - Security
-    url: https://aws.amazon.com/certification/
-    notes: "Additional notes"
+    - id: aws-cloud-practitioner
+      name: AWS Certified Cloud Practitioner
+      issuer: Amazon Web Services
+      level: Foundational
+      issued: 2024-06
+      domainTags:
+          - cloud
+          - aws
+      skills:
+          - Cloud Concepts
+          - Security
+      url: https://aws.amazon.com/certification/
+      notes: "Additional notes"
 ---
 ```
 
@@ -208,11 +226,11 @@ The theme includes Open Sans by default. To use custom fonts:
 
 1. Place your font files in `static/fonts/`
 2. Update the font paths in your `hugo.toml`:
-   ```toml
-   [params]
-   fontRegular = "static/fonts/YourFont-Regular.ttf"
-   fontBold = "static/fonts/YourFont-Bold.ttf"
-   ```
+    ```toml
+    [params]
+    fontRegular = "static/fonts/YourFont-Regular.ttf"
+    fontBold = "static/fonts/YourFont-Bold.ttf"
+    ```
 
 ### Images
 
@@ -228,39 +246,112 @@ Supported formats: AVIF, WebP, PNG (with automatic fallbacks)
 
 The theme includes several npm scripts for development and building:
 
+Start Hugo dev server with hot reload
+
 ```bash
-# Development
-npm run start:dev          # Start Hugo dev server with hot reload
-npm run start:preview      # Start preview server
+npm run start:dev
+```
 
-# Building
-npm run build:hugo         # Build with Hugo
-npm run build:obfuscate    # Obfuscate inline scripts
-npm run build:clean        # Clean build artifacts
-npm run build:prod         # Full production build
+Start preview server
 
-# Testing
-npm run test:unit          # Run unit tests
-npm run test:ui            # Run UI tests
-npm run test:e2e           # Run E2E tests with Playwright
+```bash
+npm run start:preview
+```
 
-# Code Quality
-npm run fmt:lint           # Run ESLint
-npm run fmt:format         # Run Prettier
-npm run fmt:all            # Run both linting and formatting
-npm run type:check         # TypeScript type checking
+Build with Hugo
 
-# Utilities
-npm run clear:build        # Clean build directories
-npm run clear:dep          # Reinstall dependencies
-npm run deps:update        # Update dependencies
-npm run deps:install       # Install dependencies
+```bash
+npm run build:hugo
+```
 
-# Generation
-npm run og:gen            # Generate OG images
-npm run pdf:light          # Generate PDF exports
-npm run pdf:books          # Generate book PDFs
-npm run release:gen        # Generate release
+Obfuscate inline scripts
+
+```bash
+npm run build:obfuscate
+```
+
+Clean build artifacts
+
+```bash
+npm run build:clean
+```
+
+Full production build
+
+```bash
+npm run build:prod
+```
+
+Run unit tests
+
+```bash
+npm run test:unit
+```
+
+Run UI tests
+
+```bash
+npm run test:ui
+```
+
+Run E2E tests with Playwright
+
+```bash
+npm run test:e2e
+```
+
+Run ESLint
+
+```bash
+npm run fmt:lint
+```
+
+Run Prettier
+
+```bash
+npm run fmt:format
+```
+
+Run both linting and formatting
+
+```bash
+npm run fmt:all
+```
+
+TypeScript type checking
+
+```bash
+npm run type:check
+```
+
+Clean build directories
+
+```bash
+npm run clear:build
+```
+
+Generate OG images
+
+```bash
+npm run og:gen
+```
+
+Generate PDF exports
+
+```bash
+npm run pdf:light
+```
+
+Generate book PDFs
+
+```bash
+npm run pdf:books
+```
+
+Generate release
+
+```bash
+npm run release:gen
 ```
 
 ## 🧪 Testing
@@ -272,6 +363,7 @@ The theme includes comprehensive tests:
 - **E2E Tests**: Playwright for full user flows
 
 Run all tests:
+
 ```bash
 npm run test:unit && npm run test:ui && npm run test:e2e
 ```
@@ -280,13 +372,18 @@ npm run test:unit && npm run test:ui && npm run test:e2e
 
 The theme supports generating multiple site variants from a single codebase:
 
+Generate specific variant
+
 ```bash
-# Generate specific variant
 node scripts/export.mjs --variant blog
+```
+
+```bash
 node scripts/export.mjs --variant about-only
 ```
 
 Available variants:
+
 - **blog**: Full blog with all sections
 - **about-only**: Personal site without blog features
 - **minimal**: Minimal version with essential features only
@@ -298,10 +395,7 @@ Available variants:
 The theme includes several useful shortcodes:
 
 ```html
-{{< icon "github" >}}           # Social media icons
-{{< contact >}}                # Contact form
-{{< newsletter >}}             # Newsletter signup
-{{< list-regular-pages >}}      # List regular pages
+{{< icon "github" >}} Social media icons {{< contact >}} Contact form {{< newsletter >}} Newsletter signup {{< list-regular-pages >}}List regular pages
 ```
 
 ### Taxonomies
@@ -329,11 +423,13 @@ Customize URL structures:
 ### Static Hosting
 
 Build your site:
+
 ```bash
 npm run build:prod
 ```
 
 Deploy the `public/` directory to any static hosting service:
+
 - **Netlify**: Connect your Git repository
 - **Vercel**: Import your project
 - **GitHub Pages**: Use GitHub Actions
@@ -344,10 +440,10 @@ Deploy the `public/` directory to any static hosting service:
 The theme includes Docker support:
 
 ```bash
-# Build image
 docker build -t my-site .
+```
 
-# Run container
+```bash
 docker run -p 80:80 my-site
 ```
 
@@ -358,23 +454,23 @@ Example GitHub Actions workflow:
 ```yaml
 name: Build and Deploy
 on:
-  push:
-    branches: [main]
+    push:
+        branches: [main]
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Setup Hugo
-        uses: peaceiris/actions-hugo@v2
-      - name: Setup Node
-        uses: actions/setup-node@v3
-      - name: Install dependencies
-        run: npm install
-      - name: Build
-        run: npm run build:prod
-      - name: Deploy
-        uses: peaceiris/actions-gh-pages@v3
+    build:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v3
+            - name: Setup Hugo
+              uses: peaceiris/actions-hugo@v2
+            - name: Setup Node
+              uses: actions/setup-node@v3
+            - name: Install dependencies
+              run: npm install
+            - name: Build
+              run: npm run build:prod
+            - name: Deploy
+              uses: peaceiris/actions-gh-pages@v3
 ```
 
 ## 🤝 Contributing
