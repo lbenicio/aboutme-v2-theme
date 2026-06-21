@@ -48,6 +48,8 @@
 .text-destructive-foreground { color: HSL(var(--destructive-foreground)); }
 
 // Specific legacy colors used in about page timeline categories
+.text-muted-foreground\/30 { color: HSL(var(--muted-foreground) / 0.3); }
+.text-muted-foreground\/50 { color: HSL(var(--muted-foreground) / 0.5); }
 .text-blue-500    { color: #3b82f6; }
 .text-emerald-500 { color: #10b981; }
 .text-indigo-500  { color: #6366f1; }

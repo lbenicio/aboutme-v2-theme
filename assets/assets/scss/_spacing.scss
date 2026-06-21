@@ -22,6 +22,7 @@ $spacers: (
 @each $name, $size in $spacers {
   .gap-#{$name} { gap: $size; }
 }
+.gap-px { gap: 1px; }
 
 // ── Space between (flex/grid children) ─────────────────────────────────────────
 @each $name, $size in $spacers {

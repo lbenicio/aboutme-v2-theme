@@ -28,23 +28,23 @@
   {{ else if eq $p1 "week" }}
     {{ $view = "week" }}
     {{ if ge $n 3 }}{{ $year = index $parts 2 }}{{ end }}
-    {{ if ge $n 4 }}{{ $monthIdx = int (index $parts 3) }}{{ end }}
-    {{ if ge $n 5 }}{{ $dayNum = int (index $parts 4) }}{{ end }}
+    {{ if ge $n 4 }}{{ $monthIdx = int (replaceRE "^0+(.+)$" "$1" (index $parts 3)) }}{{ end }}
+    {{ if ge $n 5 }}{{ $dayNum = int (replaceRE "^0+(.+)$" "$1" (index $parts 4)) }}{{ end }}
 
   {{/* /calendar/day/YYYY/MM/DD/ */}}
   {{ else if eq $p1 "day" }}
     {{ $view = "day" }}
     {{ if ge $n 3 }}{{ $year = index $parts 2 }}{{ end }}
-    {{ if ge $n 4 }}{{ $monthIdx = int (index $parts 3) }}{{ end }}
-    {{ if ge $n 5 }}{{ $dayNum = int (index $parts 4) }}{{ end }}
+    {{ if ge $n 4 }}{{ $monthIdx = int (replaceRE "^0+(.+)$" "$1" (index $parts 3)) }}{{ end }}
+    {{ if ge $n 5 }}{{ $dayNum = int (replaceRE "^0+(.+)$" "$1" (index $parts 4)) }}{{ end }}
 
   {{/* /calendar/YYYY/ or /calendar/YYYY/MM/ */}}
   {{ else if findRE `^\d{4}$` $p1 }}
     {{ $year = $p1 }}
-    {{ if ge $n 3 }}{{ $monthIdx = int (index $parts 2) }}{{ end }}
+    {{ if ge $n 3 }}{{ $monthIdx = int (replaceRE "^0+(.+)$" "$1" (index $parts 2)) }}{{ end }}
     {{ if ge $n 4 }}
       {{ $view = "day" }}
-      {{ $dayNum = int (index $parts 3) }}
+      {{ $dayNum = int (replaceRE "^0+(.+)$" "$1" (index $parts 3)) }}
     {{ end }}
   {{ end }}
 {{ end }}
