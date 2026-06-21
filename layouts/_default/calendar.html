@@ -71,11 +71,11 @@
 {{ $nextM := add $monthIdx 1 }}{{ $nextY := $year }}
 {{ if gt $nextM 12 }}{{ $nextM = 1 }}{{ $nextY = add (int $year) 1 | printf "%d" }}{{ end }}
 
-{{/* Build day → posts map for current month */}}
+{{/* Build day → posts map for current month (string keys: "01", "02", …) */}}
 {{ $dayPosts := dict }}
 {{ range $posts }}
   {{ if and (eq (.Date.Format "2006") $year) (eq (.Date.Format "01") $monthKey) }}
-    {{ $d := int (.Date.Format "02") }}
+    {{ $d := .Date.Format "02" }}
     {{ $existing := index $dayPosts $d | default slice }}
     {{ $dayPosts = merge $dayPosts (dict $d (append $existing .)) }}
   {{ end }}
@@ -235,7 +235,7 @@
     {{ if gt $nextDay $dim }}{{ $nextDay = 1 }}{{ $nextDM = $nextM }}{{ $nextDY = $nextY }}{{ end }}
 
     {{ $dateLabel := printf "%s %d, %s" $monthName $dayNum $year }}
-    {{ $dayDisplayPosts := index $dayPosts $dayNum | default slice }}
+    {{ $dayDisplayPosts := index $dayPosts $dayKey | default slice }}
 
     <div class="flex items-center justify-between mb-4">
       <a href="{{ printf "%sday/%s/%02d/%02d/" $calBase $prevDY $prevDM $prevDay }}" class="text-sm font-medium text-muted-foreground hover:text-foreground">&larr; {{ index (slice "" "Jan" "Feb" "Mar" "Apr" "May" "Jun" "Jul" "Aug" "Sep" "Oct" "Nov" "Dec") $prevDM }} {{ $prevDay }}</a>
@@ -289,9 +289,10 @@
         {{ range seq 0 (sub $firstDow 1) }}<div class="border-b border-r min-h-[80px] p-1 bg-muted/30"></div>{{ end }}
         {{/* Day cells */}}
         {{ range seq 1 $dim }}
-          {{ $dp := index $dayPosts . | default slice }}
+          {{ $dk := printf "%02d" . }}
+          {{ $dp := index $dayPosts $dk | default slice }}
           {{ $hasPosts := gt (len $dp) 0 }}
-          {{ $today := and (eq $year (now.Format "2006")) (eq $monthKey (now.Format "01")) (eq (printf "%02d" .) (now.Format "02")) }}
+          {{ $today := and (eq $year (now.Format "2006")) (eq $monthKey (now.Format "01")) (eq $dk (now.Format "02")) }}
           <div class="border-b border-r min-h-[80px] p-1 {{ if $hasPosts }}bg-accent/10{{ end }} {{ if $today }}ring-2 ring-primary ring-inset{{ end }}">
             <div class="flex items-center gap-1">
               {{ if $hasPosts }}
