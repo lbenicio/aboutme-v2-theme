@@ -1,7 +1,7 @@
 {{/* obfuscate/map.html — deterministic class-name obfuscation mapping.
      Uses site.Params.obfuscateSeed + sha256 to generate stable 6-char aliases. */}}
 {{ $seed := site.Params.obfuscateSeed | default (site.Title | sha256) }}
-{{ $data := site.Data.obfuscate }}
+{{ $data := hugo.Data.obfuscate }}
 {{ $map := dict }}
 
 {{/* Protected classes: keep original name */}}
