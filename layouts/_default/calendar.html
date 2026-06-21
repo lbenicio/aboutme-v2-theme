@@ -1,4 +1,4 @@
-{{/* calendar layout — month / week / day / year views */}}
+{{/* calendar layout — month / day / year views */}}
 {{ define "main" }}
 {{ $allPosts := where .Site.RegularPages "Section" "post" }}
 {{ $allPosts = where $allPosts "Kind" "page" }}
@@ -11,7 +11,7 @@
 {{ $dayNum := int (now.Format "2") }}
 {{ $calBase := "calendar/" | relURL }}
 
-{{/* Parse URL path: calendar[/year][/week|day]?/[YYYY]/[MM]/[DD]/ */}}
+{{/* Parse URL path: calendar[/YYYY/[/MM/[/DD/]]] */}}
 {{ $path := strings.Trim .RelPermalink "/" }}
 {{ $parts := split $path "/" }}
 {{ $n := len $parts }}
@@ -19,32 +19,16 @@
 {{ if ge $n 2 }}
   {{ $p1 := index $parts 1 }}
 
-  {{/* /calendar/year/ */}}
-  {{ if eq $p1 "year" }}
-    {{ $view = "year" }}
-    {{ if ge $n 3 }}{{ $year = index $parts 2 }}{{ end }}
-
-  {{/* /calendar/week/YYYY/MM/DD/ */}}
-  {{ else if eq $p1 "week" }}
-    {{ $view = "week" }}
-    {{ if ge $n 3 }}{{ $year = index $parts 2 }}{{ end }}
-    {{ if ge $n 4 }}{{ $monthIdx = int (replaceRE "^0+(.+)$" "$1" (index $parts 3)) }}{{ end }}
-    {{ if ge $n 5 }}{{ $dayNum = int (replaceRE "^0+(.+)$" "$1" (index $parts 4)) }}{{ end }}
-
-  {{/* /calendar/day/YYYY/MM/DD/ */}}
-  {{ else if eq $p1 "day" }}
-    {{ $view = "day" }}
-    {{ if ge $n 3 }}{{ $year = index $parts 2 }}{{ end }}
-    {{ if ge $n 4 }}{{ $monthIdx = int (replaceRE "^0+(.+)$" "$1" (index $parts 3)) }}{{ end }}
-    {{ if ge $n 5 }}{{ $dayNum = int (replaceRE "^0+(.+)$" "$1" (index $parts 4)) }}{{ end }}
-
-  {{/* /calendar/YYYY/ or /calendar/YYYY/MM/ */}}
-  {{ else if findRE `^\d{4}$` $p1 }}
+  {{ if findRE `^\d{4}$` $p1 }}
     {{ $year = $p1 }}
-    {{ if ge $n 3 }}{{ $monthIdx = int (replaceRE "^0+(.+)$" "$1" (index $parts 2)) }}{{ end }}
-    {{ if ge $n 4 }}
-      {{ $view = "day" }}
-      {{ $dayNum = int (replaceRE "^0+(.+)$" "$1" (index $parts 3)) }}
+    {{ if ge $n 3 }}
+      {{ $monthIdx = int (replaceRE "^0+(.+)$" "$1" (index $parts 2)) }}
+      {{ if ge $n 4 }}
+        {{ $view = "day" }}
+        {{ $dayNum = int (replaceRE "^0+(.+)$" "$1" (index $parts 3)) }}
+      {{ end }}
+    {{ else }}
+      {{ $view = "year" }}
     {{ end }}
   {{ end }}
 {{ end }}
@@ -54,7 +38,7 @@
 {{ $dayKey := printf "%02d" $dayNum }}
 {{ $monthName := index (slice "" "January" "February" "March" "April" "May" "June" "July" "August" "September" "October" "November" "December") $monthIdx }}
 
-{{/* Days in month helper */}}
+{{/* Days in month */}}
 {{ $dim := 31 }}
 {{ if or (eq $monthIdx 4) (eq $monthIdx 6) (eq $monthIdx 9) (eq $monthIdx 11) }}{{ $dim = 30 }}{{ end }}
 {{ if eq $monthIdx 2 }}
@@ -71,7 +55,7 @@
 {{ $nextM := add $monthIdx 1 }}{{ $nextY := $year }}
 {{ if gt $nextM 12 }}{{ $nextM = 1 }}{{ $nextY = add (int $year) 1 | printf "%d" }}{{ end }}
 
-{{/* Day of week for 1st (Mon=0) */}}
+{{/* Day of week for 1st (Mon=0) — only needed for month view */}}
 {{ $firstDate := printf "%s-%s-01" $year $monthKey }}
 {{ $firstTime := time.AsTime $firstDate }}
 {{ $firstDow := 0 }}
@@ -81,8 +65,23 @@
 {{ end }}
 
 {{ $dayNames := slice "Mon" "Tue" "Wed" "Thu" "Fri" "Sat" "Sun" }}
-{{ $dayNamesFull := slice "Monday" "Tuesday" "Wednesday" "Thursday" "Friday" "Saturday" "Sunday" }}
 {{ $monthOrder := slice "January" "February" "March" "April" "May" "June" "July" "August" "September" "October" "November" "December" }}
+
+{{/* Helper: collect posts for a specific day */}}
+{{ $dayPosts := slice }}
+{{ range $allPosts }}
+  {{ if and (eq (.Date.Format "2006") $year) (eq (.Date.Format "01") $monthKey) (eq (.Date.Format "02") $dayKey) }}
+    {{ $dayPosts = $dayPosts | append . }}
+  {{ end }}
+{{ end }}
+
+{{/* Helper: collect all posts for this month */}}
+{{ $monthPosts := slice }}
+{{ range $allPosts }}
+  {{ if and (eq (.Date.Format "2006") $year) (eq (.Date.Format "01") $monthKey) }}
+    {{ $monthPosts = $monthPosts | append . }}
+  {{ end }}
+{{ end }}
 
 {{/* ── Page header ── */}}
 <section class="py-6">
@@ -93,10 +92,8 @@
 
   {{/* ── View switcher ── */}}
   <div class="flex items-center gap-4 mb-6 text-sm">
-    <a href="{{ $calBase }}" class="font-medium {{ if eq $view "month" }}text-primary{{ else }}text-muted-foreground hover:text-foreground{{ end }}">Month</a>
-    <a href="{{ printf "%sweek/" $calBase }}" class="font-medium {{ if eq $view "week" }}text-primary{{ else }}text-muted-foreground hover:text-foreground{{ end }}">Week</a>
-    <a href="{{ printf "%sday/" $calBase }}" class="font-medium {{ if eq $view "day" }}text-primary{{ else }}text-muted-foreground hover:text-foreground{{ end }}">Day</a>
-    <a href="{{ printf "%syear/" $calBase }}" class="font-medium {{ if eq $view "year" }}text-primary{{ else }}text-muted-foreground hover:text-foreground{{ end }}">Year</a>
+    <a href="{{ $calBase }}" class="font-medium {{ if ne $view "year" }}text-primary{{ else }}text-muted-foreground hover:text-foreground{{ end }}">Month</a>
+    <a href="{{ printf "%s%s/" $calBase (now.Format "2006") }}" class="font-medium {{ if eq $view "year" }}text-primary{{ else }}text-muted-foreground hover:text-foreground{{ end }}">Year</a>
   </div>
 
   {{/* ═══════════════════════════════════════════════════════════ */}}
@@ -104,9 +101,9 @@
   {{/* ═══════════════════════════════════════════════════════════ */}}
   {{ if eq $view "year" }}
     <div class="flex items-center justify-between mb-4">
-      <a href="{{ printf "%syear/%d/" $calBase (sub (int $year) 1) }}" class="text-sm font-medium text-muted-foreground hover:text-foreground">&larr; {{ sub (int $year) 1 }}</a>
+      <a href="{{ printf "%s%d/" $calBase (sub (int $year) 1) }}" class="text-sm font-medium text-muted-foreground hover:text-foreground">&larr; {{ sub (int $year) 1 }}</a>
       <h2 class="text-xl font-bold">{{ $year }}</h2>
-      <a href="{{ printf "%syear/%d/" $calBase (add (int $year) 1) }}" class="text-sm font-medium text-muted-foreground hover:text-foreground">{{ add (int $year) 1 }} &rarr;</a>
+      <a href="{{ printf "%s%d/" $calBase (add (int $year) 1) }}" class="text-sm font-medium text-muted-foreground hover:text-foreground">{{ add (int $year) 1 }} &rarr;</a>
     </div>
     <div class="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6">
       {{ range $mIdx, $mName := $monthOrder }}
@@ -142,76 +139,6 @@
     </div>
 
   {{/* ═══════════════════════════════════════════════════════════ */}}
-  {{/* ── WEEK VIEW ── */}}
-  {{/* ═══════════════════════════════════════════════════════════ */}}
-  {{ else if eq $view "week" }}
-    {{/* Compute Monday of the week containing dayNum */}}
-    {{ $dowTarget := 0 }}{{ $td := printf "%s-%s-%s" $year $monthKey $dayKey }}{{ $tt := time.AsTime $td }}
-    {{ with $tt }}{{ $w := .Weekday }}{{ if eq $w 0 }}{{ $dowTarget = 6 }}{{ else }}{{ $dowTarget = sub (int $w) 1 }}{{ end }}{{ end }}
-    {{ $mondayDay := sub $dayNum $dowTarget }}
-    {{ $mondayM := $monthIdx }}{{ $mondayY := $year }}
-    {{ if le $mondayDay 0 }}
-      {{ $mondayM = $prevM }}{{ $mondayY = $prevY }}
-      {{ $dimPrev := 31 }}{{ if or (eq $prevM 4) (eq $prevM 6) (eq $prevM 9) (eq $prevM 11) }}{{ $dimPrev = 30 }}{{ end }}
-      {{ if eq $prevM 2 }}{{ $dimPrev = 28 }}{{ $pyi := int $prevY }}{{ if or (and (eq (mod $pyi 4) 0) (ne (mod $pyi 100) 0)) (eq (mod $pyi 400) 0) }}{{ $dimPrev = 29 }}{{ end }}{{ end }}
-      {{ $mondayDay = add $dimPrev $mondayDay }}
-    {{ end }}
-    {{ $mondayDate := printf "%s-%02d-%02d" $mondayY $mondayM $mondayDay }}
-
-    {{/* Previous week Monday */}}
-    {{ $prevMon := sub $mondayDay 7 }}{{ $prevMonM := $mondayM }}{{ $prevMonY := $mondayY }}
-    {{ if le $prevMon 0 }}
-      {{ $prevMonM = sub $mondayM 1 }}{{ $prevMonY = $mondayY }}
-      {{ if lt $prevMonM 1 }}{{ $prevMonM = 12 }}{{ $prevMonY = sub (int $mondayY) 1 | printf "%d" }}{{ end }}
-      {{ $dimPM := 31 }}{{ if or (eq $prevMonM 4) (eq $prevMonM 6) (eq $prevMonM 9) (eq $prevMonM 11) }}{{ $dimPM = 30 }}{{ end }}
-      {{ if eq $prevMonM 2 }}{{ $dimPM = 28 }}{{ $pyi := int $prevMonY }}{{ if or (and (eq (mod $pyi 4) 0) (ne (mod $pyi 100) 0)) (eq (mod $pyi 400) 0) }}{{ $dimPM = 29 }}{{ end }}{{ end }}
-      {{ $prevMon = add $dimPM $prevMon }}
-    {{ end }}
-
-    {{/* Next week Monday */}}
-    {{ $nextMon := add $mondayDay 7 }}{{ $nextMonM := $mondayM }}{{ $nextMonY := $mondayY }}
-    {{ $dimCM := $dim }}
-    {{ if gt $nextMon $dimCM }}
-      {{ $nextMon = sub $nextMon $dimCM }}{{ $nextMonM = add $mondayM 1 }}{{ $nextMonY = $mondayY }}
-      {{ if gt $nextMonM 12 }}{{ $nextMonM = 1 }}{{ $nextMonY = add (int $mondayY) 1 | printf "%d" }}{{ end }}
-    {{ end }}
-
-    <div class="flex items-center justify-between mb-4">
-      <a href="{{ printf "%sweek/%s/%02d/%02d/" $calBase $prevMonY $prevMonM $prevMon }}" class="text-sm font-medium text-muted-foreground hover:text-foreground">&larr; Previous week</a>
-      <h2 class="text-xl font-bold">Week of {{ $mondayDate }}</h2>
-      <a href="{{ printf "%sweek/%s/%02d/%02d/" $calBase $nextMonY $nextMonM $nextMon }}" class="text-sm font-medium text-muted-foreground hover:text-foreground">Next week &rarr;</a>
-    </div>
-
-    <div class="grid grid-cols-7 gap-1 mb-6">
-      {{ range $col, $dname := $dayNamesFull }}
-        {{ $dayOffset := add $mondayDay $col }}
-        {{ $cellM := $mondayM }}{{ $cellY := $mondayY }}
-        {{ if gt $dayOffset $dim }}{{ $dayOffset = sub $dayOffset $dim }}{{ $cellM = add $mondayM 1 }}{{ if gt $cellM 12 }}{{ $cellM = 1 }}{{ $cellY = add (int $mondayY) 1 | printf "%d" }}{{ end }}{{ end }}
-        {{ $cellMK := printf "%02d" $cellM }}
-        {{ $cellDK := printf "%02d" $dayOffset }}
-        {{ $cellPosts := slice }}
-        {{ range $allPosts }}
-          {{ if and (eq (.Date.Format "2006") $cellY) (eq (.Date.Format "01") $cellMK) (eq (.Date.Format "02") $cellDK) }}
-            {{ $cellPosts = $cellPosts | append . }}
-          {{ end }}
-        {{ end }}
-        {{ $today := and (eq $cellY (now.Format "2006")) (eq $cellMK (now.Format "01")) (eq $cellDK (now.Format "02")) }}
-        <div class="border rounded-lg p-2 min-h-[120px] flex flex-col {{ if $today }}ring-2 ring-primary{{ end }}">
-          <div class="text-xs font-semibold mb-1 {{ if $today }}text-primary{{ else }}text-muted-foreground{{ end }}">
-            {{ substr $dname 0 3 }} <span class="tabular-nums">{{ $dayOffset }}</span>
-          </div>
-          <div class="flex flex-col gap-0.5 text-[10px] leading-tight grow">
-            {{ range $cellPosts }}
-              <a href="{{ .RelPermalink }}" class="text-muted-foreground hover:text-primary truncate" title="{{ .Title }}">{{ .Title }}</a>
-            {{ else }}
-              <span class="text-muted-foreground/30 text-[10px]"></span>
-            {{ end }}
-          </div>
-        </div>
-      {{ end }}
-    </div>
-
-  {{/* ═══════════════════════════════════════════════════════════ */}}
   {{/* ── DAY VIEW ── */}}
   {{/* ═══════════════════════════════════════════════════════════ */}}
   {{ else if eq $view "day" }}
@@ -227,25 +154,17 @@
 
     {{ $dateLabel := printf "%s %d, %s" $monthName $dayNum $year }}
 
-    {{/* Collect posts for this day */}}
-    {{ $dayDisplayPosts := slice }}
-    {{ range $allPosts }}
-      {{ if and (eq (.Date.Format "2006") $year) (eq (.Date.Format "01") $monthKey) (eq (.Date.Format "02") $dayKey) }}
-        {{ $dayDisplayPosts = $dayDisplayPosts | append . }}
-      {{ end }}
-    {{ end }}
-
     <div class="flex items-center justify-between mb-4">
-      <a href="{{ printf "%sday/%s/%02d/%02d/" $calBase $prevDY $prevDM $prevDay }}" class="text-sm font-medium text-muted-foreground hover:text-foreground">&larr; {{ index (slice "" "Jan" "Feb" "Mar" "Apr" "May" "Jun" "Jul" "Aug" "Sep" "Oct" "Nov" "Dec") $prevDM }} {{ $prevDay }}</a>
+      <a href="{{ printf "%s%s/%02d/%02d/" $calBase $prevDY $prevDM $prevDay }}" class="text-sm font-medium text-muted-foreground hover:text-foreground">&larr; {{ index (slice "" "Jan" "Feb" "Mar" "Apr" "May" "Jun" "Jul" "Aug" "Sep" "Oct" "Nov" "Dec") $prevDM }} {{ $prevDay }}</a>
       <h2 class="text-xl font-bold">{{ $dateLabel }}</h2>
-      <a href="{{ printf "%sday/%s/%02d/%02d/" $calBase $nextDY $nextDM $nextDay }}" class="text-sm font-medium text-muted-foreground hover:text-foreground">{{ index (slice "" "Jan" "Feb" "Mar" "Apr" "May" "Jun" "Jul" "Aug" "Sep" "Oct" "Nov" "Dec") $nextDM }} {{ $nextDay }} &rarr;</a>
+      <a href="{{ printf "%s%s/%02d/%02d/" $calBase $nextDY $nextDM $nextDay }}" class="text-sm font-medium text-muted-foreground hover:text-foreground">{{ index (slice "" "Jan" "Feb" "Mar" "Apr" "May" "Jun" "Jul" "Aug" "Sep" "Oct" "Nov" "Dec") $nextDM }} {{ $nextDay }} &rarr;</a>
     </div>
 
-    {{ if eq (len $dayDisplayPosts) 0 }}
+    {{ if eq (len $dayPosts) 0 }}
       <p class="text-sm text-muted-foreground">No posts on this day.</p>
     {{ else }}
       <ul class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {{ range $dayDisplayPosts }}
+        {{ range $dayPosts }}
           {{ $cover := .Params.cover }}
           <li class="border rounded-lg overflow-hidden flex flex-col transition-colors">
             {{ $permalink := .RelPermalink }}
@@ -288,7 +207,6 @@
         {{/* Day cells */}}
         {{ range seq 1 $dim }}
           {{ $dk := printf "%02d" . }}
-          {{/* Filter posts for this day */}}
           {{ $dp := slice }}
           {{ range $allPosts }}
             {{ if and (eq (.Date.Format "2006") $year) (eq (.Date.Format "01") $monthKey) (eq (.Date.Format "02") $dk) }}
@@ -296,15 +214,13 @@
             {{ end }}
           {{ end }}
           {{ $hasPosts := gt (len $dp) 0 }}
-          {{ $today := and (eq $year (now.Format "2006")) (eq $monthKey (now.Format "01")) (eq $dk (now.Format "02")) }}
-          <div class="border-b border-r min-h-[80px] p-1 {{ if $hasPosts }}bg-accent/10{{ end }} {{ if $today }}ring-2 ring-primary ring-inset{{ end }}">
-            <div class="flex items-center gap-1">
-              {{ if $hasPosts }}
-                <a href="{{ printf "%sday/%s/%s/%s/" $calBase $year $monthKey $dk }}" class="text-xs font-medium text-primary hover:underline tabular-nums">{{ . }}</a>
-              {{ else }}
-                <span class="text-xs font-medium text-muted-foreground tabular-nums">{{ . }}</span>
-              {{ end }}
-            </div>
+          {{ $isToday := and (eq $year (now.Format "2006")) (eq $monthKey (now.Format "01")) (eq $dk (now.Format "02")) }}
+          <div class="border-b border-r min-h-[80px] p-1 {{ if $hasPosts }}bg-accent/10{{ end }} {{ if $isToday }}ring-2 ring-primary ring-inset{{ end }}">
+            {{ if $hasPosts }}
+              <a href="{{ printf "%s%s/%s/%s/" $calBase $year $monthKey $dk }}" class="text-xs font-medium text-primary hover:underline tabular-nums">{{ . }}</a>
+            {{ else }}
+              <span class="text-xs font-medium text-muted-foreground tabular-nums">{{ . }}</span>
+            {{ end }}
             {{ range $dp }}
               <a href="{{ .RelPermalink }}" class="block text-[10px] leading-tight mt-0.5 text-muted-foreground hover:text-primary truncate" title="{{ .Title }}">{{ .Title }}</a>
             {{ end }}
@@ -312,6 +228,31 @@
         {{ end }}
       </div>
     </div>
+
+    {{/* Post list for this month */}}
+    {{ if gt (len $monthPosts) 0 }}
+      <h3 class="text-lg font-semibold mb-3">{{ len $monthPosts }} post{{ if gt (len $monthPosts) 1 }}s{{ end }} in {{ $monthName }} {{ $year }}</h3>
+      <ul class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        {{ range $monthPosts }}
+          {{ $cover := .Params.cover }}
+          <li class="border rounded-lg overflow-hidden flex flex-col transition-colors">
+            {{ $permalink := .RelPermalink }}
+            {{ with $cover }}
+              <a href="{{ $permalink }}" class="block aspect-video bg-muted">
+                <img src="{{ . | relURL }}" alt="" class="w-full h-full object-cover" loading="lazy" />
+              </a>
+            {{ end }}
+            <div class="p-4 flex flex-col gap-2 grow">
+              <h2 class="font-semibold text-lg leading-tight">
+                <a href="{{ .RelPermalink }}" class="underline underline-offset-4 hover:bg-muted">{{ .Title }}</a>
+              </h2>
+              <div class="text-xs text-muted-foreground">{{ .Date | time.Format "2006-01-02" }}</div>
+              {{ with .Params.description }}<p class="text-sm text-muted-foreground line-clamp-3">{{ . }}</p>{{ end }}
+            </div>
+          </li>
+        {{ end }}
+      </ul>
+    {{ end }}
   {{ end }}
 </section>
 {{ end }}

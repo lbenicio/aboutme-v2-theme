@@ -1,0 +1,63 @@
+{{/* _content.gotmpl — virtual calendar pages generated from posts at build time */}}
+{{ $pages := slice }}
+{{ $posts := where site.RegularPages "Section" "post" }}
+
+{{/* Find year range from posts */}}
+{{ $minYear := 9999 }}{{ $maxYear := 0 }}
+{{ range $posts }}
+  {{ $y := int (.Date.Format "2006") }}
+  {{ if lt $y $minYear }}{{ $minYear = $y }}{{ end }}
+  {{ if gt $y $maxYear }}{{ $maxYear = $y }}{{ end }}
+{{ end }}
+
+{{/* If no posts, use current year only */}}
+{{ if eq $maxYear 0 }}
+  {{ $minYear = int (now.Format "2006") }}
+  {{ $maxYear = $minYear }}
+{{ end }}
+
+{{/* Generate pages for the full year range */}}
+{{ range $y := seq $minYear $maxYear }}
+  {{ $yearStr := printf "%d" $y }}
+
+  {{/* ── Year page ── */}}
+  {{ $pages = $pages | append (dict
+    "path" (printf "/%s" $yearStr)
+    "kind" "section"
+    "layout" "calendar"
+    "params" (dict "title" $yearStr)
+  ) }}
+
+  {{ range $m := seq 1 12 }}
+    {{ $monthStr := printf "%s/%02d" $yearStr $m }}
+
+    {{/* ── Month page ── */}}
+    {{ $pages = $pages | append (dict
+      "path" (printf "/%s" $monthStr)
+      "kind" "section"
+      "layout" "calendar"
+      "params" (dict "title" $monthStr)
+    ) }}
+
+    {{/* ── Day pages ── */}}
+    {{ $dim := 31 }}
+    {{ if or (eq $m 4) (eq $m 6) (eq $m 9) (eq $m 11) }}{{ $dim = 30 }}{{ end }}
+    {{ if eq $m 2 }}
+      {{ $dim = 28 }}
+      {{ if or (and (eq (mod $y 4) 0) (ne (mod $y 100) 0)) (eq (mod $y 400) 0) }}
+        {{ $dim = 29 }}
+      {{ end }}
+    {{ end }}
+    {{ range $d := seq 1 $dim }}
+      {{ $dayStr := printf "%s/%02d/%02d" $yearStr $m $d }}
+      {{ $pages = $pages | append (dict
+        "path" (printf "/%s" $dayStr)
+        "kind" "page"
+        "layout" "calendar"
+        "params" (dict "title" $dayStr)
+      ) }}
+    {{ end }}
+  {{ end }}
+{{ end }}
+
+{{ return $pages }}
