@@ -75,14 +75,6 @@
   {{ end }}
 {{ end }}
 
-{{/* Helper: collect all posts for this month */}}
-{{ $monthPosts := slice }}
-{{ range $allPosts }}
-  {{ if and (eq (.Date.Format "2006") $year) (eq (.Date.Format "01") $monthKey) }}
-    {{ $monthPosts = $monthPosts | append . }}
-  {{ end }}
-{{ end }}
-
 {{/* ── Page header ── */}}
 <section {{ partial "obfuscate/cls" "py-6" | safeHTMLAttr }}>
   <h1 {{ partial "obfuscate/cls" "text-4xl md:text-5xl font-bold tracking-tighter mb-1" | safeHTMLAttr }}>Calendar</h1>
@@ -169,26 +161,17 @@
     {{ if eq (len $dayPosts) 0 }}
       <p {{ partial "obfuscate/cls" "text-sm text-muted-foreground" | safeHTMLAttr }}>No posts on this day.</p>
     {{ else }}
-      <ul {{ partial "obfuscate/cls" "grid gap-6 sm:grid-cols-2 lg:grid-cols-3" | safeHTMLAttr }}>
+      <div {{ partial "obfuscate/cls" "border rounded-lg overflow-hidden" | safeHTMLAttr }}>
         {{ range $dayPosts }}
-          {{ $cover := .Params.cover }}
-          <li {{ partial "obfuscate/cls" "border rounded-lg overflow-hidden flex flex-col transition-colors" | safeHTMLAttr }}>
-            {{ $permalink := .RelPermalink }}
-            {{ with $cover }}
-              <a href="{{ $permalink }}" {{ partial "obfuscate/cls" "block aspect-video bg-muted" | safeHTMLAttr }}>
-                <img src="{{ . | relURL }}" alt="" {{ partial "obfuscate/cls" "w-full h-full object-cover" | safeHTMLAttr }} loading="lazy" />
-              </a>
-            {{ end }}
-            <div {{ partial "obfuscate/cls" "p-4 flex flex-col gap-2 grow" | safeHTMLAttr }}>
-              <h2 {{ partial "obfuscate/cls" "font-semibold text-lg leading-tight" | safeHTMLAttr }}>
-                <a href="{{ .RelPermalink }}" {{ partial "obfuscate/cls" "underline underline-offset-4 hover:bg-muted" | safeHTMLAttr }}>{{ .Title }}</a>
-              </h2>
-              <div {{ partial "obfuscate/cls" "text-xs text-muted-foreground" | safeHTMLAttr }}>{{ .Date | time.Format "2006-01-02" }}</div>
-              {{ with .Params.description }}<p {{ partial "obfuscate/cls" "text-sm text-muted-foreground line-clamp-3" | safeHTMLAttr }}>{{ . }}</p>{{ end }}
+          <a href="{{ .RelPermalink }}" {{ partial "obfuscate/cls" "flex items-start gap-3 px-4 py-3 border-b last:border-b-0 hover:bg-muted transition-colors" | safeHTMLAttr }}>
+            <span {{ partial "obfuscate/cls" "text-xs text-muted-foreground tabular-nums shrink-0 mt-0.5 w-10" | safeHTMLAttr }}>{{ .Date | time.Format "15:04" }}</span>
+            <div {{ partial "obfuscate/cls" "min-w-0" | safeHTMLAttr }}>
+              <span {{ partial "obfuscate/cls" "text-sm font-medium" | safeHTMLAttr }}>{{ .Title }}</span>
+              {{ with .Params.description }}<p {{ partial "obfuscate/cls" "text-xs text-muted-foreground truncate mt-0.5" | safeHTMLAttr }}>{{ . }}</p>{{ end }}
             </div>
-          </li>
+          </a>
         {{ end }}
-      </ul>
+      </div>
     {{ end }}
 
   {{/* ═══════════════════════════════════════════════════════════ */}}
@@ -237,31 +220,6 @@
         {{ end }}
       </div>
     </div>
-
-    {{/* Post list for this month */}}
-    {{ if gt (len $monthPosts) 0 }}
-      <h3 {{ partial "obfuscate/cls" "text-lg font-semibold mb-3" | safeHTMLAttr }}>{{ len $monthPosts }} post{{ if gt (len $monthPosts) 1 }}s{{ end }} in {{ $monthName }} {{ $year }}</h3>
-      <ul {{ partial "obfuscate/cls" "grid gap-6 sm:grid-cols-2 lg:grid-cols-3" | safeHTMLAttr }}>
-        {{ range $monthPosts }}
-          {{ $cover := .Params.cover }}
-          <li {{ partial "obfuscate/cls" "border rounded-lg overflow-hidden flex flex-col transition-colors" | safeHTMLAttr }}>
-            {{ $permalink := .RelPermalink }}
-            {{ with $cover }}
-              <a href="{{ $permalink }}" {{ partial "obfuscate/cls" "block aspect-video bg-muted" | safeHTMLAttr }}>
-                <img src="{{ . | relURL }}" alt="" {{ partial "obfuscate/cls" "w-full h-full object-cover" | safeHTMLAttr }} loading="lazy" />
-              </a>
-            {{ end }}
-            <div {{ partial "obfuscate/cls" "p-4 flex flex-col gap-2 grow" | safeHTMLAttr }}>
-              <h2 {{ partial "obfuscate/cls" "font-semibold text-lg leading-tight" | safeHTMLAttr }}>
-                <a href="{{ .RelPermalink }}" {{ partial "obfuscate/cls" "underline underline-offset-4 hover:bg-muted" | safeHTMLAttr }}>{{ .Title }}</a>
-              </h2>
-              <div {{ partial "obfuscate/cls" "text-xs text-muted-foreground" | safeHTMLAttr }}>{{ .Date | time.Format "2006-01-02" }}</div>
-              {{ with .Params.description }}<p {{ partial "obfuscate/cls" "text-sm text-muted-foreground line-clamp-3" | safeHTMLAttr }}>{{ . }}</p>{{ end }}
-            </div>
-          </li>
-        {{ end }}
-      </ul>
-    {{ end }}
   {{ end }}
 </section>
 {{ end }}
