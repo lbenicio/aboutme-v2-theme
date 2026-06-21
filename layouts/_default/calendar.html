@@ -1,8 +1,8 @@
 {{/* calendar layout — month / week / day / year views */}}
 {{ define "main" }}
-{{ $posts := where .Site.RegularPages "Section" "post" }}
-{{ $posts = where $posts "Kind" "page" }}
-{{ $posts = where $posts "Draft" "ne" true }}
+{{ $allPosts := where .Site.RegularPages "Section" "post" }}
+{{ $allPosts = where $allPosts "Kind" "page" }}
+{{ $allPosts = where $allPosts "Draft" "ne" true }}
 
 {{/* Defaults */}}
 {{ $view := "month" }}
@@ -71,16 +71,6 @@
 {{ $nextM := add $monthIdx 1 }}{{ $nextY := $year }}
 {{ if gt $nextM 12 }}{{ $nextM = 1 }}{{ $nextY = add (int $year) 1 | printf "%d" }}{{ end }}
 
-{{/* Build day → posts map for current month (string keys: "01", "02", …) */}}
-{{ $dayPosts := dict }}
-{{ range $posts }}
-  {{ if and (eq (.Date.Format "2006") $year) (eq (.Date.Format "01") $monthKey) }}
-    {{ $d := .Date.Format "02" }}
-    {{ $existing := index $dayPosts $d | default slice }}
-    {{ $dayPosts = merge $dayPosts (dict $d (append $existing .)) }}
-  {{ end }}
-{{ end }}
-
 {{/* Day of week for 1st (Mon=0) */}}
 {{ $firstDate := printf "%s-%s-01" $year $monthKey }}
 {{ $firstTime := time.AsTime $firstDate }}
@@ -92,6 +82,7 @@
 
 {{ $dayNames := slice "Mon" "Tue" "Wed" "Thu" "Fri" "Sat" "Sun" }}
 {{ $dayNamesFull := slice "Monday" "Tuesday" "Wednesday" "Thursday" "Friday" "Saturday" "Sunday" }}
+{{ $monthOrder := slice "January" "February" "March" "April" "May" "June" "July" "August" "September" "October" "November" "December" }}
 
 {{/* ── Page header ── */}}
 <section class="py-6">
@@ -112,7 +103,6 @@
   {{/* ── YEAR VIEW ── */}}
   {{/* ═══════════════════════════════════════════════════════════ */}}
   {{ if eq $view "year" }}
-    {{ $monthOrder := slice "January" "February" "March" "April" "May" "June" "July" "August" "September" "October" "November" "December" }}
     <div class="flex items-center justify-between mb-4">
       <a href="{{ printf "%syear/%d/" $calBase (sub (int $year) 1) }}" class="text-sm font-medium text-muted-foreground hover:text-foreground">&larr; {{ sub (int $year) 1 }}</a>
       <h2 class="text-xl font-bold">{{ $year }}</h2>
@@ -136,16 +126,17 @@
             {{ $dim2 := 31 }}{{ if or (eq (add $mIdx 1) 4) (eq (add $mIdx 1) 6) (eq (add $mIdx 1) 9) (eq (add $mIdx 1) 11) }}{{ $dim2 = 30 }}{{ end }}
             {{ if eq (add $mIdx 1) 2 }}{{ $dim2 = 28 }}{{ $yi := int $year }}{{ if or (and (eq (mod $yi 4) 0) (ne (mod $yi 100) 0)) (eq (mod $yi 400) 0) }}{{ $dim2 = 29 }}{{ end }}{{ end }}
             {{ range seq 1 $dim2 }}
+              {{ $dk2 := printf "%02d" . }}
               {{ $has := false }}
-              {{ range $posts }}
-                {{ if and (eq (.Date.Format "2006") $year) (eq (.Date.Format "01") $mk) (eq (int (.Date.Format "02")) .) }}
+              {{ range $allPosts }}
+                {{ if and (eq (.Date.Format "2006") $year) (eq (.Date.Format "01") $mk) (eq (.Date.Format "02") $dk2) }}
                   {{ $has = true }}{{ $mTotal = add $mTotal 1 }}
                 {{ end }}
               {{ end }}
               <span class="text-[8px] py-0.5 rounded-sm {{ if $has }}bg-accent font-bold{{ end }}">{{ . }}</span>
             {{ end }}
           </div>
-          {{ if gt $mTotal 0 }}<p class="text-[9px] text-muted-foreground text-center mt-1">{{ $mTotal }}</p>{{ end }}
+          {{ if gt $mTotal 0 }}<p class="text-[9px] text-muted-foreground text-center mt-1">{{ $mTotal }} post{{ if gt $mTotal 1 }}s{{ end }}</p>{{ end }}
         </a>
       {{ end }}
     </div>
@@ -199,9 +190,9 @@
         {{ $cellMK := printf "%02d" $cellM }}
         {{ $cellDK := printf "%02d" $dayOffset }}
         {{ $cellPosts := slice }}
-        {{ range $posts }}
-          {{ if and (eq (.Date.Format "2006") $cellY) (eq (.Date.Format "01") $cellMK) (eq (int (.Date.Format "02")) $dayOffset) }}
-            {{ $cellPosts = append $cellPosts . }}
+        {{ range $allPosts }}
+          {{ if and (eq (.Date.Format "2006") $cellY) (eq (.Date.Format "01") $cellMK) (eq (.Date.Format "02") $cellDK) }}
+            {{ $cellPosts = $cellPosts | append . }}
           {{ end }}
         {{ end }}
         {{ $today := and (eq $cellY (now.Format "2006")) (eq $cellMK (now.Format "01")) (eq $cellDK (now.Format "02")) }}
@@ -235,7 +226,14 @@
     {{ if gt $nextDay $dim }}{{ $nextDay = 1 }}{{ $nextDM = $nextM }}{{ $nextDY = $nextY }}{{ end }}
 
     {{ $dateLabel := printf "%s %d, %s" $monthName $dayNum $year }}
-    {{ $dayDisplayPosts := index $dayPosts $dayKey | default slice }}
+
+    {{/* Collect posts for this day */}}
+    {{ $dayDisplayPosts := slice }}
+    {{ range $allPosts }}
+      {{ if and (eq (.Date.Format "2006") $year) (eq (.Date.Format "01") $monthKey) (eq (.Date.Format "02") $dayKey) }}
+        {{ $dayDisplayPosts = $dayDisplayPosts | append . }}
+      {{ end }}
+    {{ end }}
 
     <div class="flex items-center justify-between mb-4">
       <a href="{{ printf "%sday/%s/%02d/%02d/" $calBase $prevDY $prevDM $prevDay }}" class="text-sm font-medium text-muted-foreground hover:text-foreground">&larr; {{ index (slice "" "Jan" "Feb" "Mar" "Apr" "May" "Jun" "Jul" "Aug" "Sep" "Oct" "Nov" "Dec") $prevDM }} {{ $prevDay }}</a>
@@ -290,13 +288,19 @@
         {{/* Day cells */}}
         {{ range seq 1 $dim }}
           {{ $dk := printf "%02d" . }}
-          {{ $dp := index $dayPosts $dk | default slice }}
+          {{/* Filter posts for this day */}}
+          {{ $dp := slice }}
+          {{ range $allPosts }}
+            {{ if and (eq (.Date.Format "2006") $year) (eq (.Date.Format "01") $monthKey) (eq (.Date.Format "02") $dk) }}
+              {{ $dp = $dp | append . }}
+            {{ end }}
+          {{ end }}
           {{ $hasPosts := gt (len $dp) 0 }}
           {{ $today := and (eq $year (now.Format "2006")) (eq $monthKey (now.Format "01")) (eq $dk (now.Format "02")) }}
           <div class="border-b border-r min-h-[80px] p-1 {{ if $hasPosts }}bg-accent/10{{ end }} {{ if $today }}ring-2 ring-primary ring-inset{{ end }}">
             <div class="flex items-center gap-1">
               {{ if $hasPosts }}
-                <a href="{{ printf "%sday/%s/%s/%02d/" $calBase $year $monthKey . }}" class="text-xs font-medium text-primary hover:underline tabular-nums">{{ . }}</a>
+                <a href="{{ printf "%sday/%s/%s/%s/" $calBase $year $monthKey $dk }}" class="text-xs font-medium text-primary hover:underline tabular-nums">{{ . }}</a>
               {{ else }}
                 <span class="text-xs font-medium text-muted-foreground tabular-nums">{{ . }}</span>
               {{ end }}
