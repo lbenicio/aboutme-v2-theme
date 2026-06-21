@@ -5,6 +5,28 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.0] - 2026-06-21
+
+### Added
+
+- **Calendar template** (`layouts/_default/calendar.html`) — month, day, and year views with calendar-grid rendering, prev/next navigation, post links in day cells, and a month-level post card list.
+- **Content adapter** (`_content.gotmpl`) — auto-generates virtual year, month, and day calendar pages from post dates at build time. Zero stub files required.
+- **Blog subnav** (`layouts/partials/blog-subnav.html`) — secondary navigation with Tags, Categories, and Calendar links for the blog section.
+- **Grid utilities** in SCSS: `.grid-cols-4` through `.grid-cols-7`, responsive variants up to `.xl:grid-cols-6`, and `xl` breakpoint at 1280px.
+- **Ring utilities**: `.ring-primary`, `.ring-inset` added to `_borders.scss`.
+- **Arbitrary-value classes**: `.text-[8px]`, `.text-[9px]`, `.min-h-[80px]`, `.min-h-[120px]`, `.gap-px`, `.rounded-sm`, `.text-muted-foreground/30`, `.text-muted-foreground/50`.
+
+### Changed
+
+- **Workflow URL resolution**: both deploy workflows now query GitHub API for cross-repo Pages URLs and write a dynamic `/tmp/hugo-dynamic.toml` config. Hardcoded URLs in `hugo.toml` replaced with localhost dev defaults.
+- **Go version**: CI workflows updated from Go 1.23 to 1.26 to match `go.mod` requirements.
+- **Action versions**: synced across blog and home deploy/release workflows (`cache@v5`, `setup-go@v6`, `deploy-pages@v5`, `upload-pages-artifact@v5`, etc.).
+
+### Removed
+
+- **Calendar stub file generation** — the CI `Generate calendar pages` step and local `scripts/generate-calendar-pages.sh` are no longer needed; the content adapter handles everything.
+- **Week view** — removed from calendar template; the month grid with day links and post list covers the same use case with less complexity.
+
 ## [0.3.0] - 2026-06-20
 
 ### Added
