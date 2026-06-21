@@ -8,16 +8,15 @@
 {{ $calendar := dict }}
 {{ range $posts }}
   {{ $year := .Date.Format "2006" }}
-  {{ $monthName := .Date.Format "January" }}
-  {{ $day := .Date.Format "02" }}
-  {{ $dayInt := int $day }}
+    {{ $monthName := .Date.Format "January" }}
+    {{ $dayKey := .Date.Format "02" }}
 
-  {{ $yearMap := index $calendar $year | default dict }}
-  {{ $monthMap := index $yearMap $monthName | default dict }}
-  {{ $dayPosts := index $monthMap $dayInt | default slice }}
-  {{ $dayPosts = $dayPosts | append . }}
-  {{ $monthMap = merge $monthMap (dict $dayInt $dayPosts) }}
-  {{ $yearMap = merge $yearMap (dict $monthName $monthMap) }}
+    {{ $yearMap := index $calendar $year | default dict }}
+    {{ $monthMap := index $yearMap $monthName | default dict }}
+    {{ $dayPosts := index $monthMap $dayKey | default slice }}
+    {{ $dayPosts = $dayPosts | append . }}
+    {{ $monthMap = merge $monthMap (dict $dayKey $dayPosts) }}
+    {{ $yearMap = merge $yearMap (dict $monthName $monthMap) }}
   {{ $calendar = merge $calendar (dict $year $yearMap) }}
 {{ end }}
 
@@ -86,8 +85,8 @@
               {{ end }}
               {{/* Day cells */}}
               {{ range seq 1 $dim }}
-                {{ $d := . }}
-                {{ $dayPosts := index $monthMap $d | default slice }}
+                              {{ $d := printf "%02d" . }}
+                              {{ $dayPosts := index $monthMap $d | default slice }}
                 {{ $hasPosts := gt (len $dayPosts) 0 }}
                 <span class="text-[9px] py-0.5 rounded-sm {{ if $hasPosts }}bg-accent text-accent-foreground font-bold{{ else }}text-muted-foreground{{ end }}"
                   {{ if $hasPosts }}title="{{ len $dayPosts }} post{{ if ne (len $dayPosts) 1 }}s{{ end }}"{{ end }}>
