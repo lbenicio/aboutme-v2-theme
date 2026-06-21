@@ -1,24 +1,26 @@
-{{/* calendar layout — posts organized by year → month → day */}}
+{{/* calendar layout — traditional month-by-month calendar grid */}}
 {{ define "main" }}
 {{ $posts := where .Site.RegularPages "Section" "post" }}
 {{ $posts = where $posts "Kind" "page" }}
 {{ $posts = where $posts "Draft" "ne" true }}
 
-{{/* Build year → month → posts map using Hugo's dict */}}
+{{/* Group posts by year → month → day */}}
 {{ $calendar := dict }}
 {{ range $posts }}
   {{ $year := .Date.Format "2006" }}
-  {{ $monthKey := .Date.Format "2006-01" }}
   {{ $monthName := .Date.Format "January" }}
+  {{ $day := .Date.Format "02" }}
+  {{ $dayInt := int $day }}
 
   {{ $yearMap := index $calendar $year | default dict }}
-  {{ $monthMap := index $yearMap $monthName | default slice }}
-  {{ $monthMap = $monthMap | append . }}
+  {{ $monthMap := index $yearMap $monthName | default dict }}
+  {{ $dayPosts := index $monthMap $dayInt | default slice }}
+  {{ $dayPosts = $dayPosts | append . }}
+  {{ $monthMap = merge $monthMap (dict $dayInt $dayPosts) }}
   {{ $yearMap = merge $yearMap (dict $monthName $monthMap) }}
   {{ $calendar = merge $calendar (dict $year $yearMap) }}
 {{ end }}
 
-{{/* Sort years descending */}}
 {{ $yearKeys := slice }}
 {{ range $year, $_ := $calendar }}
   {{ $yearKeys = $yearKeys | append $year }}
@@ -26,10 +28,11 @@
 {{ $yearKeys = sort $yearKeys "value" "desc" }}
 
 {{ $monthOrder := slice "January" "February" "March" "April" "May" "June" "July" "August" "September" "October" "November" "December" }}
+{{ $dayNames := slice "M" "T" "W" "T" "F" "S" "S" }}
 
 <section class="py-6">
   <h1 class="text-4xl md:text-5xl font-bold tracking-tighter mb-1">Calendar</h1>
-  <p class="text-muted-foreground mt-1 mb-4">Posts organized by date.</p>
+  <p class="text-muted-foreground mt-1 mb-4">Posts organized by date. Highlighted days have posts.</p>
 
   {{ partial "blog-subnav.html" . }}
 
@@ -37,37 +40,62 @@
     {{ $year := . }}
     {{ $yearMap := index $calendar $year }}
 
-    {{/* Count total posts for the year */}}
     {{ $yearTotal := 0 }}
-    {{ range $month, $monthPosts := $yearMap }}
-      {{ $yearTotal = add $yearTotal (len $monthPosts) }}
+    {{ range $month, $days := $yearMap }}
+      {{ range $day, $pd := $days }}
+        {{ $yearTotal = add $yearTotal (len $pd) }}
+      {{ end }}
     {{ end }}
 
-    <details class="mb-6" {{ if eq (len $yearKeys) 1 }}open{{ end }}>
+    <details class="mb-8" {{ if eq (len $yearKeys) 1 }}open{{ end }}>
       <summary class="text-2xl font-bold cursor-pointer hover:text-primary transition-colors py-2 marker:text-muted-foreground">
         {{ $year }}
         <span class="text-base font-normal text-muted-foreground ml-2">({{ $yearTotal }} posts)</span>
       </summary>
 
-      <div class="mt-4 space-y-6 ml-2">
-        {{/* Iterate months in order */}}
+      <div class="mt-4 grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6">
         {{ range $monthOrder }}
           {{ $monthName := . }}
-          {{ $monthPosts := index $yearMap $monthName | default slice }}
+          {{ $monthMap := index $yearMap $monthName | default dict }}
 
-          {{ if gt (len $monthPosts) 0 }}
-            <div>
-              <h3 class="text-lg font-semibold mb-3">{{ $monthName }} <span class="text-sm font-normal text-muted-foreground">({{ len $monthPosts }})</span></h3>
-              <ul class="space-y-1.5">
-                {{ range sort $monthPosts "Date" "desc" }}
-                  <li class="flex items-baseline gap-3">
-                    <time datetime="{{ .Date.Format "2006-01-02" }}" class="text-xs text-muted-foreground whitespace-nowrap tabular-nums w-10">{{ .Date.Format "02" }}</time>
-                    <a href="{{ .RelPermalink }}" class="text-sm hover:text-primary transition-colors truncate">{{ .Title }}</a>
-                  </li>
+          {{ $monthTotal := 0 }}
+          {{ range $day, $pd := $monthMap }}{{ $monthTotal = add $monthTotal (len $pd) }}{{ end }}
+
+          <div class="rounded-lg border p-2 {{ if gt $monthTotal 0 }}bg-card{{ else }}opacity-40{{ end }}">
+            <h3 class="font-semibold text-xs mb-1.5 text-center {{ if gt $monthTotal 0 }}text-foreground{{ else }}text-muted-foreground{{ end }}">
+              {{ substr $monthName 0 3 }}
+              {{ if gt $monthTotal 0 }}
+                <span class="font-normal text-muted-foreground ml-1">{{ $monthTotal }}</span>
+              {{ end }}
+            </h3>
+            <div class="grid grid-cols-7 gap-px text-center">
+              {{ range $dayNames }}
+                <span class="text-[9px] text-muted-foreground/60 font-medium py-0.5">{{ . }}</span>
+              {{ end }}
+              {{/* Determine days in month */}}
+              {{ $mIdx := 1 }}
+              {{ range $i, $mn := $monthOrder }}{{ if eq $mn $monthName }}{{ $mIdx = add $i 1 }}{{ end }}{{ end }}
+              {{ $dim := 31 }}
+              {{ if or (eq $mIdx 4) (eq $mIdx 6) (eq $mIdx 9) (eq $mIdx 11) }}{{ $dim = 30 }}{{ end }}
+              {{ if eq $mIdx 2 }}
+                {{ $dim = 28 }}
+                {{ $yi := int $year }}
+                {{ if or (and (eq (mod $yi 4) 0) (ne (mod $yi 100) 0)) (eq (mod $yi 400) 0) }}
+                  {{ $dim = 29 }}
                 {{ end }}
-              </ul>
+              {{ end }}
+              {{/* Day cells */}}
+              {{ range seq 1 $dim }}
+                {{ $d := . }}
+                {{ $dayPosts := index $monthMap $d | default slice }}
+                {{ $hasPosts := gt (len $dayPosts) 0 }}
+                <span class="text-[9px] py-0.5 rounded-sm {{ if $hasPosts }}bg-accent text-accent-foreground font-bold{{ else }}text-muted-foreground{{ end }}"
+                  {{ if $hasPosts }}title="{{ len $dayPosts }} post{{ if ne (len $dayPosts) 1 }}s{{ end }}"{{ end }}>
+                  {{ $d }}
+                </span>
+              {{ end }}
             </div>
-          {{ end }}
+          </div>
         {{ end }}
       </div>
     </details>

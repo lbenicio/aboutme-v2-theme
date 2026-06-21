@@ -1,0 +1,37 @@
+{{/* Term page (posts filtered by tag/category) — multi-column grid */}}
+{{ define "main" }}
+{{ $prefix := cond (eq .Data.Plural "tags") "#" "" }}
+<section class="py-6">
+  <h1 class="text-4xl md:text-5xl font-bold tracking-tighter mb-1">{{ $prefix }}{{ .Title }}</h1>
+  <p class="text-muted-foreground mt-1 mb-4">{{ len .Pages }} post{{ if ne (len .Pages) 1 }}s{{ end }} in {{ lower .Data.Singular }} &ldquo;{{ .Title }}&rdquo;.</p>
+
+  {{ partial "blog-subnav.html" . }}
+
+  {{ $p := .Paginate .Pages 24 }}
+  {{ if eq (len $p.Pages) 0 }}
+    <p class="text-sm text-muted-foreground">No posts yet.</p>
+  {{ else }}
+    <ul class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      {{ range $p.Pages }}
+        {{ $cover := .Params.cover }}
+        <li class="border rounded-lg overflow-hidden flex flex-col transition-colors">
+          {{ $permalink := .RelPermalink }}
+          {{ with $cover }}
+            <a href="{{ $permalink }}" class="block aspect-video bg-muted">
+              <img src="{{ . | relURL }}" alt="" class="w-full h-full object-cover" loading="lazy" />
+            </a>
+          {{ end }}
+          <div class="p-4 flex flex-col gap-2 grow">
+            <h2 class="font-semibold text-lg leading-tight">
+              <a href="{{ .RelPermalink }}" class="underline underline-offset-4 hover:bg-muted">{{ .Title }}</a>
+            </h2>
+            <div class="text-xs text-muted-foreground">{{ .Date | time.Format "2006-01-02" }}</div>
+            {{ with .Params.description }}<p class="text-sm text-muted-foreground line-clamp-3">{{ . }}</p>{{ end }}
+          </div>
+        </li>
+      {{ end }}
+    </ul>
+    {{ partial "pagination.html" . }}
+  {{ end }}
+</section>
+{{ end }}
