@@ -192,7 +192,7 @@
       </div>
       <div {{ partial "obfuscate/cls" "grid grid-cols-7" | safeHTMLAttr }}>
         {{/* Empty cells before 1st */}}
-        {{ range seq 0 (sub $firstDow 1) }}<div {{ partial "obfuscate/cls" "border-b border-r min-h-[80px] p-1 bg-muted/30" | safeHTMLAttr }}></div>{{ end }}
+        {{ if gt $firstDow 0 }}{{ range seq 1 $firstDow }}<div {{ partial "obfuscate/cls" "border-b border-r min-h-[80px] p-1 bg-muted/30" | safeHTMLAttr }}></div>{{ end }}{{ end }}
         {{/* Day cells */}}
         {{ range seq 1 $dim }}
           {{ $dk := printf "%02d" . }}
@@ -218,6 +218,10 @@
             {{ end }}
           </div>
         {{ end }}
+        {{/* Trailing empty cells to fill the last row */}}
+        {{ $trailing := sub 7 (mod (add $firstDow $dim) 7) }}
+        {{ if eq $trailing 7 }}{{ $trailing = 0 }}{{ end }}
+        {{ range seq 1 $trailing }}<div {{ partial "obfuscate/cls" "border-b border-r min-h-[80px] p-1 bg-muted/30" | safeHTMLAttr }}></div>{{ end }}
       </div>
     </div>
   {{ end }}
