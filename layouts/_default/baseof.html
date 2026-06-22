@@ -48,10 +48,7 @@
                 } catch (err) {}
             })();
         </script>
-        {{/* Class name mapping for JS (search, theme toggle) */}}
-        <script>
-          window.__cls = {{ $cls | jsonify | safeJS }};
-        </script>
+        {{ partial "obfuscate/js-map.html" $cls }}
         <a href="#content" {{ partial "obfuscate/cls" "sr-only focus:not-sr-only fixed top-2 left-2 z-50 rounded-md border bg-background px-3 py-2 text-sm shadow" | safeHTMLAttr }}>Skip to content</a>
         {{ partial "header.html" . }} {{ partial "fork-me.html" . }}
         <main id="content" {{ partial "obfuscate/cls" "w-full px-4 md:px-6 flex-1" | safeHTMLAttr }} role="main" aria-label="Content">{{ partial "breadcrumbs.html" . }} {{ block "main" . }}{{ end }}</main>

@@ -1,0 +1,4 @@
+{{/* Injects class mapping for obfuscated JS lookups */}}
+<script>
+  window.__cls = {{ . | jsonify | safeJS }};
+</script>
