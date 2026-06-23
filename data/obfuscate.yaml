@@ -54,15 +54,27 @@ protected:
   - btn-ghost
   - form-input
   - form-textarea
+  # JS-manipulated via classList/className (must match CSS selectors)
+  - dark
+  - hidden
+  - overflow-hidden
+  - flex
+  - flex-col
+  - flex-wrap
+  - gap-2
+  - gap-4
+  - text-xs
+  - pt-6
+  - sm\:flex-row
+  - items-center
+  - justify-between
 
 classes:
   - block
   - inline-block
   - inline
-  - flex
   - inline-flex
   - grid
-  - hidden
   - invisible
   - visible
   - relative
@@ -70,10 +82,8 @@ classes:
   - fixed
   - sticky
   - flex-row
-  - flex-col
   - flex-row-reverse
   - flex-col-reverse
-  - flex-wrap
   - flex-nowrap
   - flex-1
   - flex-auto
@@ -81,14 +91,12 @@ classes:
   - grow
   - shrink-0
   - items-start
-  - items-center
   - items-end
   - items-stretch
   - items-baseline
   - justify-start
   - justify-center
   - justify-end
-  - justify-between
   - justify-self-start
   - justify-self-center
   - justify-self-end
@@ -152,6 +160,7 @@ classes:
   - min-h-screen
   - min-h-\[80px\]
   - min-h-\[120px\]
+  - min-h-\[160px\]
   - min-h-\[calc(100vh-10rem)\]
   - min-w-0
   - max-w-none
@@ -177,7 +186,6 @@ classes:
   - text-\[8px\]
   - text-\[9px\]
   - text-\[10px\]
-  - text-xs
   - text-sm
   - text-base
   - text-lg
@@ -315,7 +323,6 @@ classes:
   - opacity-70
   - backdrop-blur
   - backdrop-blur-sm
-  - overflow-hidden
   - overflow-auto
   - overflow-x-auto
   - overflow-x-hidden
@@ -370,7 +377,6 @@ classes:
   - from-primary\/60
   - via-primary\/20
   - to-transparent
-  - dark
   - dark\:prose-invert
   - dark\:bg-muted\/40
   - dark\:text-foreground
@@ -380,7 +386,6 @@ classes:
   - prose-xl
   - not-prose
   - sm\:flex
-  - sm\:flex-row
   - sm\:flex-1
   - sm\:inline-flex
   - sm\:hidden
