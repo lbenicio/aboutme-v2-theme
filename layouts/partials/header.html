@@ -166,9 +166,15 @@
      Everything else (FULL, ABOUT_ONLY, BLOG_ONLY, PUBLICATIONS_ONLY):
        Always the same 7 items; only hrefs/external flags change. */}}
 {{/* --- Determine which content groups are served locally --- */}}
-{{ $aboutLocal := or (eq $siteMode "FULL") (eq $siteMode "ABOUT_ONLY") }}
+{{/* Safety net: check if sections actually have local content; if they do,
+     always treat them as local regardless of appMode. */}}
+{{ $hasPubsSection := false }}
+{{ with .Site.GetPage "publications" }}{{ $hasPubsSection = true }}{{ end }}
+{{ $hasContactSection := false }}
+{{ with .Site.GetPage "contact" }}{{ $hasContactSection = true }}{{ end }}
+{{ $aboutLocal := or (eq $siteMode "FULL") (eq $siteMode "ABOUT_ONLY") $hasContactSection }}
 {{ $blogLocal  := or (eq $siteMode "FULL") (eq $siteMode "BLOG_ONLY") }}
-{{ $pubsLocal  := or (eq $siteMode "FULL") (eq $siteMode "PUBLICATIONS_ONLY") (eq $siteMode "ABOUT_ONLY") }}
+{{ $pubsLocal  := or (eq $siteMode "FULL") (eq $siteMode "PUBLICATIONS_ONLY") (eq $siteMode "ABOUT_ONLY") $hasPubsSection }}
 
 {{/* Resolve external base URLs (empty string → fall back to internal) */}}
 {{ $aboutBase := "" }}
