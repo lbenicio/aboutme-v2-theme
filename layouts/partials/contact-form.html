@@ -10,7 +10,7 @@ submission authToken – Bearer token for the submission endpoint email – Repl
         <div>
             <h2 {{ partial "obfuscate/cls" "text-2xl font-semibold tracking-tight" | safeHTMLAttr }}>Send a Message</h2>
             <p {{ partial "obfuscate/cls" "text-sm text-muted-foreground" | safeHTMLAttr }}>Fill out the form and I will reply as soon as possible. Encrypted messages supported via OpenPGP.</p>
-            <form data-contact-form {{ partial "obfuscate/cls" "space-y-4 mt-4 w-full" | safeHTMLAttr }} method="post" action="#" onsubmit="return submitContact(event);">
+            <form data-contact-form {{ partial "obfuscate/cls" "space-y-4 mt-4 w-full" | safeHTMLAttr }} method="post" action="#">
                 <!-- Honeypot field (hidden off-screen) -->
                 <div style="position: absolute; left: -9999px; top: auto; width: 1px; height: 1px; overflow: hidden" aria-hidden="true">
                     <label for="hp">Leave this field empty</label>
@@ -133,7 +133,7 @@ submission authToken – Bearer token for the submission endpoint email – Repl
                         }catch(err){ console.warn('Encryption failed', err); }
                       }
 
-                      const data = { from: { email: email, name: (firstName + ' ' + lastName).trim() }, subject: subject, text: encrypt ? (bodyToSend.text || '') : text };
+                      const data = { name: (firstName + ' ' + lastName).trim(), email: email, subject: subject, text: encrypt ? (bodyToSend.text || '') : text };
                       const headers = { 'Content-Type': 'application/json' };
                       if (contactAuthToken && String(contactAuthToken).length) headers['Authorization'] = String(contactAuthToken);
                       const res = await fetch(contactPostUrl, { method: 'POST', headers, body: JSON.stringify(data) });
