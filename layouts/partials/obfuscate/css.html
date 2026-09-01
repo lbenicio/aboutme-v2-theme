@@ -1,5 +1,5 @@
 {{/* obfuscate/css.html — applies class-name obfuscation to a compiled CSS string.
-     Handles CSS-escaped selectors (\[ \] \: \/) by trying both escaped and unescaped forms. */}}
+     Handles CSS-escaped selectors (\[ \] \: \/ \. \\( \\)) by trying both escaped and unescaped forms. */}}
 {{ $css := .css }}
 {{ $map := .map }}
 
@@ -16,7 +16,7 @@
   {{ $obf := index $map $orig }}
   {{/* Build both unescaped and CSS-escaped selector forms */}}
   {{ $selector := printf ".%s" $orig }}
-  {{ $escaped := printf ".%s" (replace (replace (replace (replace (replace (replace $orig "[" "\\[" ) "]" "\\]" ) ":" "\\:" ) "/" "\\/" ) "(" "\\(" ) ")" "\\)" ) }}
+  {{ $escaped := printf ".%s" (replace (replace (replace (replace (replace (replace (replace $orig "[" "\\[" ) "]" "\\]" ) ":" "\\:" ) "/" "\\/" ) "(" "\\(" ) ")" "\\)" ) "." "\\." ) }}
   {{/* Replace both forms */}}
   {{ $css = replace $css $selector (printf ".%s" $obf) }}
   {{ if ne $selector $escaped }}
