@@ -122,15 +122,26 @@ submission authToken – Bearer token for the submission endpoint email – Repl
                       if (encrypt){
                         {{ $pgpShim := resources.Get "assets/js/openpgp-shim.mjs" }}
                         {{ with $pgpShim }}
-                        try{ await import('{{ .RelPermalink }}'); }catch{ console.warn('Failed to load OpenPGP'); }
-                        {{ end }}
                         try{
-                          {{/* PGP key URL from front matter */}}
+                          const pgpShim = await import('{{ .RelPermalink }}');
+                          const openpgp = await pgpShim.ensureOpenPGP();
+                          if (!openpgp) throw new Error('OpenPGP library unavailable');
                           const pgpKeyUrl = '{{ $pgpKeyUrl }}';
-                          if (pgpKeyUrl) {
-                            const keyRes = await fetch(pgpKeyUrl, { cache: 'force-cache' }); if(!keyRes.ok) throw new Error('key load failed'); const publicArmored = await keyRes.text(); const pubKey = await openpgp.readKey({ armoredKey: publicArmored }); const clear = 'Name: ' + firstName + ' ' + lastName + '\nEmail: ' + email + '\n\nMessage:\n' + text; const encrypted = await openpgp.encrypt({ message: await openpgp.createMessage({ text: clear }), encryptionKeys: pubKey }); bodyToSend = { hp, first_name: firstName, last_name: lastName, email, text: encrypted, encrypted: true };
-                          }
-                        }catch(err){ console.warn('Encryption failed', err); }
+                          if (!pgpKeyUrl) throw new Error('PGP public key unavailable');
+                          const keyRes = await fetch(pgpKeyUrl, { cache: 'force-cache' });
+                          if (!keyRes.ok) throw new Error('key load failed');
+                          const publicArmored = await keyRes.text();
+                          const pubKey = await openpgp.readKey({ armoredKey: publicArmored });
+                          const clear = 'Name: ' + firstName + ' ' + lastName + '\nEmail: ' + email + '\n\nMessage:\n' + text;
+                          const encrypted = await openpgp.encrypt({ format: 'armored', message: await openpgp.createMessage({ text: clear }), encryptionKeys: pubKey });
+                          bodyToSend = { hp, first_name: firstName, last_name: lastName, email, text: encrypted, encrypted: true };
+                        }catch(err){
+                          console.warn('Encryption failed', err);
+                          setLoading(false);
+                          showToast('PGP encryption failed; message was not sent.', true);
+                          return false;
+                        }
+                        {{ end }}
                       }
 
                       const data = { name: (firstName + ' ' + lastName).trim(), email: email, subject: subject, text: encrypt ? (bodyToSend.text || '') : text };

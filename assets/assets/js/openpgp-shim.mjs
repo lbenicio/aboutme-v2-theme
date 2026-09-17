@@ -15,7 +15,9 @@ export async function ensureOpenPGP() {
     try {
       const mod = await import(localPath);
       if (mod && (mod.openpgp || globalThis.openpgp)) {
-        return mod.openpgp || globalThis.openpgp;
+        const openpgp = mod.openpgp || globalThis.openpgp;
+        globalThis.openpgp = openpgp;
+        return openpgp;
       }
     } catch {
       // ignore local import failures and fall back to CDN
@@ -45,7 +47,11 @@ export async function ensureOpenPGP() {
     // Last resort: dynamic import from unpkg CDN (ES module)
     try {
       const mod = await import("https://unpkg.com/openpgp@5.8.0/dist/openpgp.min.mjs");
-      if (mod && (mod.openpgp || mod.default)) return mod.openpgp || mod.default || globalThis.openpgp;
+      if (mod && (mod.openpgp || mod.default)) {
+        const openpgp = mod.openpgp || mod.default || globalThis.openpgp;
+        globalThis.openpgp = openpgp;
+        return openpgp;
+      }
     } catch {
       throw new Error("Unable to load OpenPGP library");
     }
