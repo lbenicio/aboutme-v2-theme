@@ -2,14 +2,14 @@
 submission authToken – Bearer token for the submission endpoint email – Reply-to / fallback mailto address name – Contact name (falls back to .Site.Params.author) pgpKey – Path to a PGP public key file in static/
 (optional; if empty, PGP is disabled) The PGP armored block is loaded from the file referenced by pgpKey. If pgpKey is empty, the PGP column shows an "unavailable" message. */}} {{ $postUrl := .Params.postUrl | default
 "" }} {{ $authToken := .Params.authToken | default "" }} {{ $email := .Params.email | default .Site.Params.contactEmail | default "" }} {{ $name := .Params.name | default .Site.Params.contactName | default
-.Site.Params.author | default "" }} {{ $pgpKey := .Params.pgpKey | default .Site.Params.pgpPublicKey | default "" }} {{ $pgpKeyUrl := "" }} {{ if $pgpKey }} {{ $pgpKeyUrl = $pgpKey | relURL }} {{ end }}
+.Site.Params.author | default "" }} {{ $pgpKey := .Params.pgpKey | default .Site.Params.pgpPublicKey | default "" }} {{ $pgpKeyUrl := "" }} {{ if $pgpKey }} {{ $pgpKeyUrl = $pgpKey | relURL }} {{ end }} {{ $pgpShim := resources.Get "assets/js/openpgp-shim.mjs" }} {{ $pgpShimUrl := "" }} {{ if $pgpShim }} {{ $pgpShimUrl = $pgpShim.RelPermalink }} {{ end }}
 
 <section {{ partial "obfuscate/cls" "w-full px-4 pr-4" | safeHTMLAttr }}>
     <h2 {{ partial "obfuscate/cls" "sr-only" | safeHTMLAttr }}>Contact and PGP</h2>
     <div {{ partial "obfuscate/cls" "grid grid-cols-1 md:grid-cols-2 gap-6 w-full" | safeHTMLAttr }} style="width: 80vw">
         <div>
             <h2 {{ partial "obfuscate/cls" "text-2xl font-semibold tracking-tight" | safeHTMLAttr }}>Send a Message</h2>
-            <p {{ partial "obfuscate/cls" "text-sm text-muted-foreground" | safeHTMLAttr }}>Fill out the form and I will reply as soon as possible. Encrypted messages supported via OpenPGP.</p>
+            <p {{ partial "obfuscate/cls" "text-sm text-muted-foreground" | safeHTMLAttr }}>Fill out the form and I will reply as soon as possible. When enabled, your name, email, subject, and message are encrypted with OpenPGP.</p>
             <form data-contact-form {{ partial "obfuscate/cls" "space-y-4 mt-4 w-full" | safeHTMLAttr }} method="post" action="#">
                 <!-- Honeypot field (hidden off-screen) -->
                 <div style="position: absolute; left: -9999px; top: auto; width: 1px; height: 1px; overflow: hidden" aria-hidden="true">
@@ -97,6 +97,22 @@ submission authToken – Bearer token for the submission endpoint email – Repl
                     const close = document.createElement('button'); close.type='button'; close.className='ml-2 px-2'; close.innerText='x'; close.addEventListener('click', ()=> t.classList.add('hidden')); t.appendChild(close); if(!withRetry) setTimeout(()=> t.classList.add('hidden'), 4000);
                   }
 
+                  async function encryptContactMessage(firstName, lastName, email, subject, text){
+                    const pgpShimUrl = '{{ $pgpShimUrl }}';
+                    const pgpKeyUrl = '{{ $pgpKeyUrl }}';
+                    if (!pgpShimUrl) throw new Error('OpenPGP loader unavailable');
+                    if (!pgpKeyUrl) throw new Error('PGP public key unavailable');
+                    const pgpShim = await import(pgpShimUrl);
+                    const openpgp = await pgpShim.ensureOpenPGP();
+                    if (!openpgp) throw new Error('OpenPGP library unavailable');
+                    const keyRes = await fetch(pgpKeyUrl, { cache: 'force-cache' });
+                    if (!keyRes.ok) throw new Error('key load failed');
+                    const publicArmored = await keyRes.text();
+                    const pubKey = await openpgp.readKey({ armoredKey: publicArmored });
+                    const clear = 'Name: ' + firstName + ' ' + lastName + '\nEmail: ' + email + '\nSubject: ' + subject + '\n\nMessage:\n' + text;
+                    return await openpgp.encrypt({ format: 'armored', message: await openpgp.createMessage({ text: clear }), encryptionKeys: pubKey });
+                  }
+
                   async function submitContact(e, retrying=false){ if(e && e.preventDefault) e.preventDefault();
                     const hp = getVal('[data-hp]');
                     const firstName = getVal('[data-first-name]');
@@ -109,9 +125,20 @@ submission authToken – Bearer token for the submission endpoint email – Repl
                     try{ localStorage.setItem('contact:lastPayload', JSON.stringify({ hp, first_name:firstName, last_name:lastName, email, subject, text, encrypt })); }catch(e){}
 
                     if (!contactPostUrl){
-                      const body = 'Name: ' + firstName + ' ' + lastName + '\nEmail: ' + email + '\n\nMessage:\n' + text;
-                      if (encrypt) { try { await navigator.clipboard.writeText(body); } catch(e){} showToast('PGP: message copied to clipboard.'); }
-                      const mailto = 'mailto:' + encodeURIComponent(contactConfig.email) + '?subject=' + encodeURIComponent('Contact from ' + (firstName||'')) + '&body=' + encodeURIComponent(body);
+                      let body = 'Name: ' + firstName + ' ' + lastName + '\nEmail: ' + email + '\nSubject: ' + subject + '\n\nMessage:\n' + text;
+                      if (encrypt) {
+                        try {
+                          body = await encryptContactMessage(firstName, lastName, email, subject, text);
+                          try { await navigator.clipboard.writeText(body); } catch(e){}
+                          showToast('PGP: encrypted message copied to clipboard.');
+                        } catch(err) {
+                          console.warn('Encryption failed', err);
+                          showToast('PGP encryption failed; message was not sent.', true);
+                          return false;
+                        }
+                      }
+                      const mailtoSubject = encrypt ? 'Encrypted contact submission' : 'Contact from ' + (firstName||'');
+                      const mailto = 'mailto:' + encodeURIComponent(contactConfig.email) + '?subject=' + encodeURIComponent(mailtoSubject) + '&body=' + encodeURIComponent(body);
                       try{ localStorage.removeItem('contact:unsent'); }catch(e){}
                       window.location.href = mailto; return false;
                     }
@@ -120,31 +147,20 @@ submission authToken – Bearer token for the submission endpoint email – Repl
                     try{
                       let bodyToSend = { hp, first_name: firstName, last_name: lastName, email, text, encrypt };
                       if (encrypt){
-                        {{ $pgpShim := resources.Get "assets/js/openpgp-shim.mjs" }}
-                        {{ with $pgpShim }}
                         try{
-                          const pgpShim = await import('{{ .RelPermalink }}');
-                          const openpgp = await pgpShim.ensureOpenPGP();
-                          if (!openpgp) throw new Error('OpenPGP library unavailable');
-                          const pgpKeyUrl = '{{ $pgpKeyUrl }}';
-                          if (!pgpKeyUrl) throw new Error('PGP public key unavailable');
-                          const keyRes = await fetch(pgpKeyUrl, { cache: 'force-cache' });
-                          if (!keyRes.ok) throw new Error('key load failed');
-                          const publicArmored = await keyRes.text();
-                          const pubKey = await openpgp.readKey({ armoredKey: publicArmored });
-                          const clear = 'Name: ' + firstName + ' ' + lastName + '\nEmail: ' + email + '\n\nMessage:\n' + text;
-                          const encrypted = await openpgp.encrypt({ format: 'armored', message: await openpgp.createMessage({ text: clear }), encryptionKeys: pubKey });
-                          bodyToSend = { hp, first_name: firstName, last_name: lastName, email, text: encrypted, encrypted: true };
+                          bodyToSend.text = await encryptContactMessage(firstName, lastName, email, subject, text);
+                          bodyToSend.encrypted = true;
                         }catch(err){
                           console.warn('Encryption failed', err);
                           setLoading(false);
                           showToast('PGP encryption failed; message was not sent.', true);
                           return false;
                         }
-                        {{ end }}
                       }
 
-                      const data = { name: (firstName + ' ' + lastName).trim(), email: email, subject: subject, text: encrypt ? (bodyToSend.text || '') : text };
+                      const data = encrypt
+                        ? { name: 'Encrypted submission', email: contactConfig.email || '', subject: 'Encrypted contact submission', text: bodyToSend.text }
+                        : { name: (firstName + ' ' + lastName).trim(), email: email, subject: subject, text: text };
                       const headers = { 'Content-Type': 'application/json' };
                       if (contactAuthToken && String(contactAuthToken).length) headers['Authorization'] = String(contactAuthToken);
                       const res = await fetch(contactPostUrl, { method: 'POST', headers, body: JSON.stringify(data) });
