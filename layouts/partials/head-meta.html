@@ -2,8 +2,9 @@
 {{ $siteUrl := .Site.Params.siteUrl }}
 {{ $basePath := trim .Site.Params.basePath "/" }}
 {{ $appMode := upper .Site.Params.appMode }}
-{{ $isDev := or (eq (getenv "HUGO_ENV") "development") (eq (getenv "HUGO_ENVIRONMENT") "development") }}
-{{ $isProd := or (eq (getenv "HUGO_ENV") "production") (eq (getenv "HUGO_ENVIRONMENT") "production") }}
+{{ $environment := hugo.Environment }}
+{{ $isDev := or (eq $environment "development") (eq (getenv "HUGO_ENV") "development") (eq (getenv "HUGO_ENVIRONMENT") "development") }}
+{{ $isProd := or (eq $environment "production") (eq (getenv "HUGO_ENV") "production") (eq (getenv "HUGO_ENVIRONMENT") "production") }}
 
 {{ if $siteUrl }}
 	<link rel="canonical" href="{{ $siteUrl }}{{ .RelPermalink }}" />
