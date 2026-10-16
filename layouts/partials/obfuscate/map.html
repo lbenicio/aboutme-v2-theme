@@ -3,6 +3,7 @@
 {{ $seed := site.Params.obfuscateSeed | default (site.Title | sha256) }}
 {{ $data := hugo.Data.obfuscate }}
 {{ $map := dict }}
+{{ $isProduction := eq hugo.Environment "production" }}
 
 {{/* Protected classes: keep original name */}}
 {{ range $data.protected }}
@@ -12,9 +13,13 @@
 {{/* Obfuscated classes: deterministic short alias from sha256 */}}
 {{ range $data.classes }}
   {{ $clean := replace . "\\" "" }}
-  {{ $hash := sha256 (printf "%s:%s" $seed $clean) }}
-  {{ $short := substr $hash 0 6 }}
-  {{ $map = merge $map (dict $clean $short) }}
+  {{ if $isProduction }}
+    {{ $hash := sha256 (printf "%s:%s" $seed $clean) }}
+    {{ $short := printf "c%s" (substr $hash 0 6) }}
+    {{ $map = merge $map (dict $clean $short) }}
+  {{ else }}
+    {{ $map = merge $map (dict $clean $clean) }}
+  {{ end }}
 {{ end }}
 
 {{ return $map }}

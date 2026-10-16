@@ -14,7 +14,7 @@
 {{ with .Params.description }}{{ $desc = . }}{{ end }}
 {{ with $desc }}<meta name="description" content="{{ . }}" />{{ end }}
 {{/* Add noindex on paginated list pages (page > 1) to avoid duplicate content issues */}}
-{{ if .IsNode }}
+{{ if .IsBranch }}
 	{{ with .Paginator }}
 		{{ if gt .PageNumber 1 }}<meta name="robots" content="noindex,follow" />{{ end }}
 	{{ end }}
