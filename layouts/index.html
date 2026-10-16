@@ -107,7 +107,7 @@
     </div>
   {{ else }}
     {{/* Fallback to about if singleContent not found */}}
-    <div {{ partial "obfuscate/cls" "flex flex-col items-center justify-center min-h-[calc(100vh-10rem)] text-center space-y-12" | safeHTMLAttr }}>
+    <div {{ partial "obfuscate/cls" "flex flex-col items-center justify-center min-h-[calc(100vh-20rem)] text-center space-y-12" | safeHTMLAttr }}>
       <h1 {{ partial "obfuscate/cls" "text-2xl font-bold" | safeHTMLAttr }}>Welcome</h1>
       <p {{ partial "obfuscate/cls" "text-sm text-muted-foreground" | safeHTMLAttr }}>Content for this single mode is not available.</p>
     </div>
@@ -116,20 +116,20 @@
   {{ with .Site.GetPage "section" "publications" }}
     {{ partial "publications/list-main.html" . }}
   {{ else }}
-    <div {{ partial "obfuscate/cls" "flex flex-col items-center justify-center min-h-[calc(100vh-10rem)] text-center space-y-12" | safeHTMLAttr }}>
+    <div {{ partial "obfuscate/cls" "flex flex-col items-center justify-center min-h-[calc(100vh-20rem)] text-center space-y-12" | safeHTMLAttr }}>
       <h1 {{ partial "obfuscate/cls" "text-2xl font-bold" | safeHTMLAttr }}>Publications Unavailable</h1>
       <p {{ partial "obfuscate/cls" "text-sm text-muted-foreground" | safeHTMLAttr }}>No publications content is available for this build.</p>
     </div>
   {{ end }}
 {{ else if eq $mode "TOOL_BOX" }}
-  <div {{ partial "obfuscate/cls" "flex flex-col items-center justify-center min-h-[calc(100vh-10rem)] px-4" | safeHTMLAttr }}>
+  <div {{ partial "obfuscate/cls" "flex flex-col items-center justify-center min-h-[calc(100vh-20rem)] px-4" | safeHTMLAttr }}>
     <div {{ partial "obfuscate/cls" "w-full max-w-3xl" | safeHTMLAttr }}>
       <input type="search" placeholder="Search…" {{ partial "obfuscate/cls" "w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring focus:ring-ring" | safeHTMLAttr }} aria-label="Search" />
       <p {{ partial "obfuscate/cls" "text-xs text-muted-foreground mt-2" | safeHTMLAttr }}>Client-side global search will appear here in the tools build.</p>
     </div>
   </div>
 {{ else }}
-  <div {{ partial "obfuscate/cls" "flex flex-col items-center justify-center min-h-[calc(100vh-10rem)] md:min-h-screen text-center space-y-12" | safeHTMLAttr }}>
+  <div {{ partial "obfuscate/cls" "flex flex-col items-center justify-center min-h-[calc(100vh-20rem)] md:min-h-screen text-center space-y-12" | safeHTMLAttr }}>
     <section {{ partial "obfuscate/cls" "space-y-4" | safeHTMLAttr }}>
       <div {{ partial "obfuscate/cls" "flex justify-center" | safeHTMLAttr }}>
         <picture>

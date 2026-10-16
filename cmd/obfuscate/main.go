@@ -784,7 +784,7 @@ func replaceCSS(content string, mapping map[string]string) string {
 }
 
 // cssEscape returns the CSS-selector-escaped form of a class name.
-// e.g. "md:flex" -> "md\:flex", "min-h-[calc(100vh-10rem)]" -> "min-h-\[calc\(100vh-10rem\)\]"
+// e.g. "md:flex" -> "md\:flex", "min-h-[calc(100vh-20rem)]" -> "min-h-\[calc\(100vh-10rem\)\]"
 func cssEscape(name string) string {
 	r := strings.NewReplacer(
 		":", "\\:",
