@@ -5,6 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.1] - 2026-10-16
+
+### Added
+
+- **Class-name obfuscation** — deterministic HTML, CSS, and JavaScript obfuscation with protected classes, IDs, and data attributes for production builds.
+- **Calendar refinements** — compact timeline rendering, fixed year ranges, trailing empty cells, and taller day cells.
+
+### Changed
+
+- **Development output** — class names remain readable locally; obfuscation is limited to production builds.
+- **Hero layout** — increased the fallback hero minimum height from 10rem to 20rem.
+- **Header routing** — publications and contact links remain internal when those sections exist locally.
+
+### Fixed
+
+- **Contact encryption** — enforce PGP encryption and encrypt all visitor fields in the submitted payload.
+- **Contact submission** — send a flat form payload and prevent double submissions.
+- **CSS obfuscation** — preserve arbitrary-value selectors containing escaped dots.
+- **Analytics** — load Umami only in production environments.
+
 ## [0.4.0] - 2026-06-21
 
 ### Added
