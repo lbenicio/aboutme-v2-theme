@@ -23,7 +23,7 @@ permissions: write-all
 
 jobs:
   automerge:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - id: automerge
         name: automerge
