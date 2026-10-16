@@ -1,0 +1,9 @@
+{{ define "main" }}
+{{ partial "error-page.html" (dict
+  "page" .
+  "code" "500"
+  "title" "Something went wrong"
+  "description" "The site is temporarily unavailable. Please try again in a moment."
+  "showContact" false
+) }}
+{{ end }}

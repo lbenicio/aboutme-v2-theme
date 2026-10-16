@@ -1,0 +1,12 @@
+{{ $page := .page }}
+<section {{ partial "obfuscate/cls" "flex flex-col items-center justify-center py-16" | safeHTMLAttr }} aria-labelledby="error-title">
+  <h1 id="error-title" {{ partial "obfuscate/cls" "text-5xl md:text-6xl font-extrabold text-accent mb-4" | safeHTMLAttr }}>{{ .code }}</h1>
+  <p {{ partial "obfuscate/cls" "text-lg md:text-xl text-muted-foreground mb-6" | safeHTMLAttr }}>{{ .title }}</p>
+  <div {{ partial "obfuscate/cls" "max-w-xl text-center text-muted-foreground mb-8" | safeHTMLAttr }}>
+    {{ .description }}
+    {{ if .showContact }}<br />
+    If you think this is an error, please <a href="/contact/" {{ partial "obfuscate/cls" "underline" | safeHTMLAttr }}>contact me</a>.
+    {{ end }}
+  </div>
+  <a href="{{ $page.Site.Home.RelPermalink }}" {{ partial "obfuscate/cls" "inline-block px-6 py-2 rounded bg-accent text-white font-semibold shadow hover:bg-accent/80 transition" | safeHTMLAttr }}>Go to Home</a>
+</section>
