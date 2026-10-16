@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.2] - 2026-10-16
+
+### Added
+
+- **Server error page** (`layouts/500.html`) — reusable 500 error presentation for static deployments.
+
+### Changed
+
+- **Error page rendering** — 404 and 500 pages now share the `error-page.html` partial for consistent styling and navigation.
+
 ## [0.4.1] - 2026-10-16
 
 ### Added
