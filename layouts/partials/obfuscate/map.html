@@ -13,7 +13,7 @@
 {{ range $data.classes }}
   {{ $clean := replace . "\\" "" }}
   {{ $hash := sha256 (printf "%s:%s" $seed $clean) }}
-  {{ $short := substr $hash 0 6 }}
+  {{ $short := printf "c%s" (substr $hash 0 6) }}
   {{ $map = merge $map (dict $clean $short) }}
 {{ end }}
 
